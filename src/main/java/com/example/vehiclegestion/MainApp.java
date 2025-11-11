@@ -6,31 +6,26 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class MainApp extends Application {
-
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage stage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/VendeurDashboard.fxml"));
+        Parent root = null;   // Charge le FXML une seule fois
         try {
-            // Charger le layout principal commun
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/example/vehiclegestion/view/auth/Login.fxml"
-            ));
-
-            Parent root = loader.load();
-
-            // Titre et scène principale
-            Scene scene = new Scene(root);
-            primaryStage.setTitle("Système de Gestion des Ventes");
-            primaryStage.setScene(scene);
-            primaryStage.setResizable(true);
-            primaryStage.show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+        Scene scene = new Scene(root); // Utilise root ici
+        stage.setScene(scene);
+        stage.setTitle("Dashboard Vendeur");
+        stage.show();
     }
 
     public static void main(String[] args) {
-        launch(args);
+        launch();
     }
 }
