@@ -1,29 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.vehiclegestion.vendeur.controller.VendeurDashboardController"
-      spacing="20" alignment="CENTER">
+      style="-fx-background-color: #f8f9fa; -fx-padding: 20; -fx-spacing: 15;">
 
-    <padding>
-        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>  <!-- ✅ CORRECT -->
-    </padding>
-
-    <Label text="Tableau de bord du vendeur" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-
-    <GridPane hgap="30" vgap="10">
-        <Label text="Véhicules en vente :" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <Label fx:id="lblVehiclesCount" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-        <Label text="Demandes en attente :" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <Label fx:id="lblPendingRequests" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-        <Label text="Ventes effectuées :" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <Label fx:id="lblSalesCount" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-    </GridPane>
+    <Label text="📊 Tableau de Bord" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <Label text="Bienvenue dans AutoSales Pro" style="-fx-font-size: 16px;"/>
 
 </VBox>

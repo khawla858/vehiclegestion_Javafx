@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.vehiclegestion.vendeur.controller.layout.NavbarController"
+      spacing="20"
+      style="-fx-background-color: #ffffff; -fx-padding: 12 25; -fx-alignment: CENTER_LEFT; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+
+    <!-- LOGO -->
+    <HBox spacing="12" style="-fx-alignment: CENTER_LEFT;">
+        <Label text="AutoSales Pro" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    </HBox>
+
+    <!-- BARRE DE RECHERCHE -->
+    <HBox spacing="10" style="-fx-alignment: CENTER; -fx-background-color: #f8f9fa; -fx-background-radius: 20; -fx-padding: 5 15;">
+        <Label text="🔍" style="-fx-text-fill: #7f8c8d;"/>
+        <TextField fx:id="searchField" promptText="Rechercher..."
+                   style="-fx-background-color: transparent; -fx-border-width: 0; -fx-pref-width: 200;"/>
+    </HBox>
+
+    <!-- ESPACE FLEXIBLE -->
+    <Pane HBox.hgrow="ALWAYS"/>
+
+    <!-- ICÔNES NOTIFICATIONS -->
+    <HBox spacing="15" style="-fx-alignment: CENTER;">
+
+        <!-- NOTIFICATIONS -->
+        <StackPane styleClass="icon-container" onMouseClicked="#showNotifications">
+            <Label text="🔔" style="-fx-font-size: 16px;"/>
+            <Circle radius="5" fill="#e74c3c" style="-fx-translate-x: 8; -fx-translate-y: -8;"/>
+            <Label text="3" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
+        </StackPane>
+
+        <!-- MESSAGES -->
+        <StackPane styleClass="icon-container" onMouseClicked="#showMessages">
+            <Label text="✉️" style="-fx-font-size: 16px;"/>
+            <Circle radius="5" fill="#3498db" style="-fx-translate-x: 8; -fx-translate-y: -8;"/>
+            <Label text="5" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
+        </StackPane>
+
+        <!-- PANIER -->
+        <StackPane styleClass="icon-container" onMouseClicked="#showCart">
+            <Label text="🛒" style="-fx-font-size: 16px;"/>
+            <Circle radius="5" fill="#27ae60" style="-fx-translate-x: 8; -fx-translate-y: -8;"/>
+            <Label text="2" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
+        </StackPane>
+
+        <!-- SEPARATEUR -->
+        <Separator orientation="VERTICAL" style="-fx-pref-height: 25; -fx-padding: 0 5;"/>
+
+        <!-- PROFIL UTILISATEUR -->
+        <MenuButton fx:id="profileMenu" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
+            <graphic>
+                <HBox spacing="10" style="-fx-alignment: CENTER; -fx-padding: 5;">
+                    <!-- PHOTO DE PROFIL -->
+                    <StackPane>
+                        <Circle radius="16" fill="#3498db"/>
+                        <Label text="JD" style="-fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+                    </StackPane>
+
+                    <!-- INFOS UTILISATEUR -->
+                    <VBox spacing="2" style="-fx-padding: 0 5 0 0;">
+                        <Label text="John Doe" style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                        <Label text="Sales Manager" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <!-- FLÈCHE -->
+                    <Label text="⌄" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;"/>
+                </HBox>
+            </graphic>
+
+            <items>
+                <MenuItem text="👤 Mon Profil" onAction="#showUserProfile"/>
+                <MenuItem text="⚙️ Paramètres du compte" onAction="#showAccountSettings"/>
+                <MenuItem text="🔄 Dernières mises à jour" onAction="#showLastUpdates"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="❓ Aide / Support" onAction="#showHelpCenter"/>
+                <MenuItem text="💬 Envoyer un feedback" onAction="#sendFeedback"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="🚪 Déconnexion" style="-fx-text-fill: #e74c3c;" onAction="#handleLogout"/>
+            </items>
+        </MenuButton>
+    </HBox>
+</HBox>

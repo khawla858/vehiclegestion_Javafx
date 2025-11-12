@@ -1,0 +1,210 @@
+/* ================= STYLES GÉNÉRAUX ================= */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ================= NAVBAR STYLES ================= */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: 600;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8 16;
+    -fx-font-size: 13px;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #3498db;
+}
+
+.upgrade-btn {
+    -fx-background-color: linear-gradient(to right, #3498db, #2980b9);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8 16;
+    -fx-font-size: 13px;
+    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 5, 0, 0, 2);
+}
+
+.upgrade-btn:hover {
+    -fx-background-color: linear-gradient(to right, #2980b9, #2573a7);
+    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.5), 8, 0, 0, 3);
+}
+
+/* ================= ICÔNES NOTIFICATIONS ================= */
+.icon-container {
+    -fx-padding: 8;
+    -fx-cursor: hand;
+}
+
+.icon-container:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 20;
+}
+
+/* ================= SIDEBAR STYLES ================= */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: #ffffff;
+}
+
+.sidebar-btn-active {
+    -fx-background-color: #3498db;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+}
+
+/* ================= BARRE DE RECHERCHE ================= */
+.text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-text-fill: #2c3e50;
+    -fx-prompt-text-fill: #7f8c8d;
+}
+
+.text-field:focused {
+    -fx-border-width: 0;
+}
+
+/* ================= MENU ITEMS ================= */
+.menu-item {
+    -fx-padding: 8 15;
+}
+
+.menu-item:hover {
+    -fx-background-color: #ecf0f1;
+}
+
+/* ================= SCROLLBAR ================= */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5px;
+}
+/* Fichier vendeur.css */
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 13px;
+    -fx-padding: 12 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-width: 0;
+    -fx-pref-width: 280;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: #ffffff;
+}
+
+.sidebar-btn-active {
+    -fx-background-color: #3498db;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-padding: 12 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-width: 0;
+    -fx-pref-width: 280;
+}
+
+.sidebar-btn-submenu {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bdc3c7;
+    -fx-font-size: 12px;
+    -fx-padding: 10 20 10 35;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-width: 0;
+    -fx-pref-width: 280;
+}
+
+.sidebar-btn-submenu:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: #ffffff;
+}
+
+.icon-container {
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+
+.icon-container:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 5;
+}
+/* Boutons de menu principaux */
+.sidebar-btn-menu {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-size: 14px;
+    -fx-padding: 12 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 280;
+}
+
+.sidebar-btn-menu:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: #3498db;
+}
+
+/* Boutons de sous-menu */
+.sidebar-sub-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #bdc3c7;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-size: 13px;
+    -fx-padding: 8 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 240;
+}
+
+.sidebar-sub-btn:hover {
+    -fx-background-color: #34495e;
+    -fx-text-fill: #3498db;
+}
+
+/* Bouton dashboard */
+.sidebar-btn-active {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-size: 14px;
+    -fx-padding: 12 20;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 280;
+}
+
+.sidebar-btn-active:hover {
+    -fx-background-color: #2980b9;
+}

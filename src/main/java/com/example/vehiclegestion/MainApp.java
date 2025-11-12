@@ -11,7 +11,8 @@ import java.io.IOException;
 public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/VendeurDashboard.fxml"));
+// CORRECT - Charge d'abord le LAYOUT qui contient navbar + sidebar
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/layout/vendeur-layout.fxml"));
         Parent root = null;   // Charge le FXML une seule fois
         try {
             root = loader.load();
@@ -21,7 +22,7 @@ public class MainApp extends Application {
 
         Scene scene = new Scene(root); // Utilise root ici
         stage.setScene(scene);
-        stage.setTitle("Dashboard Vendeur");
+        stage.setTitle("Systeme Vhécules");
         stage.show();
     }
 
