@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20" alignment="CENTER"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.vehiclegestion.controller.LoginController"
+      style="-fx-background-color: #f8f9fa; -fx-padding: 40;">
+
+    <!-- Titre -->
+    <Text text="Connexion - Gestion Véhicules"
+          style="-fx-font-size: 24; -fx-font-weight: bold; -fx-fill: #2c3e50;"/>
+
+    <!-- Formulaire -->
+    <VBox spacing="15" style="-fx-pref-width: 300;">
+        <Label text="Email:" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+        <TextField fx:id="emailField"
+                   promptText="votre@email.com"
+                   style="-fx-pref-height: 35; -fx-font-size: 14;"/>
+
+        <Label text="Mot de passe:" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
+        <PasswordField fx:id="passwordField"
+                       promptText="Votre mot de passe"
+                       style="-fx-pref-height: 35; -fx-font-size: 14;"/>
+    </VBox>
+
+    <!-- Boutons -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="Se connecter"
+                onAction="#handleLogin"
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 120; -fx-pref-height: 35;"/>
+        <Button text="Réinitialiser"
+                onAction="#handleReset"
+                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 120; -fx-pref-height: 35;"/>
+    </HBox>
+
+</VBox>
