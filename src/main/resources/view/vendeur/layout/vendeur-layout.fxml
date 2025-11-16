@@ -6,19 +6,20 @@
             fx:controller="com.example.vehiclegestion.vendeur.controller.layout.VendeurLayoutController"
             prefWidth="1200" prefHeight="700"
             stylesheets="@/com.example.vehiclegestion/css/vendeur.css">
-
-    <top>
-        <!-- Le navbar sera chargé dynamiquement -->
-        <AnchorPane fx:id="navbarContainer"/>
-    </top>
-
     <left>
         <!-- Le sidebar sera chargé dynamiquement -->
         <AnchorPane fx:id="sidebarContainer"/>
     </left>
 
+    <top>
+        <!-- Le navbar sera chargé dynamiquement -->
+        <AnchorPane fx:id="navbarContainer" />
+    </top>
+
+
+
     <center>
-        <StackPane fx:id="contentPane" style="-fx-background-color: #f8f9fa;"/>
+        <StackPane fx:id="contentPane" style="-fx-background-color: white;"/>
     </center>
 
 </BorderPane>

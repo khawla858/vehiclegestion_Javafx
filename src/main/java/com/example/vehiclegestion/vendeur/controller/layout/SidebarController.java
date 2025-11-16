@@ -1,18 +1,23 @@
 package com.example.vehiclegestion.vendeur.controller.layout;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import java.io.IOException;
 
 public class SidebarController {
 
     private StackPane contentPane;
 
-    // Références aux sous-menus
+    // Références aux sous-menus (existants)
     @FXML private VBox clientSubMenu;
     @FXML private VBox productSubMenu;
     @FXML private VBox orderSubMenu;
@@ -21,7 +26,7 @@ public class SidebarController {
     @FXML private VBox messageSubMenu;
     @FXML private VBox settingsSubMenu;
 
-    // Références aux flèches
+    // Références aux flèches (existants)
     @FXML private Label clientArrow;
     @FXML private Label productArrow;
     @FXML private Label orderArrow;
@@ -30,6 +35,34 @@ public class SidebarController {
     @FXML private Label messageArrow;
     @FXML private Label settingsArrow;
 
+    // NOUVEAUX : Références pour la sidebar dynamique
+    @FXML private VBox sidebar;  // La VBox principale de la sidebar
+    @FXML private Button toggleBtn;  // Bouton toggle (☰)
+    @FXML private VBox menuContainer;  // Conteneur du menu pour masquer les textes
+    @FXML private Label mainNavLabel;  // Label "MAIN NAVIGATION"
+    @FXML private Button dashboardBtn;  // Bouton Dashboard
+    @FXML private Label dashboardText;  // Texte "Dashboard"
+    @FXML private Button clientBtn;  // Bouton Clients
+    @FXML private Label clientText;  // Texte "Clients"
+    @FXML private Button productBtn;  // Bouton Produits
+    @FXML private Label productText;  // Texte "Produits / Véhicules"
+    @FXML private Button orderBtn;  // Bouton Commandes
+    @FXML private Label orderText;  // Texte "Commandes / Réservations"
+    @FXML private Button cartBtn;  // Bouton Achats
+    @FXML private Label cartText;  // Texte "Achats / Panier"
+    @FXML private Button statsBtn;  // Bouton Statistiques
+    @FXML private Label statsText;  // Texte "Statistiques"
+    @FXML private Button messageBtn;  // Bouton Messages
+    @FXML private Label messageText;  // Texte "Messages / Notifications"
+    @FXML private Button settingsBtn;  // Bouton Paramètres
+    @FXML private Label settingsText;  // Texte "Paramètres"
+
+    // Variables pour l'état de la sidebar
+    private boolean isExpanded = false;
+    private boolean isHovered = false;  // Pour suivre si c'est étendu par hover
+    private final double collapsedWidth = 60;
+    private final double expandedWidth = 255;
+
     public void setContentPane(StackPane contentPane) {
         this.contentPane = contentPane;
     }
@@ -37,6 +70,88 @@ public class SidebarController {
     @FXML
     public void initialize() {
         System.out.println("SidebarController initialisé");
+        // Masquer les textes au démarrage pour commencer rétracté
+        hideTexts();
+
+        // Ajouter les listeners pour le hover
+        sidebar.setOnMouseEntered(event -> onMouseEnter());
+        sidebar.setOnMouseExited(event -> onMouseExit());
+    }
+
+    // NOUVEAU : Méthode appelée quand la souris entre dans la sidebar
+    private void onMouseEnter() {
+        if (!isExpanded) {  // Étendre seulement si pas déjà étendu manuellement
+            expandSidebar();
+            isHovered = true;
+        }
+    }
+
+    // NOUVEAU : Méthode appelée quand la souris sort de la sidebar
+    private void onMouseExit() {
+        if (isHovered && !isExpanded) {  // Rétracter seulement si étendu par hover et pas manuellement
+            collapseSidebar();
+            isHovered = false;
+        }
+    }
+
+    // Méthode pour étendre la sidebar (utilisée par hover et toggle)
+    private void expandSidebar() {
+        showTexts();
+        Timeline timeline = new Timeline();
+        timeline.getKeyFrames().addAll(
+                new KeyFrame(Duration.ZERO, new KeyValue(sidebar.prefWidthProperty(), collapsedWidth)),
+                new KeyFrame(Duration.millis(300), new KeyValue(sidebar.prefWidthProperty(), expandedWidth))
+        );
+        timeline.play();
+    }
+
+    // Méthode pour rétracter la sidebar (utilisée par hover et toggle)
+    private void collapseSidebar() {
+        Timeline timeline = new Timeline();
+        timeline.getKeyFrames().addAll(
+                new KeyFrame(Duration.ZERO, new KeyValue(sidebar.prefWidthProperty(), expandedWidth)),
+                new KeyFrame(Duration.millis(300), new KeyValue(sidebar.prefWidthProperty(), collapsedWidth))
+        );
+        timeline.setOnFinished(e -> hideTexts());
+        timeline.play();
+    }
+
+    // NOUVEAU : Méthode toggle sidebar
+    @FXML
+    private void toggleSidebar() {
+        if (isExpanded) {
+            collapseSidebar();
+            isExpanded = false;
+            isHovered = false;  // Réinitialiser le hover
+        } else {
+            expandSidebar();
+            isExpanded = true;
+        }
+    }
+
+    // Méthodes utilitaires pour masquer/montrer les textes
+    private void hideTexts() {
+        mainNavLabel.setVisible(false);
+        dashboardText.setVisible(false);
+        clientText.setVisible(false);
+        productText.setVisible(false);
+        orderText.setVisible(false);
+        cartText.setVisible(false);
+        statsText.setVisible(false);
+        messageText.setVisible(false);
+        settingsText.setVisible(false);
+    }
+
+    private void showTexts() {
+        mainNavLabel.setVisible(true);
+        dashboardText.setVisible(true);
+        clientText.setVisible(true);
+        productText.setVisible(true);
+        orderText.setVisible(true);
+        cartText.setVisible(true);
+        statsText.setVisible(true);
+        messageText.setVisible(true);
+        settingsText.setVisible(true);
     }
 
     // ================= MÉTHODES TOGGLE MENUS =================
@@ -68,8 +183,9 @@ public class SidebarController {
 
     @FXML
     private void toggleMessageMenu() {
-        toggleSubMenu(messageSubMenu, messageArrow);
+        loadContent("/view/vendeur/RendezVousList.fxml");
     }
+
 
     @FXML
     private void toggleSettingsMenu() {
@@ -83,18 +199,17 @@ public class SidebarController {
         arrow.setText(isVisible ? "▶" : "▼");
     }
 
-    // ================= MÉTHODES DASHBOARD =================
-
-    @FXML
-    private void showDashboard() {
-        loadContent("/view/vendeur/VendeurDashboard.fxml");
-    }
+// ================= MÉTHODES DASHBOARD =================
+@FXML
+private void showDashboard() {
+    loadContent("/view/vendeur/VendeurDashboard.fxml");
+}
 
     // ================= MÉTHODES CLIENTS =================
 
     @FXML
     private void showCustomerList() {
-        showAlert("Clients", "Liste des clients chargée");
+        loadContent("/view/vendeur/ClientList.fxml");
     }
 
     @FXML
@@ -144,7 +259,12 @@ public class SidebarController {
 
     @FXML
     private void showPurchaseRequests() {
-        loadContent("/view/vendeur/VendeurPurchaseRequests.fxml");
+        //loadContent("/view/vendeur/VendeurPurchaseRequests.fxml");
+    }
+
+    @FXML
+    private void showMagasines() {
+        loadContent("/view/vendeur/MagasinList.fxml");
     }
 
     @FXML

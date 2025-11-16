@@ -1,77 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.VendeurVehicleController"
-            style="-fx-background-color: #f8f9fa; -fx-padding: 20;">
+            fitToWidth="true"
+            style="-fx-background-color: #f4f6f9;"
+            vbarPolicy="ALWAYS">
 
-    <VBox spacing="20" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+    <!-- Contenu principal encapsulé dans le ScrollPane -->
+    <VBox spacing="20" style="-fx-padding: 25; -fx-background-color: white;">
 
-        <!-- En-tête de page -->
-        <HBox spacing="20" style="-fx-alignment: CENTER_LEFT;">
-            <Label text="🚗 Gestion des Véhicules" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <Button text="➕ Ajouter un véhicule" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15;" onAction="#showAddVehicleForm"/>
+        <!-- HEADER avec titre et bouton -->
+        <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+            <Label text="Mes Véhicules" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Button fx:id="addVehicleButton" text="➕ Ajouter un véhicule"
+                    style="-fx-font-size: 14px; -fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8;"
+                    onAction="#addVehicle"/>
         </HBox>
 
-        <!-- Barre d'outils -->
-        <HBox spacing="15" style="-fx-alignment: CENTER_LEFT;">
-            <TextField promptText="Rechercher un véhicule..." style="-fx-pref-width: 300;"/>
-            <ComboBox promptText="Filtrer par statut" style="-fx-pref-width: 150;"/>
-            <Button text="🔍 Rechercher" style="-fx-background-color: #2c3e50; -fx-text-fill: white;"/>
-            <Button text="📊 Exporter" style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
-        </HBox>
+        <!-- SECTION VÉHICULES -->
+        <VBox spacing="15"  style="-fx-padding: 20;">
+            <Label text="Véhicules en vente" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
 
-        <!-- Tableau des véhicules -->
-        <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20;">
-            <Label text="Liste des véhicules (12 véhicules)" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-            <TableView fx:id="vehiclesTable" style="-fx-background-radius: 5;">
-                <columns>
-                    <TableColumn text="ID" prefWidth="60">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="id"/>
-                        </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Marque" prefWidth="120">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="marque"/>
-                        </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Modèle" prefWidth="120">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="modele"/>
-                        </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Prix" prefWidth="100">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="prix"/>
-                        </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Statut" prefWidth="100">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="statut"/>
-                        </cellValueFactory>
-                    </TableColumn>
-                    <TableColumn text="Actions" prefWidth="150">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="actions"/>
-                        </cellValueFactory>
-                    </TableColumn>
-                </columns>
-            </TableView>
-
-            <!-- Pagination -->
-            <HBox spacing="10" style="-fx-alignment: CENTER; -fx-padding: 10 0 0 0;">
-                <Button text="◀ Précédent" style="-fx-background-color: transparent; -fx-border-color: #bdc3c7;"/>
-                <Label text="Page 1 sur 3" style="-fx-text-fill: #7f8c8d;"/>
-                <Button text="Suivant ▶" style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
-            </HBox>
+            <!-- Conteneur des cartes -->
+            <VBox fx:id="cardsContainer" spacing="20" alignment="CENTER"
+                  style="-fx-padding: 20;"/>
         </VBox>
 
     </VBox>
-
-</AnchorPane>
+</ScrollPane>
