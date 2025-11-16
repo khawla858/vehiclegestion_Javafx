@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.ClientDashboardController"
+            stylesheets="@/com/example/vehiclegestion/css/client-dashboard.css"
+            style="-fx-background-color: #f5f5f5;">
+
+    <!-- HEADER MODERNE TYPE AVITO -->
+    <top>
+        <VBox spacing="0">
+            <!-- Barre supérieure -->
+            <HBox style="-fx-background-color: white; -fx-padding: 12 40; -fx-border-color: #e8e8e8; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+                <!-- Logo -->
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <ImageView fitWidth="35" fitHeight="35">
+                        <image>
+                            <Image url="@../../images/car-logo.PNG" />
+                        </image>
+                    </ImageView>
+                    <Label text="AutoSales" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #FF6B35;" />
+                </HBox>
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- Barre de recherche centrale -->
+                <HBox style="-fx-background-color: #f8f8f8; -fx-background-radius: 25; -fx-padding: 8 20; -fx-min-width: 400; -fx-spacing: 10;" alignment="CENTER_LEFT">
+                    <Label text="🔍" style="-fx-font-size: 16;" />
+                    <TextField fx:id="searchField" promptText="Rechercher un véhicule..." style="-fx-background-color: transparent; -fx-border-width: 0; -fx-font-size: 14;" HBox.hgrow="ALWAYS" />
+                </HBox>
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- Infos utilisateur -->
+                <HBox spacing="20" alignment="CENTER">
+                    <Label text="🌐 FR" style="-fx-font-size: 13; -fx-text-fill: #666; -fx-cursor: hand;" />
+                    <Separator orientation="VERTICAL" style="-fx-padding: 0 5;" />
+                    <HBox spacing="10" alignment="CENTER" style="-fx-cursor: hand;">
+                        <Circle radius="18" fill="#FF6B35" />
+                        <VBox spacing="0">
+                            <Label fx:id="userNameLabel" text="Technicien" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                            <Label text="Mon compte" style="-fx-text-fill: #666; -fx-font-size: 11;" />
+                        </VBox>
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <!-- Menu de navigation horizontal -->
+            <HBox style="-fx-background-color: white; -fx-padding: 0 40; -fx-spacing: 20; -fx-border-color: #e8e8e8; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+                <Button fx:id="dashboardBtn" text="📊 Tableau de bord" onAction="#showDashboard" style="-fx-background-color: transparent; -fx-text-fill: #FF6B35; -fx-font-weight: bold; -fx-padding: 12 0; -fx-border-color: #FF6B35; -fx-border-width: 0 0 3 0; -fx-cursor: hand; -fx-font-size: 13;" />
+                <Button fx:id="vehiclesBtn" text="🚗 Véhicules (12)" onAction="#showVehicles" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-padding: 12 0; -fx-cursor: hand; -fx-font-size: 13;" />
+                <Button fx:id="favoritesBtn" text="❤️ Mes Favoris" onAction="#showFavorites" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-padding: 12 0; -fx-cursor: hand; -fx-font-size: 13;" />
+                <Button fx:id="historyBtn" text="📜 Historique" onAction="#showHistory" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-padding: 12 0; -fx-cursor: hand; -fx-font-size: 13;" />
+                <Button fx:id="profileBtn" text="👤 Profil" onAction="#showProfile" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-padding: 12 0; -fx-cursor: hand; -fx-font-size: 13;" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+              <!--  <Button fx:id="publishBtn" text="+ Publier véhicule" onAction="#publishVehicle" style="-fx-background-color: #FF6B35; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 13;" />  -->
+                <Button fx:id="logoutBtn" text="🚪 Déconnexion" onAction="#logout" style="-fx-background-color: transparent; -fx-text-fill: #e74c3c; -fx-padding: 8 12; -fx-cursor: hand; -fx-font-size: 13;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <!-- ZONE DE CONTENU DYNAMIQUE -->
+        <StackPane fx:id="contentArea">
+            <ScrollPane fitToWidth="true" style="-fx-background-color: #f5f5f5;">
+                <VBox spacing="20" style="-fx-padding: 30 40;">
+
+                    <!-- Bannière d'accueil -->
+                    <HBox style="-fx-background-color: linear-gradient(to right, #FF6B35, #FF8C42); -fx-background-radius: 12; -fx-padding: 30 40; -fx-spacing: 20;" alignment="CENTER">
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
+                            <Label text="Bienvenue dans votre espace AutoSales !" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: white;" />
+                            <Label text="Gérez vos véhicules, suivez vos favoris et consultez l'historique en un clic" style="-fx-font-size: 14; -fx-text-fill: rgba(255,255,255,0.9);" />
+                        </VBox>
+                        <Button text="Explorer →" style="-fx-background-color: white; -fx-text-fill: #FF6B35; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 25; -fx-cursor: hand;" />
+                    </HBox>
+
+                    <!-- Statistiques rapides -->
+                    <HBox spacing="15" style="-fx-padding: 0;">
+                        <!-- Carte 1 -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25; -fx-border-color: #e8e8e8; -fx-border-radius: 10; -fx-border-width: 1; -fx-spacing: 10;" HBox.hgrow="ALWAYS">
+                            <Label text="📈" style="-fx-font-size: 32;" />
+                            <Label text="12" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FF6B35;" />
+                            <Label text="Véhicules actifs" style="-fx-text-fill: #666; -fx-font-size: 13;" />
+                        </VBox>
+
+                        <!-- Carte 2 -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25; -fx-border-color: #e8e8e8; -fx-border-radius: 10; -fx-border-width: 1; -fx-spacing: 10;" HBox.hgrow="ALWAYS">
+                            <Label text="❤️" style="-fx-font-size: 32;" />
+                            <Label text="5" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #e74c3c;" />
+                            <Label text="Favoris enregistrés" style="-fx-text-fill: #666; -fx-font-size: 13;" />
+                        </VBox>
+
+                        <!-- Carte 3 -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25; -fx-border-color: #e8e8e8; -fx-border-radius: 10; -fx-border-width: 1; -fx-spacing: 10;" HBox.hgrow="ALWAYS">
+                            <Label text="📋" style="-fx-font-size: 32;" />
+                            <Label text="28" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #3498db;" />
+                            <Label text="Transactions totales" style="-fx-text-fill: #666; -fx-font-size: 13;" />
+                        </VBox>
+
+                        <!-- Carte 4 -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25; -fx-border-color: #e8e8e8; -fx-border-radius: 10; -fx-border-width: 1; -fx-spacing: 10;" HBox.hgrow="ALWAYS">
+                            <Label text="⭐" style="-fx-font-size: 32;" />
+                            <Label text="4.8" style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #f39c12;" />
+                            <Label text="Note moyenne" style="-fx-text-fill: #666; -fx-font-size: 13;" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Liste des véhicules -->
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25; -fx-border-color: #e8e8e8; -fx-border-radius: 10; -fx-border-width: 1;">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Mes véhicules" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #333;" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button text="Voir tout (12)" style="-fx-background-color: transparent; -fx-text-fill: #FF6B35; -fx-font-weight: bold; -fx-cursor: hand;" />
+                        </HBox>
+
+                        <!-- Table moderne -->
+                        <TableView style="-fx-background-color: transparent; -fx-border-color: #e8e8e8; -fx-border-radius: 8; -fx-background-radius: 8;">
+                            <columns>
+                                <TableColumn text="ID" prefWidth="60" style="-fx-alignment: CENTER;" />
+                                <TableColumn text="Marque" prefWidth="150" style="-fx-alignment: CENTER_LEFT;" />
+                                <TableColumn text="Modèle" prefWidth="150" style="-fx-alignment: CENTER_LEFT;" />
+                                <TableColumn text="Prix (DH)" prefWidth="120" style="-fx-alignment: CENTER;" />
+                                <TableColumn text="Statut" prefWidth="120" style="-fx-alignment: CENTER;" />
+                                <TableColumn text="Actions" prefWidth="150" style="-fx-alignment: CENTER;" />
+                            </columns>
+                            <placeholder>
+                                <VBox spacing="10" alignment="CENTER" style="-fx-padding: 40;">
+                                    <Label text="🚗" style="-fx-font-size: 48;" />
+                                    <Label text="Aucun véhicule disponible" style="-fx-font-size: 16; -fx-text-fill: #999;" />
+                                    <Button text="Ajouter votre premier véhicule" style="-fx-background-color: #FF6B35; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 5;" />
+                                </VBox>
+                            </placeholder>
+                        </TableView>
+                    </VBox>
+
+                    <!-- Section Notifications -->
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25; -fx-border-color: #e8e8e8; -fx-border-radius: 10; -fx-border-width: 1;">
+                        <Label text="🔔 Préférences de notifications" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+                        <VBox spacing="12" style="-fx-padding: 10 0;">
+                            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 8 0;">
+                                <CheckBox selected="true" style="-fx-cursor: hand;" />
+                                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                    <Label text="Commandes &amp; Réservations" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                                    <Label text="Être notifié des nouvelles commandes et réservations" style="-fx-text-fill: #666; -fx-font-size: 12;" />
+                                </VBox>
+                            </HBox>
+
+                            <Separator style="-fx-background-color: #f0f0f0;" />
+
+                            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 8 0;">
+                                <CheckBox selected="true" style="-fx-cursor: hand;" />
+                                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                    <Label text="Activités &amp; Messages" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                                    <Label text="Recevoir les messages et activités importantes" style="-fx-text-fill: #666; -fx-font-size: 12;" />
+                                </VBox>
+                            </HBox>
+
+                            <Separator style="-fx-background-color: #f0f0f0;" />
+
+                            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 8 0;">
+                                <CheckBox style="-fx-cursor: hand;" />
+                                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                    <Label text="Statistiques hebdomadaires" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                                    <Label text="Rapport des performances chaque semaine" style="-fx-text-fill: #666; -fx-font-size: 12;" />
+                                </VBox>
+                            </HBox>
+
+                            <Separator style="-fx-background-color: #f0f0f0;" />
+
+                            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 8 0;">
+                                <CheckBox selected="true" style="-fx-cursor: hand;" />
+                                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                    <Label text="Alertes système" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+                                    <Label text="Notifications importantes sur le système" style="-fx-text-fill: #666; -fx-font-size: 12;" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+                            <Button text="Enregistrer les préférences" style="-fx-background-color: #FF6B35; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 5; -fx-cursor: hand;" />
+                            <Button text="Réinitialiser" style="-fx-background-color: #f0f0f0; -fx-text-fill: #666; -fx-padding: 10 25; -fx-background-radius: 5; -fx-cursor: hand;" />
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </ScrollPane>
+        </StackPane>
+    </center>
+
+    <!-- Footer optionnel -->
+    <bottom>
+        <HBox style="-fx-background-color: white; -fx-padding: 15 40; -fx-border-color: #e8e8e8; -fx-border-width: 1 0 0 0; -fx-spacing: 30;" alignment="CENTER">
+            <Label text="© 2024 AutoSales Pro" style="-fx-text-fill: #999; -fx-font-size: 12;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="Aide" style="-fx-text-fill: #666; -fx-font-size: 12; -fx-cursor: hand;" />
+            <Label text="•" style="-fx-text-fill: #ccc;" />
+            <Label text="Conditions" style="-fx-text-fill: #666; -fx-font-size: 12; -fx-cursor: hand;" />
+            <Label text="•" style="-fx-text-fill: #ccc;" />
+            <Label text="Contact" style="-fx-text-fill: #666; -fx-font-size: 12; -fx-cursor: hand;" />
+        </HBox>
+    </bottom>
+
+</BorderPane>
