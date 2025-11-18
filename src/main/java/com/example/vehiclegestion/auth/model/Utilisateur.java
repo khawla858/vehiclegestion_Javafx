@@ -1,5 +1,6 @@
 package com.example.vehiclegestion.auth.model;
 
+import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 public class Utilisateur {
@@ -15,6 +16,8 @@ public class Utilisateur {
     // Constructeurs
     public Utilisateur() {}
 
+
+    // Dans Utilisateur.java
     public Utilisateur(String nom, String prenom, String email, String motDePasse, String role) {
         this.nom = nom;
         this.prenom = prenom;
@@ -22,7 +25,17 @@ public class Utilisateur {
         this.motDePasse = motDePasse;
         this.role = role;
         this.statut = "actif";
+
     }
+
+   /* public Utilisateur(String nom, String prenom, String email, String motDePasse, String role) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.motDePasse = motDePasse;
+        this.role = role;
+        this.statut = "actif";
+    }*/
 
     // Getters et Setters
     public int getIdUtilisateur() { return idUtilisateur; }

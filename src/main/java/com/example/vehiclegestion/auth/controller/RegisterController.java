@@ -141,4 +141,7 @@ public class RegisterController {
     private void hideError() {
         errorLabel.setVisible(false);
     }
+
+
+
 }
