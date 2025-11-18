@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 package com.example.vehiclegestion.auth.controller;
 
 import com.example.vehiclegestion.client.model.Client;
@@ -8,6 +8,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+
+import java.sql.Connection;
 import java.time.LocalDateTime;
 
 public class LoginController {
@@ -35,14 +37,14 @@ public class LoginController {
         String email = emailField.getText();
         String password = passwordField.getText();
 
-=======
-package com.example.vehiclegestion.controller;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import java.sql.Connection;
+package com.example.vehiclegestion.client.controller;
+
+import FXML;
+import Alert;
+import PasswordField;
+import TextField;
+import Connection;
 
 public class LoginController{
     @FXML
@@ -63,12 +65,12 @@ public class LoginController{
 
         System.out.println("tentative de connection "+email);
 
->>>>>>> 6beccf9ab2d9a6f3480a8433f3a542500cff3b44
+
         if (email.isEmpty() || password.isEmpty()) {
             showAlert("Erreur", "Veuillez remplir tous les champs");
             return;
         }
-<<<<<<< HEAD
+
 
         try {
             // Simuler une connexion réussie
@@ -90,7 +92,7 @@ public class LoginController{
     }
 
     private void showAlert(String title, String message) {
-=======
+
         if(email.equals("admin@test.com") &&password.equals("addmin")){
             showAlert("Succées" ," connection réussite pour :"+email);
         }else{
@@ -105,19 +107,19 @@ public class LoginController{
     }
 @FXML
     private void showAlert(String title , String message){
->>>>>>> 6beccf9ab2d9a6f3480a8433f3a542500cff3b44
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-<<<<<<< HEAD
+
     }
-=======
+
 }
 @FXML
     private void initialize(){
         System.out.println("Initialisation avec succées !");
 }
->>>>>>> 6beccf9ab2d9a6f3480a8433f3a542500cff3b44
+
 }
