@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.vendeur.controller.ClientListController"
+            fitToWidth="true"
+            style="-fx-background-color: #f8fafc;"
+            vbarPolicy="ALWAYS">
+
+    <VBox spacing="20" style="-fx-padding: 25;">
+        <!-- Cartes statistiques -->
+        <HBox spacing="20" alignment="CENTER">
+            <VBox alignment="CENTER" spacing="5" prefWidth="150"
+                  style="-fx-background-color: #e8f6f3; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                <Label text="👥" style="-fx-font-size: 20px;"/>
+                <Label fx:id="totalClientsLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Label text="Clients totaux" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="5" prefWidth="150"
+                  style="-fx-background-color: #fff9e6; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                <Label text="⭐" style="-fx-font-size: 20px;"/>
+                <Label fx:id="activeClientsLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Label text="Clients actifs" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="5" prefWidth="150"
+                  style="-fx-background-color: #e6f7ff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                <Label text="🛒" style="-fx-font-size: 20px;"/>
+                <Label fx:id="buyersLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Label text="Acheteurs" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            </VBox>
+        </HBox>
+
+        <!-- En-tête -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="📋 Liste des Clients" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Button text="➕ Nouveau Client"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(46,204,113,0.3), 5, 0, 0, 2);"
+                    onAction="#addNewClient"/>
+        </HBox>
+
+        <!-- Barre de recherche et filtres -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="🔍 Rechercher un client..."
+                       style="-fx-pref-width: 300; -fx-padding: 8; -fx-background-radius: 5; -fx-border-color: #ddd; -fx-border-radius: 5;"/>
+            <ComboBox fx:id="filterComboBox" promptText="Tous les clients"
+                      style="-fx-pref-width: 200; -fx-background-radius: 5;"/>
+            <Button text="🔄 Actualiser"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5;"
+                    onAction="#refreshClients"/>
+        </HBox>
+
+        <!-- Tableau des clients -->
+        <TableView fx:id="clientsTable" style="-fx-background-color: transparent; -fx-border-color: #e1e5e9; -fx-border-radius: 8;">
+            <columns>
+                <TableColumn text="ID" prefWidth="80">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="id" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                        -fx-font-weight: bold;
+                        -fx-text-fill: #2c3e50;
+                    </style>
+                </TableColumn>
+                <TableColumn text="Nom Complet" prefWidth="200">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="fullName" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Téléphone" prefWidth="150">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="telephone" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Email" prefWidth="250">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="email" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Statut" prefWidth="120">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="statutClient" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn text="Nb Ventes" prefWidth="100">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="nbVentes"/>
+                    </cellValueFactory>
+                    <style>-fx-alignment: CENTER;</style>
+                </TableColumn>
+
+                <TableColumn text="Total dépensé" prefWidth="120">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="totalDepense"/>
+                    </cellValueFactory>
+                    <style>-fx-alignment: CENTER-RIGHT;</style>
+                </TableColumn>
+
+                <TableColumn text="Dernier achat" prefWidth="120">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="dernierAchat"/>
+                    </cellValueFactory>
+                    <style>-fx-alignment: CENTER;</style>
+                </TableColumn>
+
+                <TableColumn text="Adresse" prefWidth="200">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="adresse" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Actions" prefWidth="150">
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+            </columns>
+
+            <!-- Style du tableau -->
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+
+            <style>
+                -fx-font-size: 14px;
+                -fx-table-cell-border-color: transparent;
+                -fx-table-header-border-color: #bdc3c7;
+            </style>
+        </TableView>
+    </VBox>
+</ScrollPane>

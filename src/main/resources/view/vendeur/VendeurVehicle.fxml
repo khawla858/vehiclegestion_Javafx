@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.vendeur.controller.VendeurVehicleController"
+            fitToWidth="true"
+            style="-fx-background-color: #f4f6f9;"
+            vbarPolicy="ALWAYS">
+
+    <!-- Contenu principal encapsulé dans le ScrollPane -->
+    <VBox spacing="20" style="-fx-padding: 25; -fx-background-color: white;">
+
+        <!-- HEADER avec titre et bouton -->
+        <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+            <Label text="Mes Véhicules" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Button fx:id="addVehicleButton" text="➕ Ajouter un véhicule"
+                    style="-fx-font-size: 14px; -fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8;"
+                    onAction="#addVehicle"/>
+        </HBox>
+
+        <!-- SECTION VÉHICULES -->
+        <VBox spacing="15"  style="-fx-padding: 20;">
+            <Label text="Véhicules en vente" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+            <!-- Conteneur des cartes -->
+            <VBox fx:id="cardsContainer" spacing="20" alignment="CENTER"
+                  style="-fx-padding: 20;"/>
+        </VBox>
+
+    </VBox>
+</ScrollPane>
