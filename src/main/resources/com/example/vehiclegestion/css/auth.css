@@ -1,0 +1,235 @@
+/* ============================================
+   CORRECTIONS DE VISIBILITÉ DU TEXTE
+   ============================================ */
+
+/* Forcer le texte en noir pour une meilleure lisibilité */
+.custom-field,
+.custom-field .text,
+.text-field .text,
+.password-field .text,
+.text-input,
+.text-input .text {
+    -fx-text-fill: #000000 !important;
+    -fx-fill: #000000 !important;
+}
+
+/* Background clair pour les champs de saisie */
+.custom-field {
+    -fx-background-color: #ffffff !important;
+    -fx-text-fill: #000000 !important;
+}
+
+.custom-field .text {
+    -fx-fill: #000000 !important;
+}
+
+/* Placeholder en gris foncé */
+.custom-field .prompt-text {
+    -fx-fill: #666666 !important;
+}
+
+/* Champs focus avec fond très clair */
+.custom-field:focused {
+    -fx-background-color:#f0f2f5!important;
+    -fx-text-fill: #000000 !important;
+}
+
+.custom-field:focused .text {
+    -fx-fill: #000000 !important;
+}
+
+/* ============================================
+   POLICE CLAIRE COMME CLAUDE
+   ============================================ */
+
+/* Application de la police système moderne */
+.app-title,
+.subtitle,
+.field-label,
+.custom-field,
+.login-button,
+.forgot-link,
+.signup-link,
+.signup-text,
+.remember-checkbox,
+.error-message {
+    -fx-font-family: "Segoe UI", "System", "Arial", sans-serif;
+}
+
+/* Taille de police optimisée pour lisibilité */
+.custom-field {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+}
+
+.app-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+}
+
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+/* ============================================
+   REDIMENSIONNEMENT DE L'INTERFACE
+   ============================================ */
+
+/* Container principal redimensionnable */
+.login-background {
+    -fx-background-color:
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 40%),
+        linear-gradient(160deg, #0a0f1a 0%, #0f172a 30%, #1e293b 70%, #334155 100%);
+    -fx-padding: 20;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0, 0, 10);
+}
+
+/* Carte de connexion adaptative */
+.login-card {
+    -fx-background-color:
+        linear-gradient(145deg,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(248, 249, 250, 0.92) 50%,
+            rgba(255, 255, 255, 0.95) 100%);
+    -fx-background-radius: 16;
+    -fx-padding: 30 25 25 25;
+    -fx-effect:
+        dropshadow(gaussian, rgba(0, 0, 0, 0.3), 20, 0, 0, 5);
+    -fx-border-color: rgba(0, 0, 0, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+    -fx-min-width: 350px;
+    -fx-pref-width: 400px;
+    -fx-max-width: 500px;
+}
+
+/* Container principal flexible */
+.login-card-container {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+/* HBox principal responsive */
+.main-hbox {
+    -fx-alignment: CENTER;
+    -fx-spacing: 0;
+    -fx-max-width: 1200px;
+    -fx-max-height: 800px;
+    -fx-pref-width: 1000px;
+    -fx-pref-height: 650px;
+}
+
+/* ============================================
+   MEDIA QUERIES AMÉLIORÉES POUR LE RESPONSIVE
+   ============================================ */
+
+/* Grands écrans */
+@media (min-width: 1200px) {
+    .login-card {
+        -fx-padding: 40 35 35 35;
+        -fx-pref-width: 450px;
+    }
+
+    .main-hbox {
+        -fx-pref-width: 1100px;
+    }
+}
+
+/* Tablettes */
+@media (max-width: 1024px) {
+    .illustration-section {
+        -fx-pref-width: 300px;
+        -fx-min-width: 250px;
+    }
+
+    .login-card {
+        -fx-max-width: 380px;
+        -fx-padding: 25 20 20 20;
+    }
+
+    .main-hbox {
+        -fx-pref-width: 900px;
+    }
+}
+
+/* Grands smartphones */
+@media (max-width: 768px) {
+    .illustration-section {
+        -fx-visible: false;
+        -fx-managed: false;
+        -fx-pref-width: 0;
+    }
+
+    .login-card-container {
+        -fx-pref-width: 100%;
+        -fx-max-width: 100%;
+    }
+
+    .login-card {
+        -fx-max-width: 400px;
+        -fx-padding: 20 15 15 15;
+        -fx-background-radius: 12;
+    }
+
+    .main-hbox {
+        -fx-pref-width: 100%;
+    }
+}
+
+/* Petits smartphones */
+@media (max-width: 480px) {
+    .login-background {
+        -fx-padding: 10;
+    }
+
+    .login-card {
+        -fx-max-width: 100%;
+        -fx-padding: 15 10 10 10;
+        -fx-background-radius: 10;
+        -fx-min-width: 280px;
+    }
+
+    .app-title {
+        -fx-font-size: 24px;
+    }
+
+    .custom-field {
+        -fx-font-size: 16px; /* Plus grand pour mobile */
+    }
+}
+
+/* ============================================
+   AMÉLIORATIONS SPÉCIFIQUES POUR LA VISIBILITÉ
+   ============================================ */
+
+/* Contraste amélioré pour tous les textes */
+.field-label {
+    -fx-text-fill: #2d3748 !important; /* Gris très foncé */
+}
+
+.app-title {
+    -fx-text-fill: #1a202c !important; /* Presque noir */
+}
+
+.subtitle {
+    -fx-text-fill: #4a5568 !important; /* Gris foncé */
+}
+
+/* Bordure visible pour les champs */
+.custom-field {
+    -fx-border-color: #cbd5e0 !important;
+    -fx-border-width: 1.5 !important;
+}
+
+.custom-field:focused {
+    -fx-border-color: #3b82f6 !important;
+    -fx-border-width: 2 !important;
+}
+
+/* État hover amélioré */
+.custom-field:hover {
+    -fx-background-color: #f7fafc !important;
+    -fx-border-color: #a0aec0 !important;
+}

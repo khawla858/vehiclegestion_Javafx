@@ -10,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -26,12 +25,24 @@ public class VendeurVehicleController {
     @FXML
     private VBox cardsContainer;
 
-    private ArticleDAO articleDAO = new ArticleDAO();
+    private ArticleDAO articleDAO;
     private final int VENDEUR_ID = 1; // ID du vendeur connecté
 
     @FXML
     public void initialize() {
         System.out.println("🚀 Initialisation de la page véhicules...");
+
+        // ✅ Initialiser ArticleDAO avec gestion d'exception
+        try {
+            articleDAO = new ArticleDAO();
+            System.out.println("✅ Connexion à la base de données établie");
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur de connexion à la base de données: " + e.getMessage());
+            e.printStackTrace();
+            showError("Impossible de se connecter à la base de données.\nVérifiez votre configuration.");
+            return; // Arrêter l'initialisation si la connexion échoue
+        }
+
         loadVehicles();
     }
 
@@ -72,6 +83,12 @@ public class VendeurVehicleController {
     }
 
     private void loadVehicles() {
+        // ✅ Vérifier que articleDAO est initialisé
+        if (articleDAO == null) {
+            showError("La connexion à la base de données n'est pas disponible.");
+            return;
+        }
+
         cardsContainer.getChildren().clear();
         try {
             List<Article> articles = articleDAO.getArticlesByVendeur(VENDEUR_ID);
@@ -116,6 +133,7 @@ public class VendeurVehicleController {
             cardsContainer.setAlignment(Pos.CENTER);
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL lors du chargement des véhicules: " + e.getMessage());
             e.printStackTrace();
             showError("Erreur de chargement des véhicules: " + e.getMessage());
         }
@@ -187,6 +205,7 @@ public class VendeurVehicleController {
         detailBtn.setOnAction(e -> detailVehicle(article));
 
         buttonBox.getChildren().addAll(editBtn, deleteBtn, detailBtn);
+
         // Assemblage de la carte
         infoBox.getChildren().addAll(titleLabel, priceLabel, detailBox, descLabel);
         contentBox.getChildren().addAll(vehicleImage, infoBox, buttonBox);
@@ -267,6 +286,8 @@ public class VendeurVehicleController {
     }
 
     private void showError(String message) {
+        cardsContainer.getChildren().clear(); // ✅ Effacer le contenu existant
+
         VBox errorState = new VBox(15);
         errorState.setAlignment(Pos.CENTER);
         errorState.setPadding(new Insets(40));
@@ -279,6 +300,8 @@ public class VendeurVehicleController {
 
         Label errorDetail = new Label(message);
         errorDetail.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;");
+        errorDetail.setWrapText(true);
+        errorDetail.setMaxWidth(400);
 
         Button retryButton = new Button("🔄 Réessayer");
         retryButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; " +
@@ -297,12 +320,31 @@ public class VendeurVehicleController {
 
     private void deleteVehicle(Article article) {
         System.out.println("🗑️ Suppression du véhicule: " + article.getTitre());
-        // TODO: Implémenter la suppression avec confirmation
+
+        // ✅ Vérifier que articleDAO est initialisé
+        if (articleDAO == null) {
+            showError("La connexion à la base de données n'est pas disponible.");
+            return;
+        }
+
+        // TODO: Ajouter une confirmation avant suppression
+        try {
+            boolean success = articleDAO.deleteArticle(article.getId());
+            if (success) {
+                System.out.println("✅ Véhicule supprimé avec succès");
+                loadVehicles(); // Recharger la liste
+            } else {
+                showError("Impossible de supprimer le véhicule");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la suppression: " + e.getMessage());
+            e.printStackTrace();
+            showError("Erreur lors de la suppression: " + e.getMessage());
+        }
     }
+
     private void detailVehicle(Article article) {
         System.out.println("🔍 Détails du véhicule: " + article.getTitre());
         // TODO: Implémenter l'affichage des détails
     }
-
-
 }

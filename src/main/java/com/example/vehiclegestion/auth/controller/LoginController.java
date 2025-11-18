@@ -1,125 +1,176 @@
-
 package com.example.vehiclegestion.auth.controller;
 
-import com.example.vehiclegestion.client.model.Client;
-import com.example.vehiclegestion.utils.NavigationController; // ← IMPORT AJOUTÉ
+import com.example.vehiclegestion.auth.dao.UtilisateurDAO;
+import com.example.vehiclegestion.auth.model.Utilisateur;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import javafx.scene.control.Button;
 
-import java.sql.Connection;
-import java.time.LocalDateTime;
+import java.io.IOException;
 
 public class LoginController {
 
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
+    @FXML
+    private TextField emailField;
 
     @FXML
-    public void initialize() {
-        System.out.println("✅ LoginController initialisé");
+    private PasswordField passwordField;
 
-        // Auto-remplir pour tests
-        emailField.setText("test@automarket.com");
-        passwordField.setText("test123");
+    @FXML
+    private Label errorLabel;
 
-        // Enter key pour connexion
-        passwordField.setOnAction(e -> handleLogin());
-    }
+    private UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
 
+    /**
+     * Gérer la connexion
+     */
     @FXML
     private void handleLogin() {
-        System.out.println("🔄 Tentative de connexion...");
-
-        String email = emailField.getText();
+        String email = emailField.getText().trim();
         String password = passwordField.getText();
 
-
-package com.example.vehiclegestion.client.controller;
-
-import FXML;
-import Alert;
-import PasswordField;
-import TextField;
-import Connection;
-
-public class LoginController{
-    @FXML
-    private TextField emailField ;
-    @FXML
-    private PasswordField passwordField ;
-
-    private Connection connection ;
-
-    public void setConnection(Connection connection){
-   this.connection = connection ;
-   System.out.println("conextion BD injecté dans loginController ");
-    }
-    @FXML
-    private void handleLogin(){
-        String email = emailField.getText();
-        String password = passwordField.getText();
-
-        System.out.println("tentative de connection "+email);
-
-
+        // Validation
         if (email.isEmpty() || password.isEmpty()) {
-            showAlert("Erreur", "Veuillez remplir tous les champs");
+            showError("Veuillez remplir tous les champs");
             return;
         }
 
+        if (!isValidEmail(email)) {
+            showError("Format d'email invalide");
+            return;
+        }
 
+        // Tentative de connexion
+        Utilisateur user = utilisateurDAO.seConnecter(email, password);
+
+        if (user != null) {
+            hideError();
+
+            // Redirection selon le rôle
+            try {
+                switch (user.getRole()) {
+                    case "client":
+                        redirectToClientDashboard(user);
+                        break;
+                    case "vendeur":
+                        redirectToVendeurDashboard(user);
+                        break;
+                    case "admin":
+                        redirectToAdminDashboard(user);
+                        break;
+                    default:
+                        showError("Rôle utilisateur inconnu");
+                }
+            } catch (IOException e) {
+                showError("Erreur lors du chargement du tableau de bord");
+                e.printStackTrace();
+            }
+        } else {
+            showError("Email ou mot de passe incorrect");
+        }
+    }
+
+    /**
+     * Gérer le mot de passe oublié
+     */
+    @FXML
+    private void handleForgotPassword() {
         try {
-            // Simuler une connexion réussie
-            System.out.println("✅ Connexion réussie: " + email);
-
-            // Rediriger vers le dashboard
-            NavigationController.loadDashboard();
-
-        } catch (Exception e) {
-            System.err.println("❌ Erreur connexion: " + e.getMessage());
-            showAlert("Erreur", "Échec de la connexion: " + e.getMessage());
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/ForgotPassword.fxml"));
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (IOException e) {
+            showError("Fonctionnalité en cours de développement");
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Connexion avec Microsoft
+     */
     @FXML
-    private void handleRegister() {
-        System.out.println("📝 Inscription demandée");
-        showAlert("Inscription", "Fonctionnalité d'inscription à implémenter");
+    private void handleMicrosoftLogin() {
+        showError("Connexion Microsoft en cours de développement");
     }
 
-    private void showAlert(String title, String message) {
+    /**
+     * Redirection vers le dashboard client
+     */
+    private void redirectToClientDashboard(Utilisateur user) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/vehiclegestion/view/client/ClientDashboard.fxml"));
+        Parent root = loader.load();
 
-        if(email.equals("admin@test.com") &&password.equals("addmin")){
-            showAlert("Succées" ," connection réussite pour :"+email);
-        }else{
-            showAlert("Erreur","Email ou mdp incorrect ");
+        // Passer les données utilisateur au contrôleur
+        // ClientDashboardController controller = loader.getController();
+        // controller.setUser(user);
+
+        Stage stage = (Stage) emailField.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Gestion Véhicules - Client");
+        stage.setMaximized(true);
+    }
+
+    /**
+     * Redirection vers le dashboard vendeur
+     */
+    private void redirectToVendeurDashboard(Utilisateur user) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/VendeurDashboard.fxml"));
+        Parent root = loader.load();
+
+        Stage stage = (Stage) emailField.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Gestion Véhicules - Vendeur");
+        stage.setMaximized(true);
+    }
+
+    /**
+     * Redirection vers le dashboard admin
+     */
+    private void redirectToAdminDashboard(Utilisateur user) throws IOException {
+        // TODO: Créer le dashboard admin
+        showError("Dashboard admin en cours de développement");
+    }
+
+    /**
+     * Aller vers la page d'inscription
+     */
+    @FXML
+    private void handleGoToRegister() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/Register.fxml"));
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (IOException e) {
+            showError("Erreur lors du chargement de la page d'inscription");
+            e.printStackTrace();
         }
     }
-    @FXML
-    private void handleReset(){
-        emailField.clear();
-        passwordField.clear();
-        System.out.println("Formulaire réinitialisé");
-    }
-@FXML
-    private void showAlert(String title , String message){
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-
+    /**
+     * Validation email
+     */
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 
-}
-@FXML
-    private void initialize(){
-        System.out.println("Initialisation avec succées !");
-}
+    /**
+     * Afficher une erreur
+     */
+    private void showError(String message) {
+        errorLabel.setText("⚠️ " + message);
+        errorLabel.setVisible(true);
+    }
 
+    /**
+     * Masquer l'erreur
+     */
+    private void hideError() {
+        errorLabel.setVisible(false);
+    }
 }

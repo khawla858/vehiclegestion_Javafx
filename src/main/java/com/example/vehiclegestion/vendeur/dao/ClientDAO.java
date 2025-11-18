@@ -8,15 +8,12 @@ import java.util.List;
 
 public class ClientDAO {
 
-    private Connection connection;
+    private final Connection connection;
     private final int VENDEUR_ID = 1; // ID du vendeur connecté
 
-    public ClientDAO() {
-        try {
-            connection = DatabaseConnection.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public ClientDAO() throws SQLException {
+        // ✅ Laisse l'exception remonter
+        connection = DatabaseConnection.getConnection();
     }
 
     // 🔹 Récupérer tous les clients du vendeur
@@ -54,11 +51,12 @@ public class ClientDAO {
                     clients.add(client);
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans getClientsByVendeur: " + e.getMessage());
+            throw e;
         }
         return clients;
     }
-
-
 
     // 🔹 Récupérer un client par son ID
     public Client getClientById(int clientId) throws SQLException {
@@ -72,11 +70,14 @@ public class ClientDAO {
                     return mapResultSetToClient(rs);
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans getClientById: " + e.getMessage());
+            throw e;
         }
         return null;
     }
 
-    // 🔹 AJOUTER CETTE MÉTHODE : Supprimer un client
+    // 🔹 Supprimer un client
     public boolean deleteClient(int clientId) throws SQLException {
         String query = "DELETE FROM Client WHERE id_client = ? AND id_vendeur = ?";
 
@@ -117,7 +118,11 @@ public class ClientDAO {
                 }
             }
 
+            System.out.println("✅ Client ajouté - Lignes affectées: " + rowsAffected);
             return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans addClient: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -136,7 +141,12 @@ public class ClientDAO {
             stmt.setInt(8, client.getId());
             stmt.setInt(9, VENDEUR_ID);
 
-            return stmt.executeUpdate() > 0;
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("✅ Client mis à jour - Lignes affectées: " + rowsAffected);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans updateClient: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -182,6 +192,9 @@ public class ClientDAO {
                     clients.add(client);
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans searchClients: " + e.getMessage());
+            throw e;
         }
         return clients;
     }
@@ -195,7 +208,9 @@ public class ClientDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
             }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans countClientsByVendeur: " + e.getMessage());
+            throw e;
         }
     }
-
 }

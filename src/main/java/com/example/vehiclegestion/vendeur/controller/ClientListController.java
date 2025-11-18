@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.List;
 
@@ -20,13 +21,25 @@ public class ClientListController implements Initializable {
     @FXML private Label activeClientsLabel;
     @FXML private Label buyersLabel;
 
-    private ClientDAO clientDAO = new ClientDAO();
+    private ClientDAO clientDAO;
     private ObservableList<Client> clientsList = FXCollections.observableArrayList();
     private final int VENDEUR_ID = 1;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("🚀 Initialisation de la liste des clients...");
+
+        // ✅ Initialiser ClientDAO avec gestion d'exception
+        try {
+            clientDAO = new ClientDAO();
+            System.out.println("✅ Connexion à la base de données établie");
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur de connexion à la base de données: " + e.getMessage());
+            e.printStackTrace();
+            showError("Impossible de se connecter à la base de données.\nVérifiez votre configuration.");
+            return; // Arrêter l'initialisation si la connexion échoue
+        }
+
         setupTable();
         setupFilters();
         loadClients();
@@ -73,11 +86,18 @@ public class ClientListController implements Initializable {
     }
 
     private void loadClients() {
+        // ✅ Vérifier que clientDAO est initialisé
+        if (clientDAO == null) {
+            showError("La connexion à la base de données n'est pas disponible.");
+            return;
+        }
+
         try {
             List<Client> clients = clientDAO.getClientsByVendeur(VENDEUR_ID);
             clientsList.setAll(clients);
             System.out.println("✅ " + clients.size() + " clients chargés");
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL lors du chargement des clients: " + e.getMessage());
             e.printStackTrace();
             showError("Erreur de chargement des clients: " + e.getMessage());
         }
@@ -98,8 +118,21 @@ public class ClientListController implements Initializable {
         if (searchTerm.isEmpty()) {
             loadClients();
         } else {
-            // Recherche simple - à améliorer
-            System.out.println("Recherche: " + searchTerm);
+            // ✅ Vérifier que clientDAO est initialisé
+            if (clientDAO == null) {
+                showError("La connexion à la base de données n'est pas disponible.");
+                return;
+            }
+
+            try {
+                List<Client> results = clientDAO.searchClients(searchTerm);
+                clientsList.setAll(results);
+                System.out.println("🔍 Recherche: " + searchTerm + " - " + results.size() + " résultats");
+            } catch (SQLException e) {
+                System.err.println("❌ Erreur lors de la recherche: " + e.getMessage());
+                e.printStackTrace();
+                showError("Erreur de recherche: " + e.getMessage());
+            }
         }
     }
 
@@ -172,6 +205,12 @@ public class ClientListController implements Initializable {
             alert.setContentText("Êtes-vous sûr de vouloir supprimer " + selected.getFullName() + "?");
 
             if (alert.showAndWait().get() == ButtonType.OK) {
+                // ✅ Vérifier que clientDAO est initialisé
+                if (clientDAO == null) {
+                    showError("La connexion à la base de données n'est pas disponible.");
+                    return;
+                }
+
                 try {
                     boolean success = clientDAO.deleteClient(selected.getId());
                     if (success) {
@@ -179,8 +218,11 @@ public class ClientListController implements Initializable {
                         loadClients();
                         updateStatistics();
                         showAlert("Succès", "Client supprimé avec succès");
+                    } else {
+                        showAlert("Erreur", "Impossible de supprimer le client");
                     }
-                } catch (Exception e) {
+                } catch (SQLException e) {
+                    System.err.println("❌ Erreur lors de la suppression: " + e.getMessage());
                     e.printStackTrace();
                     showError("Erreur lors de la suppression: " + e.getMessage());
                 }
@@ -201,7 +243,7 @@ public class ClientListController implements Initializable {
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");
-        alert.setHeaderText("Erreur de chargement");
+        alert.setHeaderText("Erreur de base de données");
         alert.setContentText(message);
         alert.showAndWait();
     }

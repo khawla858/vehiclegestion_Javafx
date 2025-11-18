@@ -9,15 +9,11 @@ import java.util.List;
 
 public class ArticleDAO {
 
-    private Connection connection;
+    private final Connection connection;
 
-    public ArticleDAO() {
-        try {
-            // ✅ Utilise la classe commune pour obtenir la connexion
-            connection = DatabaseConnection.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public ArticleDAO() throws SQLException {
+        // ✅ Laisse l'exception remonter au lieu de la capturer
+        connection = DatabaseConnection.getConnection();
     }
 
     // 🔹 Récupérer tous les articles d'un vendeur
@@ -83,7 +79,12 @@ public class ArticleDAO {
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, articleId);
-            return stmt.executeUpdate() > 0;
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("✅ Article supprimé - Lignes affectées: " + rowsAffected);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans deleteArticle: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -100,7 +101,12 @@ public class ArticleDAO {
             stmt.setString(6, article.getImage());
             stmt.setInt(7, article.getId());
 
-            return stmt.executeUpdate() > 0;
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("✅ Article mis à jour - Lignes affectées: " + rowsAffected);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans updateArticle: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -123,6 +129,9 @@ public class ArticleDAO {
                     return article;
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans getArticleById: " + e.getMessage());
+            throw e;
         }
         return null;
     }
@@ -136,6 +145,9 @@ public class ArticleDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
             }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur SQL dans countArticlesByVendeur: " + e.getMessage());
+            throw e;
         }
     }
 }

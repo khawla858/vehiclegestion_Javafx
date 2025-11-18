@@ -6,26 +6,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class MainApp extends Application {
-    @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/VendeurDashboard.fxml"));
-        Parent root = null;   // Charge le FXML une seule fois
-        try {
-            root = loader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        Scene scene = new Scene(root); // Utilise root ici
-        stage.setScene(scene);
-        stage.setTitle("Dashboard Vendeur");
-        stage.show();
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/Login.fxml"));
+        Scene scene = new Scene(root);
+
+        primaryStage.setTitle("Gestion Véhicules - Connexion");
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 }

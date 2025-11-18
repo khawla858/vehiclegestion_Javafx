@@ -46,7 +46,24 @@
             <version>42.7.3</version>
         </dependency>
 
+        <!-- Ikonli Core -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+
+        <!-- FontAwesome icons -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+
     </dependencies>
+
+
+
 
     <build>
         <plugins>
@@ -56,7 +73,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.example.salesmanagement.MainApp</mainClass>
+                    <mainClass>com.example.vehiclegestion.MainApp</mainClass>
                 </configuration>
             </plugin>
         </plugins>

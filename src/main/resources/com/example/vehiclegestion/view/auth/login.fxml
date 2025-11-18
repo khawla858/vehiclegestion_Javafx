@@ -1,55 +1,263 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<VBox alignment="CENTER" spacing="20" xmlns="http://javafx.com/javafx/11.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.vehiclegestion.auth.controller.LoginController"
-      style="-fx-background-color: #f8f9fa;">
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.vehiclegestion.auth.controller.LoginController"
+           stylesheets="@../../css/auth.css"
+           prefWidth="1200" prefHeight="800" minWidth="400" minHeight="500">
 
-    <padding>
-        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
-    </padding>
 
-    <!-- En-tête -->
-    <VBox alignment="CENTER" spacing="10">
-        <Label text="🚗" style="-fx-font-size: 48;"/>
-        <Label text="AutoMarket" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-        <Label text="Connexion à votre espace client" style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;" />
+    <!-- Fond principal responsive -->
+    <VBox alignment="CENTER" spacing="0" styleClass="login-background"
+          StackPane.alignment="CENTER" VBox.vgrow="ALWAYS">
+
+
+
+        <!-- Par cette ligne : -->
+        <HBox alignment="CENTER" spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"
+              maxWidth="1400" maxHeight="900" prefWidth="1000" prefHeight="650"
+              styleClass="main-hbox">
+
+
+
+            <!-- Section illustration (cachée sur petits écrans) -->
+            <VBox fx:id="illustrationSection" alignment="CENTER" spacing="30"
+                  styleClass="illustration-section"
+                  prefWidth="500" minWidth="400" maxWidth="600"
+                  HBox.hgrow="ALWAYS" visible="true" managed="true">
+
+                <!-- Logo véhicule premium -->
+                <VBox alignment="CENTER" spacing="20">
+                    <Label text="🏎️" styleClass="premium-logo-icon">
+                        <font>
+                            <Font size="80"/>
+                        </font>
+                    </Label>
+                    <VBox alignment="CENTER" spacing="10">
+                        <Label text="Gestion Véhicules" styleClass="illustration-title">
+                            <font>
+                                <Font name="System Bold" size="32"/>
+                            </font>
+                        </Label>
+                        <Label text="Solution premium de gestion automobile"
+                               styleClass="illustration-subtitle" textAlignment="CENTER"
+                               wrapText="true" maxWidth="350">
+                            <font>
+                                <Font size="14"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </VBox>
+
+                <!-- Features list -->
+                <VBox alignment="CENTER_LEFT" spacing="15" styleClass="features-list"
+                      maxWidth="400">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="✓" styleClass="feature-icon">
+                            <font>
+                                <Font size="16"/>
+                            </font>
+                        </Label>
+                        <Label text="Gestion complète du parc automobile"
+                               styleClass="feature-text" wrapText="true">
+                            <font>
+                                <Font size="13"/>
+                            </font>
+                        </Label>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="✓" styleClass="feature-icon">
+                            <font>
+                                <Font size="16"/>
+                            </font>
+                        </Label>
+                        <Label text="Suivi en temps réel des véhicules"
+                               styleClass="feature-text" wrapText="true">
+                            <font>
+                                <Font size="13"/>
+                            </font>
+                        </Label>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="✓" styleClass="feature-icon">
+                            <font>
+                                <Font size="16"/>
+                            </font>
+                        </Label>
+                        <Label text="Rapports détaillés et analytics"
+                               styleClass="feature-text" wrapText="true">
+                            <font>
+                                <Font size="13"/>
+                            </font>
+                        </Label>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Carte de connexion responsive -->
+            <VBox alignment="CENTER" spacing="0" styleClass="login-card-container"
+                  prefWidth="450" minWidth="400" maxWidth="500"
+                  HBox.hgrow="ALWAYS">
+
+                <VBox alignment="CENTER" spacing="25" styleClass="login-card"
+                      VBox.vgrow="ALWAYS" maxWidth="420">
+
+                    <!-- En-tête responsive -->
+                    <VBox alignment="CENTER" spacing="15">
+                        <!-- Logo mobile (visible seulement sur petits écrans) -->
+                        <Label text="🚗" styleClass="mobile-logo-icon"
+                               visible="false" managed="false">
+                            <font>
+                                <Font size="45"/>
+                            </font>
+                        </Label>
+                        <VBox alignment="CENTER" spacing="8">
+                            <Label text="Connexion" styleClass="app-title">
+                                <font>
+                                    <Font name="System Bold" size="26"/>
+                                </font>
+                            </Label>
+                            <Label text="Accédez à votre espace véhicules"
+                                   styleClass="subtitle" textAlignment="CENTER"
+                                   wrapText="true" maxWidth="300">
+                                <font>
+                                    <Font size="13"/>
+                                </font>
+                            </Label>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Formulaire responsive -->
+                    <VBox spacing="20" VBox.vgrow="ALWAYS" prefWidth="380"
+                          maxWidth="400">
+
+                        <!-- Champ Email -->
+                        <VBox spacing="8" VBox.vgrow="ALWAYS">
+                            <Label text="Adresse Email" styleClass="field-label">
+                                <font>
+                                    <Font name="System Bold" size="12"/>
+                                </font>
+                            </Label>
+                            <TextField fx:id="emailField" promptText="exemple@email.com"
+                                       styleClass="custom-field" prefHeight="45">
+                                <font>
+                                    <Font size="14"/>
+                                </font>
+                            </TextField>
+                        </VBox>
+
+                        <!-- Champ Mot de passe -->
+                        <VBox spacing="8" VBox.vgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="0">
+                                <Label text="Mot de passe" styleClass="field-label">
+                                    <font>
+                                        <Font name="System Bold" size="12"/>
+                                    </font>
+                                </Label>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Hyperlink text="Mot de passe oublié?"
+                                           styleClass="forgot-link"
+                                           onAction="#handleForgotPassword">
+                                    <font>
+                                        <Font size="11"/>
+                                    </font>
+                                </Hyperlink>
+                            </HBox>
+                            <PasswordField fx:id="passwordField" promptText="••••••••"
+                                           styleClass="custom-field" prefHeight="45">
+                                <font>
+                                    <Font size="14"/>
+                                </font>
+                            </PasswordField>
+                        </VBox>
+
+                        <!-- Options supplémentaires -->
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <CheckBox fx:id="rememberCheckbox" text="Se souvenir de moi"
+                                      styleClass="remember-checkbox"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                        </HBox>
+
+                        <!-- Message d'erreur -->
+                        <Label fx:id="errorLabel" styleClass="error-message"
+                               visible="false" wrapText="true" prefHeight="60"
+                               maxWidth="380">
+                            <font>
+                                <Font size="11"/>
+                            </font>
+                        </Label>
+
+                        <!-- Bouton de connexion -->
+                        <Button text="Se connecter" onAction="#handleLogin"
+                                styleClass="login-button" maxWidth="Infinity"
+                                prefHeight="50">
+                            <font>
+                                <Font name="System Bold" size="14"/>
+                            </font>
+                        </Button>
+
+                        <!-- Séparateur -->
+                        <HBox alignment="CENTER" spacing="15" prefHeight="30">
+                            <Separator HBox.hgrow="ALWAYS" styleClass="divider"/>
+                            <Label text="OU" styleClass="divider-text">
+                                <font>
+                                    <Font name="System Bold" size="10"/>
+                                </font>
+                            </Label>
+                            <Separator HBox.hgrow="ALWAYS" styleClass="divider"/>
+                        </HBox>
+
+                        <!-- Boutons sociaux (optionnel) -->
+                        <HBox alignment="CENTER" spacing="12" styleClass="social-buttons-container">
+
+                            <Button text="Microsoft" styleClass="social-button microsoft-button"
+                                    maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                    prefHeight="40" onAction="#handleMicrosoftLogin">
+                                <font>
+                                    <Font name="System Bold" size="12"/>
+                                </font>
+                            </Button>
+                        </HBox>
+
+                        <!-- Lien inscription -->
+                        <HBox alignment="CENTER" spacing="5" styleClass="signup-container">
+                            <Label text="Nouveau sur la plateforme ?" styleClass="signup-text">
+                                <font>
+                                    <Font size="12"/>
+                                </font>
+                            </Label>
+                            <Hyperlink text="Créer un compte" onAction="#handleGoToRegister"
+                                       styleClass="signup-link">
+                                <font>
+                                    <Font name="System Bold" size="12"/>
+                                </font>
+                            </Hyperlink>
+                        </HBox>
+
+                        <!-- Footer -->
+                        <VBox alignment="CENTER" spacing="5" styleClass="footer-container">
+                            <Label text="© 2024 Gestion Véhicules. Tous droits réservés."
+                                   styleClass="footer-text">
+                                <font>
+                                    <Font size="10"/>
+                                </font>
+                            </Label>
+                            <HBox alignment="CENTER" spacing="15">
+                                <Hyperlink text="Conditions d'utilisation"
+                                           styleClass="footer-link"/>
+                                <Hyperlink text="Politique de confidentialité"
+                                           styleClass="footer-link"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </HBox>
     </VBox>
-
-    <!-- Carte de connexion -->
-    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
-        <VBox spacing="15" style="-fx-pref-width: 300;">
-            <Label text="Email" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-            <TextField fx:id="emailField" promptText="votre@email.com"
-                       style="-fx-pref-height: 40; -fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #bdc3c7;"/>
-
-            <Label text="Mot de passe" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-            <PasswordField fx:id="passwordField" promptText="Votre mot de passe"
-                           style="-fx-pref-height: 40; -fx-background-radius: 5; -fx-border-radius: 5; -fx-border-color: #bdc3c7;"/>
-        </VBox>
-
-        <!-- Boutons -->
-        <VBox spacing="10" style="-fx-pref-width: 300;">
-            <Button fx:id="loginButton" text="Se connecter" onAction="#handleLogin"
-                    style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-height: 45; -fx-background-radius: 5;" />
-
-            <HBox alignment="CENTER" spacing="5">
-                <Label text="Nouveau client?" style="-fx-text-fill: #7f8c8d;" />
-                <Button text="Créer un compte" onAction="#handleRegister"
-                        style="-fx-background-color: transparent; -fx-text-fill: #e67e22; -fx-font-weight: bold; -fx-border-color: transparent; -fx-padding: 0;" />
-            </HBox>
-        </VBox>
-    </VBox>
-
-    <!-- Message pour les tests -->
-    <VBox alignment="CENTER" spacing="5">
-        <Label text="🔧 Mode Développement" style="-fx-font-size: 12; -fx-text-fill: #e67e22; -fx-font-weight: bold;" />
-        <Label text="Utilisez n'importe quel email/mot de passe pour tester"
-               style="-fx-font-size: 11; -fx-text-fill: #95a5a6; -fx-font-style: italic; -fx-text-alignment: center;" />
-    </VBox>
-</VBox>
+</StackPane>

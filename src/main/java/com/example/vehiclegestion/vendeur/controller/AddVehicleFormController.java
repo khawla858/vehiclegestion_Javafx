@@ -35,7 +35,14 @@ public class AddVehicleFormController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        articleDAO = new ArticleDAO();
+        try {
+            articleDAO = new ArticleDAO();
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de l'initialisation de ArticleDAO: " + e.getMessage());
+            e.printStackTrace();
+            // Optionnel : lancer une exception runtime si critique
+            // throw new RuntimeException("Impossible de se connecter à la base de données", e);
+        }
         setupForm();
     }
 

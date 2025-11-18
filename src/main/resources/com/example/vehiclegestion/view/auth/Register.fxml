@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.vehiclegestion.auth.controller.RegisterController"
+           stylesheets="@../../css/auth.css">
+
+    <!-- Fond dégradé -->
+    <VBox alignment="CENTER" spacing="0" styleClass="login-background">
+
+        <!-- Carte d'inscription -->
+        <VBox alignment="CENTER" spacing="20" styleClass="login-card" maxWidth="500" maxHeight="700">
+
+            <!-- Titre -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="🚗" styleClass="logo-icon">
+                    <font><Font size="45"/></font>
+                </Label>
+                <Label text="Créer un compte" styleClass="app-title">
+                    <font><Font name="System Bold" size="26"/></font>
+                </Label>
+                <Label text="Rejoignez notre plateforme" styleClass="subtitle">
+                    <font><Font size="13"/></font>
+                </Label>
+            </VBox>
+
+            <!-- Formulaire -->
+            <ScrollPane fitToWidth="true" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+                <VBox spacing="18" padding="5">
+
+                    <!-- Nom et Prénom -->
+                    <HBox spacing="15">
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
+                            <Label text="Nom" styleClass="field-label">
+                                <font><Font name="System Bold" size="12"/></font>
+                            </Label>
+                            <TextField fx:id="nomField" promptText="Votre nom" styleClass="custom-field">
+                                <font><Font size="13"/></font>
+                            </TextField>
+                        </VBox>
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
+                            <Label text="Prénom" styleClass="field-label">
+                                <font><Font name="System Bold" size="12"/></font>
+                            </Label>
+                            <TextField fx:id="prenomField" promptText="Votre prénom" styleClass="custom-field">
+                                <font><Font size="13"/></font>
+                            </TextField>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Email -->
+                    <VBox spacing="8">
+                        <Label text="Email" styleClass="field-label">
+                            <font><Font name="System Bold" size="12"/></font>
+                        </Label>
+                        <TextField fx:id="emailField" promptText="exemple@email.com" styleClass="custom-field">
+                            <font><Font size="13"/></font>
+                        </TextField>
+                    </VBox>
+
+                    <!-- Mot de passe -->
+                    <VBox spacing="8">
+                        <Label text="Mot de passe" styleClass="field-label">
+                            <font><Font name="System Bold" size="12"/></font>
+                        </Label>
+                        <PasswordField fx:id="passwordField" promptText="Au moins 6 caractères" styleClass="custom-field">
+                            <font><Font size="13"/></font>
+                        </PasswordField>
+                    </VBox>
+
+                    <!-- Confirmation mot de passe -->
+                    <VBox spacing="8">
+                        <Label text="Confirmer le mot de passe" styleClass="field-label">
+                            <font><Font name="System Bold" size="12"/></font>
+                        </Label>
+                        <PasswordField fx:id="confirmPasswordField" promptText="Répétez le mot de passe" styleClass="custom-field">
+                            <font><Font size="13"/></font>
+                        </PasswordField>
+                    </VBox>
+
+                    <!-- Type de compte -->
+                    <VBox spacing="10">
+                        <Label text="Type de compte" styleClass="field-label">
+                            <font><Font name="System Bold" size="12"/></font>
+                        </Label>
+                        <HBox spacing="15">
+                            <RadioButton fx:id="clientRadio" text="Client" styleClass="custom-radio" selected="true">
+                                <font><Font size="13"/></font>
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="roleGroup"/>
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton fx:id="vendeurRadio" text="Vendeur" styleClass="custom-radio" toggleGroup="$roleGroup">
+                                <font><Font size="13"/></font>
+                            </RadioButton>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Message d'erreur -->
+                    <Label fx:id="errorLabel" styleClass="error-message" visible="false" wrapText="true">
+                        <font><Font size="11"/></font>
+                    </Label>
+
+                    <!-- Bouton d'inscription -->
+                    <Button text="Créer mon compte" onAction="#handleRegister" styleClass="login-button" maxWidth="Infinity">
+                        <font><Font name="System Bold" size="14"/></font>
+                    </Button>
+
+                    <!-- Retour à la connexion -->
+                    <HBox alignment="CENTER" spacing="5">
+                        <Label text="Vous avez déjà un compte ?" styleClass="signup-text">
+                            <font><Font size="12"/></font>
+                        </Label>
+                        <Hyperlink text="Se connecter" onAction="#handleGoToLogin" styleClass="signup-link">
+                            <font><Font name="System Bold" size="12"/></font>
+                        </Hyperlink>
+                    </HBox>
+
+                </VBox>
+            </ScrollPane>
+
+        </VBox>
+    </VBox>
+</StackPane>
