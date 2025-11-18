@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.vehiclegestion.vendeur.controller.layout.NavbarController"
+      spacing="20"
+      style="-fx-background-color: #ffffff; -fx-padding: 10 25;-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2)">
+
+    <!-- LOGO -->
+    <HBox spacing="12" style="-fx-alignment: CENTER_LEFT;">
+        <Label text="AutoSales Pro" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    </HBox>
+
+    <!-- ESPACE FLEXIBLE -->
+    <Pane HBox.hgrow="ALWAYS"/>
+
+    <!-- BARRE DE RECHERCHE (déplacée à droite) -->
+    <HBox spacing="10"
+          style="-fx-alignment: CENTER; -fx-background-color: #f8f9fa; -fx-background-radius: 20; -fx-padding: 5 15;">
+        <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#7f8c8d"/>
+        <TextField fx:id="searchField" promptText="Rechercher..."
+                   style="-fx-background-color: transparent; -fx-border-width: 0; -fx-pref-width: 200;"/>
+    </HBox>
+
+    <!-- ICÔNES NOTIFICATIONS -->
+    <HBox spacing="15" style="-fx-alignment: CENTER;">
+
+        <!-- NOTIFICATIONS -->
+        <StackPane styleClass="icon-container" onMouseClicked="#showNotifications">
+            <FontIcon iconLiteral="far-bell" iconSize="16"/>
+            <Label text="3" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
+        </StackPane>
+
+        <!-- MESSAGES -->
+        <StackPane styleClass="icon-container" onMouseClicked="#showMessages">
+            <FontIcon iconLiteral="far-comment-alt" iconSize="16"/>
+            <Label text="5" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
+        </StackPane>
+
+        <!-- PANIER -->
+        <StackPane styleClass="icon-container" onMouseClicked="#showCart">
+            <FontIcon iconLiteral="fas-shopping-cart" iconSize="16"/>
+            <Label text="2" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
+        </StackPane>
+
+        <!-- SEPARATEUR -->
+        <Separator orientation="VERTICAL" style="-fx-pref-height: 25; -fx-padding: 0 5;"/>
+
+        <!-- PROFIL UTILISATEUR -->
+        <MenuButton fx:id="profileMenu"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
+            <graphic>
+                <HBox spacing="10" style="-fx-alignment: CENTER; -fx-padding: 5;">
+                    <!-- PHOTO DE PROFIL -->
+                    <StackPane>
+                        <ImageView fx:id="profileImage" fitWidth="32" fitHeight="32" pickOnBounds="true" preserveRatio="true"/>
+                    </StackPane>
+
+
+                    <!-- INFOS UTILISATEUR -->
+                    <VBox spacing="2" style="-fx-padding: 0 5 0 0;">
+                        <Label text="John Doe" style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                        <Label text="Sales Manager" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <!-- FLÈCHE -->
+                    <FontIcon iconLiteral="fas-chevron-down" iconSize="12" iconColor="#7f8c8d"/>
+                </HBox>
+            </graphic>
+
+            <items>
+                <MenuItem text="Mon Profil" onAction="#showUserProfile" >
+                    <graphic><FontIcon iconLiteral="fas-user" iconColor="#2c3e50"/></graphic>
+                </MenuItem>
+                <MenuItem text="Paramètres du compte" onAction="#showAccountSettings" >
+                    <graphic><FontIcon iconLiteral="fas-cog" iconColor="#2c3e50"/></graphic>
+                </MenuItem>
+                <MenuItem text="Dernières mises à jour" onAction="#showLastUpdates" >
+                    <graphic><FontIcon iconLiteral="fas-sync-alt" iconColor="#2c3e50"/></graphic>
+                </MenuItem>
+                <SeparatorMenuItem/>
+                <MenuItem text="Aide / Support" onAction="#showHelpCenter" >
+                    <graphic><FontIcon iconLiteral="fas-question-circle" iconColor="#2c3e50"/></graphic>
+                </MenuItem>
+                <MenuItem text="Envoyer un feedback" onAction="#sendFeedback" >
+                    <graphic><FontIcon iconLiteral="fas-comment-dots" iconColor="#2c3e50"/></graphic>
+                </MenuItem>
+                <SeparatorMenuItem/>
+                <MenuItem text="Déconnexion" onAction="#handleLogout" >
+                    <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconColor="#e74c3c"/></graphic>
+                </MenuItem>
+            </items>
+        </MenuButton>
+    </HBox>
+</HBox>

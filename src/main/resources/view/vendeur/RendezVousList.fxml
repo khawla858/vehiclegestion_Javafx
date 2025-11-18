@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.vendeur.controller.RendezVousListController"
+            fitToWidth="true"
+            style="-fx-background-color: #f4f6f9;"
+            vbarPolicy="ALWAYS">
+
+    <VBox spacing="20" style="-fx-padding: 25; -fx-background-color: white;">
+
+        <!-- HEADER -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="📅 Gestion des Rendez-Vous"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Button text="➕ Ajouter un RDV"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 14px;"
+                    onAction="#addRendezVous"/>
+            <Button text="📤 Exporter"
+                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 14px;"
+                    onAction="#exportRendezVous"/>
+        </HBox>
+
+        <!-- FILTRES ET CALENDRIER -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <ComboBox fx:id="statutFilter" promptText="Tous les statuts" style="-fx-pref-width: 150;"/>
+            <DatePicker fx:id="dateFilter" promptText="Filtrer par date" style="-fx-pref-width: 150;"/>
+            <TextField fx:id="clientFilter" promptText="Rechercher par client" style="-fx-pref-width: 200;"/>
+            <Button text="🔄 Actualiser"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 10 15; -fx-background-radius: 8;"
+                    onAction="#refreshRendezVous"/>
+        </HBox>
+
+        <!-- TABLEAU DES RDV -->
+        <TableView fx:id="rdvTable" style="-fx-background-color: white; -fx-border-color: #ddd;">
+            <columns>
+                <TableColumn text="ID RDV" prefWidth="80">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="idRdv"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Client" prefWidth="150">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="nomClient"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Téléphone" prefWidth="120">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="telephoneClient"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Voiture" prefWidth="150">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="titreArticle"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Date" prefWidth="100">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="dateRdv"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Heure" prefWidth="80">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="heureRdv"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Type" prefWidth="120">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="typeRdv"/>
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn text="Statut" prefWidth="100">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="statut"/>
+                    </cellValueFactory>
+                </TableColumn>
+
+            </columns>
+        </TableView>
+
+        <!-- CALENDRIER SIMPLE -->
+        <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #ecf0f1; -fx-background-radius: 10;">
+            <Label text="📆 Calendrier des RDV" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <DatePicker fx:id="calendarPicker" style="-fx-pref-width: 200;"/>
+            <ListView fx:id="calendarList" style="-fx-pref-height: 150;"/>
+        </VBox>
+
+        <!-- STATISTIQUES -->
+        <HBox spacing="20">
+            <VBox alignment="CENTER" spacing="5"
+                  style="-fx-background-color: #e8f6f3; -fx-padding: 15; -fx-background-radius: 10;">
+                <Label text="📅" style="-fx-font-size: 24px;"/>
+                <Label fx:id="totalRdvLabel" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text="Total RDV" style="-fx-font-size: 12px;"/>
+            </VBox>
+        </HBox>
+
+    </VBox>
+</ScrollPane>
