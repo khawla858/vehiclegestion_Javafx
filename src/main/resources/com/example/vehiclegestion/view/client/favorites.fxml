@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.FavoritesController"
+            stylesheets="@../../../css/client-dashboard.css">
+
+    <!-- Header identique au dashboard pour la cohérence -->
+    <top>
+        <HBox style="-fx-background-color: #2c3e50; -fx-padding: 15 30; -fx-spacing: 20;" alignment="CENTER_LEFT">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ImageView fitWidth="40" fitHeight="40">
+                    <image>
+                        <Image url="@../../images/car-logo.png" />
+                    </image>
+                </ImageView>
+                <Label text="AutoMarket" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" />
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button text="← Retour" onAction="#goBackToDashboard"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" />
+        </HBox>
+    </top>
+
+    <!-- Contenu de la page favoris -->
+    <center>
+        <ScrollPane fitToWidth="true">
+            <VBox spacing="20" style="-fx-padding: 30;">
+
+                <!-- Titre de la page -->
+                <Label fx:id="pageTitle" text="Mes Favoris"
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+                <!-- Liste des favoris -->
+                <VBox spacing="15">
+                    <Label text="5 véhicules dans vos favoris"
+                           style="-fx-text-fill: #7f8c8d; -fx-font-size: 16;" />
+
+                    <!-- Exemple de carte véhicule favori -->
+                    <HBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+                          spacing="15">
+
+                        <ImageView fitWidth="120" fitHeight="80"
+                                   style="-fx-background-color: #f8f9fa; -fx-background-radius: 5;" />
+
+                        <VBox spacing="5" style="-fx-pref-width: 300;">
+                            <Label text="BMW Série 3 2023"
+                                   style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                            <Label text="35 000 € • 15 000 km • Diesel"
+                                   style="-fx-text-fill: #7f8c8d;" />
+                            <Label text="Paris • Disponible immédiatement"
+                                   style="-fx-text-fill: #7f8c8d; -fx-font-size: 12;" />
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <VBox spacing="10" alignment="CENTER_RIGHT">
+                            <Button text="🗑️ Retirer" onAction="#removeFromFavorites"
+                                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;" />
+                            <Button text="📞 Contacter" onAction="#contactSeller"
+                                    style="-fx-background-color: #3498db; -fx-text-fill: white;" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Message si pas de favoris -->
+                    <!-- <Label text="Aucun véhicule dans vos favoris" style="-fx-text-fill: #bdc3c7; -fx-font-size: 16; -fx-padding: 40;" /> -->
+
+                </VBox>
+
+                <!-- Bouton pour explorer plus de véhicules -->
+                <HBox alignment="CENTER" style="-fx-padding: 20 0;">
+                    <Button text="🚗 Explorer tous les véhicules" onAction="#browseVehicles"
+                            style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 16; -fx-padding: 10 20;" />
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
