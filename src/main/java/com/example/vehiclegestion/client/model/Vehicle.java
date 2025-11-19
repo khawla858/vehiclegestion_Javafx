@@ -35,7 +35,15 @@ public class Vehicle {
     // Getters et Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+    private String sellerEmail;
 
+    public String getSellerEmail() {
+        return sellerEmail;
+    }
+
+    public void setSellerEmail(String sellerEmail) {
+        this.sellerEmail = sellerEmail;
+    }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 

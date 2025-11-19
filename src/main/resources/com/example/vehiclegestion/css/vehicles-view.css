@@ -33,3 +33,126 @@
 .action-button:hover {
     -fx-opacity: 0.9;
 }
+/* ===== FAVORIS PAGE STYLES ===== */
+
+.favorites-header {
+    -fx-background-color: linear-gradient(to bottom, #FFFFFF, #FFF5F5);
+    -fx-border-color: #FFE0E0;
+    -fx-border-width: 0 0 2 0;
+}
+
+.page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FF0000;
+}
+
+.subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #666666;
+}
+
+.back-button {
+    -fx-background-color: #F5F5F5;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.back-button:hover {
+    -fx-background-color: #E0E0E0;
+}
+
+.clear-all-button {
+    -fx-background-color: #FFEBEE;
+    -fx-text-fill: #FF0000;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.clear-all-button:hover {
+    -fx-background-color: #FF0000;
+    -fx-text-fill: white;
+}
+
+.clear-all-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.info-banner {
+    -fx-background-color: #E3F2FD;
+    -fx-padding: 12 15;
+    -fx-background-radius: 8;
+    -fx-border-color: #90CAF9;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.info-text {
+    -fx-text-fill: #1976D2;
+    -fx-font-size: 13px;
+}
+
+.favorites-scroll {
+    -fx-background-color: #FAFAFA;
+    -fx-border-width: 0;
+}
+
+.favorites-scroll .viewport {
+    -fx-background-color: #FAFAFA;
+}
+
+/* État vide */
+.empty-state {
+    -fx-background-color: white;
+    -fx-padding: 60;
+}
+
+.empty-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.empty-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #999999;
+}
+
+.primary-button {
+    -fx-background-color: #0066FF;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 30;
+    -fx-background-radius: 25;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.primary-button:hover {
+    -fx-background-color: #0052CC;
+}
+
+/* Cartes de véhicules */
+.vehicle-card {
+    -fx-background-color: white;
+    -fx-border-color: #E8E8E8;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);
+}
+
+.vehicle-card:hover {
+    -fx-border-color: #FF0000;
+    -fx-effect: dropshadow(gaussian, rgba(255,0,0,0.2), 12, 0, 0, 4);
+}

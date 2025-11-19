@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c7b9e3b3-9612-4fce-8814-9fd1aab00aad" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/vehicles/chos.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/LoginConroller.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/MainApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/auth/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/auth/controller/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientFavoritesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientFavoritesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientVehiclesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientVehiclesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/LoginController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/NavigationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/NavigationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/FavoriteDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/FavoriteDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/VehicleDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/VehicleDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/model/Favorite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/model/Favorite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/model/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/model/Vehicle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/utils/NavigationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/utils/NavigationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/css/vehicles-view.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/css/vehicles-view.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/view/client/vehicles-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/view/client/vehicles-view.fxml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FxmlFile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="35LMRGztS6vANoMuh4CgT921oop" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Merging main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/khadi/vehiclegestion_Javafx&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="MainApp" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="25" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.example.vehiclegestion.MainApp" />
+      <module name="vehiclegestion" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\khadi\Downloads\openjfx-21.0.9_windows-x64_bin-sdk\javafx-sdk-21.0.9\lib&quot; --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c7b9e3b3-9612-4fce-8814-9fd1aab00aad" name="Changes" comment="" />
+      <created>1762884891824</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1762884891824</updated>
+    </task>
+    <servers />
+  </component>
+</project>

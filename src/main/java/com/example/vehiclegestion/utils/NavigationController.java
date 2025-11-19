@@ -5,35 +5,62 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class NavigationController {
-    private static Stage primaryStage;
 
-    public static void setPrimaryStage(Stage stage) {
-        primaryStage = stage;
-    }
-
-    public static void loadFXML(String fxmlPath) {
+    public static void loadDashboard() {
         try {
-            FXMLLoader loader = new FXMLLoader(NavigationController.class.getResource(fxmlPath));
-            Parent root = loader.load();
-            Scene scene = new Scene(root, 1200, 800);
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            System.out.println("🚀 Chargement du dashboard...");
 
-            System.out.println("✅ Navigation vers: " + fxmlPath);
-        } catch (IOException e) {
-            System.err.println("❌ Erreur navigation: " + e.getMessage());
+            // Charger le FXML du dashboard
+            FXMLLoader loader = new FXMLLoader(NavigationController.class.getResource("/com/example/vehiclegestion/view/client/client-dashboard.fxml"));
+            Parent dashboard = loader.load();
+
+            // Créer une nouvelle fenêtre pour le dashboard
+            Stage dashboardStage = new Stage();
+            dashboardStage.setTitle("AutoSales Pro - Tableau de Bord");
+            dashboardStage.setScene(new Scene(dashboard, 1200, 800));
+            dashboardStage.setMaximized(true);
+
+            // Fermer la fenêtre de login actuelle
+            closeLoginWindow();
+
+            // Afficher le dashboard
+            dashboardStage.show();
+
+            System.out.println("✅ Dashboard chargé avec succès");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur navigation dashboard: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public static void loadLogin() {
-        loadFXML("/com/example/vehiclegestion/view/auth/login.fxml");
+    private static void closeLoginWindow() {
+        try {
+            // Fermer toutes les fenêtres de type Stage qui pourraient être la fenêtre de login
+            for (Stage stage : Stage.getWindows().toArray(new Stage[0])) {
+                if (stage.getTitle() != null && stage.getTitle().contains("AutoSales Pro")) {
+                    stage.close();
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Impossible de fermer la fenêtre de login: " + e.getMessage());
+        }
     }
 
-    public static void loadDashboard() {
-        loadFXML("/com/example/vehiclegestion/view/client/client-dashboard.fxml");
+    public static void loadLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(NavigationController.class.getResource("/com/example/vehiclegestion/view/auth/login.fxml"));
+            Parent login = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("AutoSales Pro - Connexion");
+            stage.setScene(new Scene(login, 900, 700));
+            stage.show();
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur navigation login: " + e.getMessage());
+        }
     }
 }

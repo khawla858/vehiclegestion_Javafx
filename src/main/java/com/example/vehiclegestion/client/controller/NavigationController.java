@@ -45,7 +45,7 @@ public class NavigationController {
     }
 
     public static void loadFavorites() {
-        loadView("/com/example/vehiclegestion/view/client/favorites.fxml");
+        loadView("/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml");
     }
 
     public static void loadVehicles() {

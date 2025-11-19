@@ -86,14 +86,26 @@ public class ClientDashboardController {
         setActiveMenu(vehiclesBtn);
         loadPage("/com/example/vehiclegestion/view/client/vehicles-view.fxml");
     }
-
     @FXML
     private void showFavorites() {
         System.out.println("❤️ Navigation vers les favoris");
         setActiveMenu(favoritesBtn);
         showInfo("Fonctionnalité", "Les favoris seront disponibles prochainement");
-        loadPage("/com/example/vehiclegestion/view/client/vehicles-view.fxml");
+        loadPage("/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml");
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @FXML
     private void showHistory() {

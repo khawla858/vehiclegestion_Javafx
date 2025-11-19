@@ -154,4 +154,91 @@ public class VehicleDAO {
         }
         return vehicles;
     }
-}
+
+
+
+
+
+        // ... vos méthodes existantes ...
+
+        // Ajouter un véhicule aux favoris
+        public boolean addToFavorites(int clientId, int vehicleId) {
+            String sql = "INSERT INTO Favoris (id_client, id_article) VALUES (?, ?) " +
+                    "ON CONFLICT (id_client, id_article) DO NOTHING";
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, clientId);
+                stmt.setInt(2, vehicleId);
+                return stmt.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.err.println("❌ Erreur ajout favori: " + e.getMessage());
+                return false;
+            }
+        }
+
+        // Retirer des favoris
+        public boolean removeFromFavorites(int clientId, int vehicleId) {
+            String sql = "DELETE FROM Favoris WHERE id_client = ? AND id_article = ?";
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, clientId);
+                stmt.setInt(2, vehicleId);
+                return stmt.executeUpdate() > 0;
+            } catch (SQLException e) {
+                System.err.println("❌ Erreur suppression favori: " + e.getMessage());
+                return false;
+            }
+        }
+
+        // Vérifier si un véhicule est dans les favoris
+        public boolean isFavorite(int clientId, int vehicleId) {
+            String sql = "SELECT 1 FROM Favoris WHERE id_client = ? AND id_article = ?";
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, clientId);
+                stmt.setInt(2, vehicleId);
+                ResultSet rs = stmt.executeQuery();
+                return rs.next();
+            } catch (SQLException e) {
+                System.err.println("❌ Erreur vérification favori: " + e.getMessage());
+                return false;
+            }
+        }
+
+        // Récupérer tous les favoris d'un client
+        public List<Vehicle> getFavorites(int clientId) {
+            List<Vehicle> favorites = new ArrayList<>();
+            String sql = "SELECT a.*, u.nom as vendeur_nom, u.prenom as vendeur_prenom " +
+                    "FROM Article a " +
+                    "JOIN Vendeur v ON a.id_vendeur = v.id_vendeur " +
+                    "JOIN Utilisateur u ON v.id_vendeur = u.id_utilisateur " +
+                    "JOIN Favoris f ON a.id_article = f.id_article " +
+                    "WHERE f.id_client = ? " +
+                    "ORDER BY f.date_ajout DESC";
+
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, clientId);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    Vehicle vehicle = new Vehicle(
+                            rs.getInt("id_article"),
+                            rs.getString("titre"),
+                            rs.getString("description"),
+                            rs.getDouble("prix"),
+                            rs.getString("categorie"),
+                            rs.getString("etat"),
+                            rs.getString("image"),
+                            rs.getTimestamp("date_ajout").toLocalDateTime(),
+                            rs.getInt("id_vendeur"),
+                            rs.getString("vendeur_prenom") + " " + rs.getString("vendeur_nom")
+                    );
+                    favorites.add(vehicle);
+                }
+            } catch (SQLException e) {
+                System.err.println("❌ Erreur récupération favoris: " + e.getMessage());
+            }
+            return favorites;
+        }
+    }

@@ -12,11 +12,6 @@
             fx:controller="com.example.vehiclegestion.client.controller.ClientVehiclesController"
             style="-fx-background-color: #f5f5f5;">
 
-
-
-
-
-
     <center>
         <HBox spacing="0" style="-fx-padding: 0;">
             <!-- ========== SIDEBAR FILTRES (GAUCHE) ========== -->
@@ -113,11 +108,15 @@
 
             <!-- ========== CONTENU PRINCIPAL (DROITE) ========== -->
             <VBox style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS">
-                <!-- Barre d'outils supérieure -->
+                <!-- Barre d'outils supérieure MODIFIÉE -->
                 <HBox style="-fx-background-color: white; -fx-padding: 15 20; -fx-border-color: #e8e8e8; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
                     <Label fx:id="resultsCount" text="0 annonces" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;" />
 
                     <Region HBox.hgrow="ALWAYS" />
+
+                    <!-- NOUVEAU BOUTON MES FAVORIS -->
+                    <Button text="❤️ Mes Favoris" onAction="#openFavoritesView"
+                            style="-fx-background-color: #FF0000; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 20; -fx-cursor: hand; -fx-margin: 0 15 0 0;"/>
 
                     <!-- Tri -->
                     <HBox spacing="10" alignment="CENTER_RIGHT">
