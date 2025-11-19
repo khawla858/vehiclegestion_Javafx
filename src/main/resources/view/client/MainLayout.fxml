@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.MainLayoutController"
+            stylesheets="@../../../css/main-layout.css">
+
+    <!-- TOP BAR (Fixe) -->
+    <top>
+        <HBox style="-fx-background-color: #2c3e50; -fx-padding: 15 30; -fx-spacing: 20;" alignment="CENTER_LEFT">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ImageView fitWidth="40" fitHeight="40">
+                    <image>
+                        <Image url="@../../images/car-logo.png" />
+                    </image>
+                </ImageView>
+                <Label text="AutoSales Pro" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;" />
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox spacing="15" alignment="CENTER">
+                <Label text="13°C" style="-fx-text-fill: white; -fx-font-size: 14;" />
+                <Label text="FR" style="-fx-text-fill: white; -fx-font-size: 14;" />
+                <Label text="2024-01-15" style="-fx-text-fill: white; -fx-font-size: 14;" />
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER" style="-fx-cursor: hand;">
+                <Circle radius="20" fill="#3498db" />
+                <VBox spacing="2">
+                    <Label fx:id="userNameLabel" text="Technicien" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+                    <Label text="Session Véhicules" style="-fx-text-fill: #ecf0f1; -fx-font-size: 10;" />
+                </VBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- CENTER avec Sidebar + Content Dynamique -->
+    <center>
+        <SplitPane dividerPositions="0.2">
+            <!-- SIDEBAR FIXE -->
+            <VBox style="-fx-background-color: #34495e; -fx-padding: 30 0; -fx-spacing: 5;" spacing="5">
+                <Label text="MENU PRINCIPAL" style="-fx-text-fill: #95a5a6; -fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 0 20 20 20;" />
+
+                <!-- Tableau de bord -->
+                <VBox style="-fx-padding: 12 20; -fx-cursor: hand;" onMouseClicked="#showDashboard">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Tableau de bord" style="-fx-text-fill: #ecf0f1;" />
+                    </HBox>
+                </VBox>
+
+                <!-- Véhicules -->
+                <VBox style="-fx-padding: 12 20; -fx-cursor: hand;" onMouseClicked="#showVehicles">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Véhicules" style="-fx-text-fill: #bdc3c7;" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="vehiclesCount" text="12" style="-fx-text-fill: #3498db; -fx-font-weight: bold; -fx-font-size: 12;" />
+                    </HBox>
+                </VBox>
+
+                <!-- Favoris -->
+                <VBox style="-fx-padding: 12 20; -fx-cursor: hand;" onMouseClicked="#showFavorites">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Mes Favoris" style="-fx-text-fill: #bdc3c7;" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="favoritesCount" text="5" style="-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 12;" />
+                    </HBox>
+                </VBox>
+
+                <!-- Historique -->
+                <VBox style="-fx-padding: 12 20; -fx-cursor: hand;" onMouseClicked="#showHistory">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Historique" style="-fx-text-fill: #bdc3c7;" />
+                    </HBox>
+                </VBox>
+
+                <!-- Profil -->
+                <VBox style="-fx-padding: 12 20; -fx-cursor: hand;" onMouseClicked="#showProfile">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Mon Profil" style="-fx-text-fill: #bdc3c7;" />
+                    </HBox>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <!-- Déconnexion -->
+                <VBox style="-fx-padding: 12 20; -fx-cursor: hand;" onMouseClicked="#logout">
+                    <Label text="Déconnexion" style="-fx-text-fill: #e74c3c;" />
+                </VBox>
+            </VBox>
+
+            <!-- CONTENU DYNAMIQUE -->
+            <StackPane fx:id="contentArea" />
+        </SplitPane>
+    </center>
+</BorderPane>

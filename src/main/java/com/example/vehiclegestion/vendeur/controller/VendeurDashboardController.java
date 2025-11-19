@@ -20,6 +20,12 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import java.util.HashMap;
+
 
 public class VendeurDashboardController implements Initializable {
 
@@ -38,6 +44,9 @@ public class VendeurDashboardController implements Initializable {
     @FXML private Label systemStatusLabel;
     @FXML private Label systemStatusValue;
     @FXML private Label systemStatusDesc;
+    @FXML
+    private StackedBarChart<String, Number> categorySalesChart;
+
 
     private VendeurDAO vendeurDAO;
     private final int VENDEUR_ID = 1; // 🔹 ID du vendeur connecté
@@ -58,6 +67,8 @@ public class VendeurDashboardController implements Initializable {
 
             // 3. Initialiser les graphiques
             initializeCharts();
+            loadCategorySalesChart();
+
 
             // 4. Initialiser les activités dynamiques
             initializeActivities();
@@ -342,4 +353,32 @@ public class VendeurDashboardController implements Initializable {
             return dateString;
         }
     }
+    public void loadCategorySalesChart() {
+        try {
+            // Récupérer les catégories existantes
+            Map<String, Integer> productCounts = vendeurDAO.getProductDistribution(); // total par catégorie
+            Map<String, Map<String, Double>> monthlyCategorySales = vendeurDAO.getMonthlyCategoryRevenuePercentage();
+
+            categorySalesChart.getData().clear();
+
+            for (String category : productCounts.keySet()) {
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                series.setName(category);
+
+                Map<String, Double> monthData = monthlyCategorySales.getOrDefault(category, new HashMap<>());
+
+                // Ajouter chaque mois
+                String[] months = {"Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"};
+                for (String month : months) {
+                    series.getData().add(new XYChart.Data<>(month, monthData.getOrDefault(month, 0.0)));
+                }
+
+                categorySalesChart.getData().add(series);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

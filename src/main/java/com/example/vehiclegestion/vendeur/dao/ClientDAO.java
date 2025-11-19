@@ -29,7 +29,7 @@ public class ClientDAO {
                 "MAX(v.date_vente) AS dernier_achat " +
                 "FROM Client c " +
                 "JOIN Utilisateur u ON u.id_utilisateur = c.id_client " +
-                "LEFT JOIN Vente v ON v.id_client = c.id_client AND v.id_vendeur = ? " +
+                "JOIN Vente v ON v.id_client = c.id_client AND v.id_vendeur = ? " +
                 "GROUP BY c.id_client, u.nom, u.prenom, u.email, c.telephone, c.adresse, c.statut_client";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -76,22 +76,20 @@ public class ClientDAO {
         return null;
     }
 
-    // 🔹 AJOUTER CETTE MÉTHODE : Supprimer un client
-    public boolean deleteClient(int clientId) throws SQLException {
-        String query = "DELETE FROM Client WHERE id_client = ? AND id_vendeur = ?";
+    // 🔹 Supprimer un client (avec suppression des ventes associées)
+    // 🔹 Supprimer toutes les ventes d'un client pour ce vendeur
+    public boolean deleteClientVentes(int clientId) throws SQLException {
+        String deleteVentesQuery = "DELETE FROM Vente WHERE id_client = ? AND id_vendeur = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(deleteVentesQuery)) {
             stmt.setInt(1, clientId);
             stmt.setInt(2, VENDEUR_ID);
-
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("🗑️ Client supprimé - ID: " + clientId + " - Lignes affectées: " + rowsAffected);
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL lors de la suppression du client: " + e.getMessage());
-            throw e;
+            int ventesDeleted = stmt.executeUpdate();
+            System.out.println("🗑️ " + ventesDeleted + " vente(s) du client supprimée(s)");
+            return ventesDeleted >= 0;
         }
     }
+
 
     // 🔹 Ajouter un nouveau client
     public boolean addClient(Client client) throws SQLException {
@@ -197,5 +195,67 @@ public class ClientDAO {
             }
         }
     }
+    // 🔹 Rechercher et filtrer des clients dynamiquement
+    public List<Client> getClientsByVendeurWithFilter(int vendeurId, String filter, String searchTerm) throws SQLException {
+        List<Client> clients = new ArrayList<>();
+
+        StringBuilder query = new StringBuilder(
+                "SELECT c.*, u.nom, u.prenom, u.email " +
+                        "FROM Client c " +
+                        "JOIN Utilisateur u ON u.id_utilisateur = c.id_client " +
+                        "WHERE c.id_vendeur = ?"
+        );
+
+        // Filtre par statut
+        if (filter != null && !filter.equalsIgnoreCase("Tous les clients")) {
+            query.append(" AND c.status = ?");
+        }
+
+        // Recherche texte
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            query.append(" AND (u.nom ILIKE ? OR u.prenom ILIKE ? OR u.email ILIKE ? OR c.telephone ILIKE ?)");
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+            int idx = 1;
+            stmt.setInt(idx++, vendeurId);
+
+            if (filter != null && !filter.equalsIgnoreCase("Tous les clients")) {
+                stmt.setString(idx++, filter);
+            }
+
+            if (searchTerm != null && !searchTerm.isEmpty()) {
+                String like = "%" + searchTerm + "%";
+                stmt.setString(idx++, like);
+                stmt.setString(idx++, like);
+                stmt.setString(idx++, like);
+                stmt.setString(idx++, like);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    clients.add(mapResultSetToClient(rs));
+                }
+            }
+        }
+
+        return clients;
+    }
+
+    public List<String> getDistinctStatutsByVendeur(int vendeurId) throws SQLException {
+        List<String> statuts = new ArrayList<>();
+        String query = "SELECT DISTINCT statut_client FROM Client WHERE id_vendeur = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, vendeurId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    statuts.add(rs.getString("statut_client"));
+                }
+            }
+        }
+        return statuts;
+    }
+
+
 
 }

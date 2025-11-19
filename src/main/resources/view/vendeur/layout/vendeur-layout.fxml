@@ -5,7 +5,7 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.vehiclegestion.vendeur.controller.layout.VendeurLayoutController"
             prefWidth="1200" prefHeight="700"
-            stylesheets="@/com.example.vehiclegestion/css/vendeur.css">
+            stylesheets="@/com/example/vehiclegestion/css/vendeur.css">
     <left>
         <!-- Le sidebar sera chargé dynamiquement -->
         <AnchorPane fx:id="sidebarContainer"/>

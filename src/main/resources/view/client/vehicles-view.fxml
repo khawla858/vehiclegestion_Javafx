@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.ClientVehiclesController"
+            style="-fx-background-color: #f5f5f5;">
+    <center>
+        <HBox spacing="0" style="-fx-padding: 0;">
+            <!-- ========== SIDEBAR FILTRES (GAUCHE) ========== -->
+            <VBox style="-fx-background-color: white; -fx-min-width: 280; -fx-max-width: 280; -fx-border-color: #e8e8e8; -fx-border-width: 0 1 0 0;">
+                <ScrollPane fitToWidth="true" style="-fx-background-color: white; -fx-border-width: 0; -fx-padding: 0;">
+                    <VBox spacing="0" style="-fx-padding: 20;">
+                        <!-- Titre Filtres -->
+                        <Label text="Filtres" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #333; -fx-padding: 0 0 15 0;" />
+
+                        <!-- Section Catégorie -->
+                        <VBox spacing="10" style="-fx-padding: 0 0 20 0;">
+                            <Label text="Catégorie" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+                            <!-- Ville -->
+                            <VBox spacing="5">
+                                <Label text="Ville" style="-fx-font-size: 12; -fx-text-fill: #666;" />
+                                <ComboBox promptText="Choisir ville" style="-fx-background-radius: 5; -fx-pref-width: 240;" />
+                            </VBox>
+
+                            <!-- Secteur -->
+                            <VBox spacing="5">
+                                <Label text="Secteur" style="-fx-font-size: 12; -fx-text-fill: #666;" />
+                                <ComboBox promptText="Secteur" style="-fx-background-radius: 5; -fx-pref-width: 240;" />
+                            </VBox>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #f0f0f0; -fx-padding: 0 0 15 0;" />
+
+                        <!-- Section Prix -->
+                        <VBox spacing="10" style="-fx-padding: 0 0 20 0;">
+                            <Label text="Prix" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Min DH" style="-fx-font-size: 11; -fx-text-fill: #666;" />
+                                    <TextField fx:id="minPriceField" promptText="2000" style="-fx-background-radius: 5; -fx-pref-width: 110;" />
+                                </VBox>
+                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                    <Label text="Max DH" style="-fx-font-size: 11; -fx-text-fill: #666;" />
+                                    <TextField fx:id="maxPriceField" promptText="15000" style="-fx-background-radius: 5; -fx-pref-width: 110;" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #f0f0f0; -fx-padding: 0 0 15 0;" />
+
+                        <!-- Type de vendeurs -->
+                        <VBox spacing="10" style="-fx-padding: 0 0 20 0;">
+                            <Label text="Type de vendeurs" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+                            <VBox spacing="8">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <RadioButton fx:id="particulierRadio" selected="true" style="-fx-cursor: hand;" />
+                                    <Label text="Particuliers" style="-fx-font-size: 13; -fx-text-fill: #333;" />
+                                </HBox>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <RadioButton fx:id="professionnelRadio" style="-fx-cursor: hand;" />
+                                    <Label text="Professionnels" style="-fx-font-size: 13; -fx-text-fill: #333;" />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+
+                        <Separator style="-fx-background-color: #f0f0f0; -fx-padding: 0 0 15 0;" />
+
+                        <!-- Filtres rapides -->
+                        <VBox spacing="15" style="-fx-padding: 0 0 20 0;">
+                            <!-- Marque -->
+                            <VBox spacing="5">
+                                <Label text="Marque" style="-fx-font-size: 12; -fx-text-fill: #666;" />
+                                <ComboBox fx:id="brandFilter" promptText="Toutes les marques" style="-fx-background-radius: 5; -fx-pref-width: 240;" />
+                            </VBox>
+
+                            <!-- Type -->
+                            <VBox spacing="5">
+                                <Label text="Type" style="-fx-font-size: 12; -fx-text-fill: #666;" />
+                                <ComboBox fx:id="typeFilter" promptText="Tous les types" style="-fx-background-radius: 5; -fx-pref-width: 240;" />
+                            </VBox>
+
+                            <!-- Prix prédéfinis -->
+                            <VBox spacing="5">
+                                <Label text="Prix" style="-fx-font-size: 12; -fx-text-fill: #666;" />
+                                <ComboBox fx:id="priceFilter" promptText="Tous les prix" style="-fx-background-radius: 5; -fx-pref-width: 240;" />
+                            </VBox>
+                        </VBox>
+
+                        <!-- Boutons d'action -->
+                        <VBox spacing="10">
+                            <Button text="Appliquer les filtres" onAction="#applyAllFilters" style="-fx-background-color: #FF6B35; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 5; -fx-cursor: hand;" />
+                            <Button text="Réinitialiser" onAction="#resetFilters" style="-fx-background-color: #f8f8f8; -fx-text-fill: #666; -fx-padding: 12; -fx-background-radius: 5; -fx-cursor: hand;" />
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+            <!-- ========== CONTENU PRINCIPAL (DROITE) ========== -->
+            <VBox style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS">
+                <!-- Barre d'outils supérieure -->
+                <HBox style="-fx-background-color: white; -fx-padding: 15 20; -fx-border-color: #e8e8e8; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+                    <Label fx:id="resultsCount" text="0 annonces" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <!-- Tri -->
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Label text="Trier par:" style="-fx-font-size: 13; -fx-text-fill: #666;" />
+                        <ComboBox fx:id="sortFilter" style="-fx-background-radius: 5; -fx-pref-width: 150;" />
+                    </HBox>
+                </HBox>
+
+                <!-- Grille des véhicules avec ScrollPane correct -->
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-width: 0; -fx-padding: 0;">
+                    <VBox style="-fx-padding: 20;">
+                        <GridPane fx:id="vehiclesGrid" hgap="15" vgap="15" style="-fx-alignment: TOP_LEFT;">
+                            <!-- Le contenu sera généré dynamiquement -->
+                        </GridPane>
+                    </VBox>
+                </ScrollPane>
+
+                <!-- Message si aucun véhicule -->
+                <VBox fx:id="emptyState" visible="false" alignment="CENTER" style="-fx-padding: 60;">
+                    <Label text="🚗" style="-fx-font-size: 64;" />
+                    <Label text="Aucun véhicule trouvé" style="-fx-font-size: 18; -fx-text-fill: #999; -fx-padding: 10;" />
+                    <Label text="Ajustez vos filtres ou réessayez une autre recherche" style="-fx-text-fill: #666; -fx-font-size: 14;" />
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+
+</BorderPane>

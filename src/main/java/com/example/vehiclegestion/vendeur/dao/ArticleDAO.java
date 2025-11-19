@@ -6,6 +6,14 @@ import com.example.vehiclegestion.vendeur.model.Article;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ArticleDAO {
 
@@ -13,129 +21,133 @@ public class ArticleDAO {
 
     public ArticleDAO() {
         try {
-            // ✅ Utilise la classe commune pour obtenir la connexion
             connection = DatabaseConnection.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    // 🔹 Récupérer tous les articles d'un vendeur
+    // Récupérer tous les articles d’un vendeur
     public List<Article> getArticlesByVendeur(int vendeurId) throws SQLException {
         List<Article> articles = new ArrayList<>();
         String query = "SELECT * FROM Article WHERE id_vendeur = ?";
 
-        System.out.println("🔍 Recherche articles pour vendeur ID: " + vendeurId);
-
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, vendeurId);
             try (ResultSet rs = stmt.executeQuery()) {
-                int count = 0;
                 while (rs.next()) {
-                    Article article = new Article();
-                    article.setId(rs.getInt("id_article"));
-                    article.setTitre(rs.getString("titre"));
-                    article.setDescription(rs.getString("description"));
-                    article.setPrix(rs.getDouble("prix"));
-                    article.setCategorie(rs.getString("categorie"));
-                    article.setEtat(rs.getString("etat"));
-                    article.setImage(rs.getString("image"));
+                    Article article = new Article(
+                            rs.getInt("id_article"),
+                            rs.getString("titre"),
+                            rs.getString("description"),
+                            rs.getDouble("prix"),
+                            rs.getDouble("prix_promo"),
+                            rs.getInt("reduction"),
+                            rs.getString("categorie"),
+                            rs.getString("etat"),
+                            rs.getString("image"),
+                            rs.getInt("id_vendeur"),
+                            rs.getString("marque"),
+                            rs.getString("modele"),
+                            rs.getInt("annee"),
+                            rs.getInt("kilometrage"),
+                            rs.getString("transmission"),
+                            rs.getString("carburant"),
+                            rs.getInt("puissance"),
+                            rs.getString("couleur")
+                    );
+
                     articles.add(article);
-                    count++;
-
-                    System.out.println("📄 Article " + count + ": " + article.getTitre() + " - " + article.getPrix() + " MAD");
                 }
-                System.out.println("✅ Total articles récupérés: " + count);
             }
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL dans getArticlesByVendeur: " + e.getMessage());
-            throw e;
         }
-
         return articles;
     }
 
-    // 🔹 Méthode pour ajouter un article
+    // Ajouter un article/////////////////////////////////////////////////////////////
     public boolean addArticle(Article article, int vendeurId) throws SQLException {
-        String query = "INSERT INTO Article (titre, description, prix, categorie, etat, image, id_vendeur) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Article " +
+                "(titre, description, prix, prix_promo, reduction, categorie, etat, image, id_vendeur, " +
+                "marque, modele, annee, kilometrage, transmission, carburant, puissance, couleur) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, article.getTitre());
             stmt.setString(2, article.getDescription());
             stmt.setDouble(3, article.getPrix());
-            stmt.setString(4, article.getCategorie());
-            stmt.setString(5, article.getEtat());
-            stmt.setString(6, article.getImage());
-            stmt.setInt(7, vendeurId);
+            stmt.setDouble(4, article.getPrixPromo());
+            stmt.setInt(5, article.getReduction());
+            stmt.setString(6, article.getCategorie());
+            stmt.setString(7, article.getEtat());
+            stmt.setString(8, article.getImage());
+            stmt.setInt(9, vendeurId);
+            stmt.setString(10, article.getMarque());
+            stmt.setString(11, article.getModele());
+            stmt.setInt(12, article.getAnnee());
+            stmt.setInt(13, article.getKilometrage());
+            stmt.setString(14, article.getTransmission());
+            stmt.setString(15, article.getCarburant());
+            stmt.setInt(16, article.getPuissance());
+            stmt.setString(17, article.getCouleur());
 
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("✅ Article ajouté - Lignes affectées: " + rowsAffected);
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL dans addArticle: " + e.getMessage());
-            throw e;
+            return stmt.executeUpdate() > 0;
         }
     }
 
-    // 🔹 Méthode pour supprimer un article
+
+    // Supprimer un article/////////////////////////////////////////////////////////////////////////
     public boolean deleteArticle(int articleId) throws SQLException {
-        String query = "DELETE FROM Article WHERE id_article = ?";
+        // récupérer le chemin image
+        String select = "SELECT image FROM Article WHERE id_article = ?";
+        String imagePath = null;
+        try (PreparedStatement ps = connection.prepareStatement(select)) {
+            ps.setInt(1, articleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) imagePath = rs.getString("image");
+            }
+        }
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, articleId);
-            return stmt.executeUpdate() > 0;
+        // supprimer la ligne
+        String delete = "DELETE FROM Article WHERE id_article = ?";
+        try (PreparedStatement ps = connection.prepareStatement(delete)) {
+            ps.setInt(1, articleId);
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok && imagePath != null) {
+                // supprimer le fichier physique
+                Path p = Path.of(System.getProperty("user.dir")).resolve(imagePath);
+                try { Files.deleteIfExists(p); } catch (Exception ex) { ex.printStackTrace(); }
+            }
+            return ok;
         }
     }
 
-    // 🔹 Méthode pour mettre à jour un article
-    public boolean updateArticle(Article article) throws SQLException {
-        String query = "UPDATE Article SET titre = ?, description = ?, prix = ?, categorie = ?, etat = ?, image = ? WHERE id_article = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+    // Mettre à jour un article////////////////////////////////////////////////////////////////////////
+    public boolean updateArticle(Article article) throws SQLException {
+        String sql = "UPDATE Article SET titre=?, description=?, prix=?, prix_promo=?, reduction=?, categorie=?, etat=?, image=?, " +
+                "marque=?, modele=?, annee=?, kilometrage=?, transmission=?, carburant=?, puissance=?, couleur=? " +
+                "WHERE id_article=?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, article.getTitre());
             stmt.setString(2, article.getDescription());
             stmt.setDouble(3, article.getPrix());
-            stmt.setString(4, article.getCategorie());
-            stmt.setString(5, article.getEtat());
-            stmt.setString(6, article.getImage());
-            stmt.setInt(7, article.getId());
+            stmt.setDouble(4, article.getPrixPromo());
+            stmt.setInt(5, article.getReduction());
+            stmt.setString(6, article.getCategorie());
+            stmt.setString(7, article.getEtat());
+            stmt.setString(8, article.getImage());
+            stmt.setString(9, article.getMarque());
+            stmt.setString(10, article.getModele());
+            stmt.setInt(11, article.getAnnee());
+            stmt.setInt(12, article.getKilometrage());
+            stmt.setString(13, article.getTransmission());
+            stmt.setString(14, article.getCarburant());
+            stmt.setInt(15, article.getPuissance());
+            stmt.setString(16, article.getCouleur());
+            stmt.setInt(17, article.getId());
 
             return stmt.executeUpdate() > 0;
-        }
-    }
-
-    // 🔹 Méthode pour récupérer un article par son ID
-    public Article getArticleById(int articleId) throws SQLException {
-        String query = "SELECT * FROM Article WHERE id_article = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, articleId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Article article = new Article();
-                    article.setId(rs.getInt("id_article"));
-                    article.setTitre(rs.getString("titre"));
-                    article.setDescription(rs.getString("description"));
-                    article.setPrix(rs.getDouble("prix"));
-                    article.setCategorie(rs.getString("categorie"));
-                    article.setEtat(rs.getString("etat"));
-                    article.setImage(rs.getString("image"));
-                    return article;
-                }
-            }
-        }
-        return null;
-    }
-
-    // 🔹 Méthode pour compter les articles d'un vendeur
-    public int countArticlesByVendeur(int vendeurId) throws SQLException {
-        String query = "SELECT COUNT(*) FROM Article WHERE id_vendeur = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, vendeurId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? rs.getInt(1) : 0;
-            }
         }
     }
 }

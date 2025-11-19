@@ -258,20 +258,27 @@
 .add-button:hover {
     -fx-background-color: #2980b9;
 }
-.card {
-    -fx-padding: 20;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
-    -fx-alignment: center;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 6, 0, 0, 2);
-    -fx-pref-width: 180;
-    -fx-pref-height: 120;
-}
+
 
 .table-view {
     -fx-background-color: white;
     -fx-background-radius: 10;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1);
 }
+
+
+.vehicle-card {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+.vehicle-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 0);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
 
 

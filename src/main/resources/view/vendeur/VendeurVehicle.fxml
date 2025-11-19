@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
@@ -11,24 +10,62 @@
             style="-fx-background-color: #f4f6f9;"
             vbarPolicy="ALWAYS">
 
-    <!-- Contenu principal encapsulé dans le ScrollPane -->
-    <VBox spacing="20" style="-fx-padding: 25; -fx-background-color: white;">
+    <VBox spacing="20" style="-fx-padding: 25; ">
 
         <!-- HEADER avec titre et bouton -->
         <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 10;">
-            <Label text="Mes Véhicules" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Mes Véhicules"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Region HBox.hgrow="ALWAYS"/>
             <Button fx:id="addVehicleButton" text="➕ Ajouter un véhicule"
                     style="-fx-font-size: 14px; -fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8;"
                     onAction="#addVehicle"/>
         </HBox>
 
+        <!-- BARRE DE FILTRES - UNE SEULE LIGNE -->
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-padding: 15; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;-fx-background-color:white">
+
+            <!-- Recherche -->
+            <TextField fx:id="searchField"
+                       promptText="🔍 Rechercher par titre, marque ou modèle..."
+                       style="-fx-pref-width: 350; -fx-font-size: 14px; -fx-padding: 8;"/>
+
+            <!-- Catégorie -->
+            <VBox spacing="3">
+                <Label text="Catégorie" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                <ComboBox fx:id="categorieCombo" promptText="Toutes" style="-fx-pref-width: 140;"/>
+            </VBox>
+
+            <!-- État -->
+            <VBox spacing="3">
+                <Label text="État" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                <ComboBox fx:id="etatCombo" promptText="Tous" style="-fx-pref-width: 120;"/>
+            </VBox>
+
+            <!-- Année Max -->
+            <VBox spacing="3">
+                <Label text="Année Max" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                <ComboBox fx:id="anneeMaxCombo" promptText="Toutes" style="-fx-pref-width: 100;"/>
+            </VBox>
+
+            <!-- Bouton Réinitialiser -->
+            <Button text="Réinitialiser"
+                    onAction="#resetFilters"
+                    style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 8 15; -fx-cursor: hand;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Compteur de résultats -->
+            <Label fx:id="resultsLabel" text="0 véhicule(s) trouvé(s)"
+                   style="-fx-font-size: 12px; -fx-text-fill: #666; -fx-font-weight: bold;"/>
+        </HBox>
+
         <!-- SECTION VÉHICULES -->
-        <VBox spacing="15"  style="-fx-padding: 20;">
-            <Label text="Véhicules en vente" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <VBox spacing="15" style="-fx-padding: 20;">
 
             <!-- Conteneur des cartes -->
-            <VBox fx:id="cardsContainer" spacing="20" alignment="CENTER"
-                  style="-fx-padding: 20;"/>
+            <VBox fx:id="cardsContainer" spacing="20" alignment="CENTER" style="-fx-padding: 20;"/>
         </VBox>
 
     </VBox>

@@ -2,99 +2,272 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.geometry.Insets?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.RendezVousListController"
             fitToWidth="true"
-            style="-fx-background-color: #f4f6f9;"
-            vbarPolicy="ALWAYS">
+            style="-fx-background-color: #f8f9fa;"
+            vbarPolicy="AS_NEEDED">
 
-    <VBox spacing="20" style="-fx-padding: 25; -fx-background-color: white;">
+    <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #f8f9fa;">
 
-        <!-- HEADER -->
-        <HBox spacing="15" alignment="CENTER_LEFT">
+        <!-- ============================================ -->
+        <!-- HEADER: TITRE À GAUCHE + BOUTONS À DROITE -->
+        <!-- ============================================ -->
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <!-- Titre à gauche -->
             <Label text="📅 Gestion des Rendez-Vous"
-                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <Button text="➕ Ajouter un RDV"
-                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 14px;"
-                    onAction="#addRendezVous"/>
-            <Button text="📤 Exporter"
-                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 8; -fx-font-size: 14px;"
-                    onAction="#exportRendezVous"/>
+                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;">
+                <HBox.hgrow>ALWAYS</HBox.hgrow>
+            </Label>
+
+            <!-- Spacer pour pousser les boutons à droite -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Groupe de 3 boutons à droite -->
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Button text="➕ Ajouter"
+                        onAction="#addRendezVous"
+                        style="-fx-background-color: linear-gradient(to bottom, #4CAF50, #45a049);
+                               -fx-text-fill: white;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+
+                <Button text="🔄 Actualiser"
+                        onAction="#refreshRendezVous"
+                        style="-fx-background-color: linear-gradient(to bottom, #2196F3, #1976D2);
+                               -fx-text-fill: white;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+
+                <Button text="📤 Exporter"
+                        onAction="#exportRendezVous"
+                        style="-fx-background-color: linear-gradient(to bottom, #FF9800, #F57C00);
+                               -fx-text-fill: white;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+            </HBox>
         </HBox>
 
-        <!-- FILTRES ET CALENDRIER -->
-        <HBox spacing="15" alignment="CENTER_LEFT">
-            <ComboBox fx:id="statutFilter" promptText="Tous les statuts" style="-fx-pref-width: 150;"/>
-            <DatePicker fx:id="dateFilter" promptText="Filtrer par date" style="-fx-pref-width: 150;"/>
-            <TextField fx:id="clientFilter" promptText="Rechercher par client" style="-fx-pref-width: 200;"/>
-            <Button text="🔄 Actualiser"
-                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 10 15; -fx-background-radius: 8;"
-                    onAction="#refreshRendezVous"/>
+        <!-- ============================================ -->
+        <!-- FILTRES: BARRE DE RECHERCHE + FILTRES -->
+        <!-- ============================================ -->
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-background-color: white;
+                     -fx-padding: 20;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+            <!-- Barre de recherche principale -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 350;">
+                <Label text="🔍" style="-fx-font-size: 18px;"/>
+                <TextField fx:id="clientFilter"
+                           promptText="Rechercher par nom du client..."
+                           style="-fx-pref-width: 300;
+                                 -fx-padding: 10;
+                                 -fx-background-radius: 8;
+                                 -fx-border-color: #e0e0e0;
+                                 -fx-border-radius: 8;
+                                 -fx-border-width: 1.5;
+                                 -fx-font-size: 13px;"/>
+            </HBox>
+
+            <!-- Séparateur vertical -->
+            <Separator orientation="VERTICAL" style="-fx-pref-height: 35;"/>
+
+            <!-- Filtres -->
+            <Label text="Filtrer par:" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #666;"/>
+
+            <ComboBox fx:id="statutFilter"
+                      promptText="📊 Statut"
+                      style="-fx-pref-width: 150;
+                            -fx-background-radius: 8;
+                            -fx-border-radius: 8;"/>
+
+            <DatePicker fx:id="dateFilter"
+                        promptText="📅 Date"
+                        style="-fx-pref-width: 160;
+                              -fx-background-radius: 8;"/>
         </HBox>
 
-        <!-- TABLEAU DES RDV -->
-        <TableView fx:id="rdvTable" style="-fx-background-color: white; -fx-border-color: #ddd;">
-            <columns>
-                <TableColumn text="ID RDV" prefWidth="80">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="idRdv"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Client" prefWidth="150">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="nomClient"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Téléphone" prefWidth="120">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="telephoneClient"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Voiture" prefWidth="150">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="titreArticle"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Date" prefWidth="100">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="dateRdv"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Heure" prefWidth="80">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="heureRdv"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Type" prefWidth="120">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="typeRdv"/>
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Statut" prefWidth="100">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="statut"/>
-                    </cellValueFactory>
-                </TableColumn>
+        <!-- ============================================ -->
+        <!-- TABLEAU DES RENDEZ-VOUS MODERNE -->
+        <!-- ============================================ -->
+        <VBox spacing="15"
+              style="-fx-background-color: white;
+                     -fx-padding: 25;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
 
-            </columns>
-        </TableView>
+            <!-- En-tête du tableau -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📋 Liste des Rendez-Vous"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="countLabel" text="Total: 0 RDV"
+                       style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+            </HBox>
 
-        <!-- CALENDRIER SIMPLE -->
-        <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #ecf0f1; -fx-background-radius: 10;">
-            <Label text="📆 Calendrier des RDV" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <DatePicker fx:id="calendarPicker" style="-fx-pref-width: 200;"/>
-            <ListView fx:id="calendarList" style="-fx-pref-height: 150;"/>
+            <Separator style="-fx-background-color: #ecf0f1;"/>
+
+            <!-- Tableau stylé -->
+            <TableView fx:id="rdvTable"
+                       style="-fx-background-color: transparent;
+                             -fx-border-color: transparent;
+                             -fx-table-cell-border-color: #f0f0f0;">
+                <columns>
+                    <TableColumn text="ID" prefWidth="60" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="idRdv"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="👤 Client" prefWidth="180">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="nomClient"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📞 Téléphone" prefWidth="130">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="telephoneClient"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="🚗 Véhicule" prefWidth="180">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="titreArticle"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📅 Date" prefWidth="110" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="dateRdv"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="⏰ Heure" prefWidth="90" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="heureRdv"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📋 Type" prefWidth="140">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="typeRdv"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="🔔 Statut" prefWidth="120" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="statut"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 40;">
+                        <Label text="📭" style="-fx-font-size: 48px;"/>
+                        <Label text="Aucun rendez-vous trouvé"
+                               style="-fx-font-size: 16px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+                </placeholder>
+            </TableView>
         </VBox>
 
-        <!-- STATISTIQUES -->
-        <HBox spacing="20">
-            <VBox alignment="CENTER" spacing="5"
-                  style="-fx-background-color: #e8f6f3; -fx-padding: 15; -fx-background-radius: 10;">
-                <Label text="📅" style="-fx-font-size: 24px;"/>
-                <Label fx:id="totalRdvLabel" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-                <Label text="Total RDV" style="-fx-font-size: 12px;"/>
+        <!-- ============================================ -->
+        <!-- SECTION CALENDRIER ET STATISTIQUES -->
+        <!-- ============================================ -->
+        <HBox spacing="20" alignment="TOP_LEFT">
+
+            <!-- Calendrier -->
+            <VBox spacing="15"
+                  style="-fx-background-color: white;
+                         -fx-padding: 20;
+                         -fx-background-radius: 12;
+                         -fx-pref-width: 350;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+                <Label text="📆 Calendrier des RDV"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+                <DatePicker fx:id="calendarPicker"
+                            style="-fx-pref-width: 310; -fx-background-radius: 8;"/>
+
+                <Separator style="-fx-background-color: #ecf0f1;"/>
+
+                <Label text="RDV du jour sélectionné:"
+                       style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
+
+                <ListView fx:id="calendarList"
+                          style="-fx-pref-height: 180;
+                                -fx-background-radius: 8;
+                                -fx-border-color: #ecf0f1;
+                                -fx-border-radius: 8;"/>
+            </VBox>
+
+            <!-- Statistiques -->
+            <VBox spacing="15" HBox.hgrow="ALWAYS">
+                <Label text="📊 Statistiques"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+                <HBox spacing="15">
+                    <!-- Carte Total RDV -->
+                    <VBox alignment="CENTER" spacing="8"
+                          style="-fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);
+                                 -fx-padding: 25;
+                                 -fx-background-radius: 12;
+                                 -fx-pref-width: 180;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                        <Label text="📅" style="-fx-font-size: 32px;"/>
+                        <Label fx:id="totalRdvLabel" text="0"
+                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Total RDV"
+                               style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                    </VBox>
+
+                    <!-- Carte En Attente -->
+                    <VBox alignment="CENTER" spacing="8"
+                          style="-fx-background-color: linear-gradient(to bottom right, #f093fb, #f5576c);
+                                 -fx-padding: 25;
+                                 -fx-background-radius: 12;
+                                 -fx-pref-width: 180;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                        <Label text="⏳" style="-fx-font-size: 32px;"/>
+                        <Label fx:id="enAttenteLabel" text="0"
+                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="En Attente"
+                               style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                    </VBox>
+
+                    <!-- Carte Confirmés -->
+                    <VBox alignment="CENTER" spacing="8"
+                          style="-fx-background-color: linear-gradient(to bottom right, #4facfe, #00f2fe);
+                                 -fx-padding: 25;
+                                 -fx-background-radius: 12;
+                                 -fx-pref-width: 180;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                        <Label text="✅" style="-fx-font-size: 32px;"/>
+                        <Label fx:id="confirmesLabel" text="0"
+                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Confirmés"
+                               style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
+                    </VBox>
+                </HBox>
             </VBox>
         </HBox>
 
