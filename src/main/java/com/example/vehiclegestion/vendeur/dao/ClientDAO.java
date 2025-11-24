@@ -5,11 +5,12 @@ import com.example.vehiclegestion.vendeur.model.Client;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+
 
 public class ClientDAO {
 
     private Connection connection;
-    private final int VENDEUR_ID = 1; // ID du vendeur connecté
 
     public ClientDAO() {
         try {
@@ -61,12 +62,13 @@ public class ClientDAO {
 
 
     // 🔹 Récupérer un client par son ID
-    public Client getClientById(int clientId) throws SQLException {
+    public Client getClientById(int clientId, int vendeurId) throws SQLException {
         String query = "SELECT * FROM Client WHERE id_client = ? AND id_vendeur = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, clientId);
-            stmt.setInt(2, VENDEUR_ID);
+            stmt.setInt(2, vendeurId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToClient(rs);
@@ -76,23 +78,25 @@ public class ClientDAO {
         return null;
     }
 
+
     // 🔹 Supprimer un client (avec suppression des ventes associées)
     // 🔹 Supprimer toutes les ventes d'un client pour ce vendeur
-    public boolean deleteClientVentes(int clientId) throws SQLException {
+    public boolean deleteClientVentes(int clientId, int vendeurId) throws SQLException {
         String deleteVentesQuery = "DELETE FROM Vente WHERE id_client = ? AND id_vendeur = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(deleteVentesQuery)) {
             stmt.setInt(1, clientId);
-            stmt.setInt(2, VENDEUR_ID);
+            stmt.setInt(2, vendeurId);
             int ventesDeleted = stmt.executeUpdate();
-            System.out.println("🗑️ " + ventesDeleted + " vente(s) du client supprimée(s)");
-            return ventesDeleted >= 0;
+
+            System.out.println("🗑️ " + ventesDeleted + " vente(s) supprimée(s)");
+            return true;
         }
     }
 
 
     // 🔹 Ajouter un nouveau client
-    public boolean addClient(Client client) throws SQLException {
+    public boolean addClient(Client client, int vendeurId) throws SQLException {
         String query = "INSERT INTO Client (nom, prenom, email, telephone, adresse, status, id_vendeur) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -102,26 +106,17 @@ public class ClientDAO {
             stmt.setString(4, client.getTelephone());
             stmt.setString(5, client.getAdresse());
             stmt.setString(6, client.getStatus());
-            stmt.setInt(7, VENDEUR_ID);
+            stmt.setInt(7, vendeurId);
 
-            int rowsAffected = stmt.executeUpdate();
-
-            // Récupérer l'ID généré
-            if (rowsAffected > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        client.setId(generatedKeys.getInt(1));
-                    }
-                }
-            }
-
-            return rowsAffected > 0;
+            return stmt.executeUpdate() > 0;
         }
     }
 
+
     // 🔹 Mettre à jour un client
-    public boolean updateClient(Client client) throws SQLException {
-        String query = "UPDATE Client SET nom = ?, prenom = ?, email = ?, telephone = ?, adresse = ?, status = ?, dernier_contact = ? WHERE id_client = ? AND id_vendeur = ?";
+    public boolean updateClient(Client client, int vendeurId) throws SQLException {
+        String query = "UPDATE Client SET nom=?, prenom=?, email=?, telephone=?, adresse=?, status=?, dernier_contact=? " +
+                "WHERE id_client=? AND id_vendeur=?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, client.getNom());
@@ -130,13 +125,14 @@ public class ClientDAO {
             stmt.setString(4, client.getTelephone());
             stmt.setString(5, client.getAdresse());
             stmt.setString(6, client.getStatus());
-            stmt.setDate(7, java.sql.Date.valueOf(java.time.LocalDate.now()));
+            stmt.setDate(7, Date.valueOf(LocalDate.now()));
             stmt.setInt(8, client.getId());
-            stmt.setInt(9, VENDEUR_ID);
+            stmt.setInt(9, vendeurId);
 
             return stmt.executeUpdate() > 0;
         }
     }
+
 
     // 🔹 Méthode utilitaire pour mapper ResultSet vers Client
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
@@ -162,12 +158,12 @@ public class ClientDAO {
     }
 
     // 🔹 Rechercher des clients
-    public List<Client> searchClients(String searchTerm) throws SQLException {
+    public List<Client> searchClients(String searchTerm, int vendeurId) throws SQLException {
         List<Client> clients = new ArrayList<>();
         String query = "SELECT * FROM Client WHERE id_vendeur = ? AND (nom LIKE ? OR prenom LIKE ? OR email LIKE ? OR telephone LIKE ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, VENDEUR_ID);
+            stmt.setInt(1, vendeurId);
             String likeTerm = "%" + searchTerm + "%";
             stmt.setString(2, likeTerm);
             stmt.setString(3, likeTerm);
@@ -176,13 +172,13 @@ public class ClientDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Client client = mapResultSetToClient(rs);
-                    clients.add(client);
+                    clients.add(mapResultSetToClient(rs));
                 }
             }
         }
         return clients;
     }
+
 
     // 🔹 Compter le nombre total de clients
     public int countClientsByVendeur(int vendeurId) throws SQLException {

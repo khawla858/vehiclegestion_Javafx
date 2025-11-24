@@ -2,102 +2,361 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
-<HBox xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.vehiclegestion.vendeur.controller.layout.NavbarController"
-      spacing="20"
-      style="-fx-background-color: #ffffff; -fx-padding: 10 25;-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2)">
+      spacing="0"
+      style="-fx-background-color: #ffffff;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
 
-    <!-- LOGO -->
-    <HBox spacing="12" style="-fx-alignment: CENTER_LEFT;">
-        <Label text="AutoSales Pro" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    <!-- ============================================ -->
+    <!-- NIVEAU 1 : HEADER (Logo + Recherche + Actions) -->
+    <!-- ============================================ -->
+    <HBox spacing="0"
+          alignment="CENTER"
+          style="-fx-padding: 12 30; -fx-background-color: #ffffff;">
+
+        <!-- LOGO + NOM -->
+        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane style="-fx-background-color: linear-gradient(to bottom right, #3498db, #2980b9);
+                              -fx-background-radius: 10;
+                              -fx-pref-width: 45;
+                              -fx-pref-height: 45;
+                              -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 8, 0, 0, 2);">
+                <FontIcon iconLiteral="fas-car-side" iconSize="24" iconColor="white"/>
+            </StackPane>
+
+            <VBox spacing="2">
+                <Label text="AutoSales Pro"
+                       style="-fx-font-size: 18px;
+                              -fx-font-weight: bold;
+                              -fx-text-fill: #2c3e50;"/>
+                <Label text="Gestion Automobile"
+                       style="-fx-font-size: 11px;
+                              -fx-text-fill: #95a5a6;"/>
+            </VBox>
+        </HBox>
+
+        <!-- BARRE DE RECHERCHE CENTRALE -->
+        <HBox spacing="0"
+              alignment="CENTER"
+              style="-fx-background-color: #f8f9fa;
+                     -fx-background-radius: 25;
+                     -fx-padding: 10 20;
+                     -fx-border-color: #e0e0e0;
+                     -fx-border-radius: 25;
+                     -fx-border-width: 1;
+                     -fx-min-width: 450;">
+            <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#95a5a6"/>
+            <TextField fx:id="searchField"
+                       promptText="Rechercher véhicule, client, commande..."
+                       style="-fx-background-color: transparent;
+                              -fx-border-width: 0;
+                              -fx-pref-width: 380;
+                              -fx-padding: 0 12;
+                              -fx-font-size: 14px;"/>
+            <Button text="Rechercher"
+                    onAction="#performSearch"
+                    style="-fx-background-color: #3498db;
+                           -fx-text-fill: white;
+                           -fx-font-size: 12px;
+                           -fx-font-weight: 600;
+                           -fx-background-radius: 20;
+                           -fx-padding: 6 16;
+                           -fx-cursor: hand;"/>
+        </HBox>
+
+        <!-- ACTIONS DROITE -->
+        <HBox spacing="15" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <!-- PANIER -->
+            <StackPane fx:id="cartIcon" styleClass="top-icon-btn" onMouseClicked="#showCart"
+                       style="-fx-cursor: hand;">
+                <StackPane style="-fx-background-color: transparent;
+                                  -fx-pref-width: 42;
+                                  -fx-pref-height: 42;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#7f8c8d"/>
+                </StackPane>
+                <Label text="2"
+                       style="-fx-text-fill: white;
+                              -fx-font-size: 9px;
+                              -fx-translate-x: 12;
+                              -fx-translate-y: -12;
+                              -fx-padding: 2 6;
+                              -fx-min-width: 18;
+                              -fx-alignment: center;"/>
+            </StackPane>
+
+            <!-- NOTIFICATIONS -->
+            <StackPane styleClass="top-icon-btn" onMouseClicked="#showNotifications">
+                <StackPane style="
+                                  -fx-background-radius: 50;
+                                  -fx-pref-width: 42;
+                                  -fx-pref-height: 42;
+                                  -fx-cursor: hand;">
+                    <FontIcon iconLiteral="far-bell" iconSize="18" iconColor="#7f8c8d"/>
+                </StackPane>
+                <Label text="3"
+                       style="-fx-text-fill: white;
+                              -fx-font-size: 9px;
+                              -fx-font-weight: bold;
+                              -fx-translate-x: 12;
+                              -fx-translate-y: -12;
+                              -fx-background-color: #e74c3c;
+                              -fx-background-radius: 10;
+                              -fx-padding: 2 6;
+                              -fx-min-width: 18;
+                              -fx-alignment: center;"/>
+            </StackPane>
+
+            <!-- MESSAGES -->
+            <StackPane styleClass="top-icon-btn" onMouseClicked="#showMessages">
+                <StackPane style="
+                                  -fx-background-radius: 50;
+                                  -fx-pref-width: 42;
+                                  -fx-pref-height: 42;
+                                  -fx-cursor: hand;">
+                    <FontIcon iconLiteral="far-envelope" iconSize="18" iconColor="#7f8c8d"/>
+                </StackPane>
+                <Label text="5"
+                       style="-fx-text-fill: white;
+                              -fx-font-size: 9px;
+                              -fx-font-weight: bold;
+                              -fx-translate-x: 12;
+                              -fx-translate-y: -12;
+                              -fx-background-color: #3498db;
+                              -fx-background-radius: 10;
+                              -fx-padding: 2 6;
+                              -fx-min-width: 18;
+                              -fx-alignment: center;"/>
+            </StackPane>
+
+            <!-- SÉPARATEUR -->
+            <Separator orientation="VERTICAL"
+                       style="-fx-pref-height: 35; -fx-background-color: #e0e0e0;"/>
+
+            <!-- PROFIL UTILISATEUR -->
+            <MenuButton fx:id="profileMenu"
+                        style="-fx-background-color: transparent;
+                               -fx-border-color: transparent;
+                               -fx-cursor: hand;">
+                <graphic>
+                    <HBox spacing="12" alignment="CENTER">
+                        <!-- Avatar -->
+                        <StackPane style="-fx-background-color: linear-gradient(to bottom right, #3498db, #2980b9);
+                                          -fx-background-radius: 50;
+                                          -fx-pref-width: 42;
+                                          -fx-pref-height: 42;
+                                          -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 6, 0, 0, 2);">
+                            <Label text="JD"
+                                   style="-fx-text-fill: white;
+                                          -fx-font-weight: bold;
+                                          -fx-font-size: 15px;"/>
+                        </StackPane>
+
+                        <!-- Infos -->
+                        <VBox spacing="2" alignment="CENTER_LEFT">
+                            <Label fx:id="userNameLabel"
+                                   text="John Doe"
+                                   style="-fx-text-fill: #2c3e50;
+                                          -fx-font-weight: 600;
+                                          -fx-font-size: 14px;"/>
+                            <Label fx:id="userRoleLabel"
+                                   text="Vendeur"
+                                   style="-fx-text-fill: #95a5a6;
+                                          -fx-font-size: 11px;"/>
+                        </VBox>
+
+                        <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
+                    </HBox>
+                </graphic>
+
+                <items>
+                    <MenuItem text="Mon Profil" onAction="#showUserProfile">
+                        <graphic><FontIcon iconLiteral="fas-user" iconSize="14" iconColor="#3498db"/></graphic>
+                    </MenuItem>
+                    <MenuItem text="Paramètres" onAction="#showAccountSettings">
+                        <graphic><FontIcon iconLiteral="fas-cog" iconSize="14" iconColor="#7f8c8d"/></graphic>
+                    </MenuItem>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Déconnexion" onAction="#handleLogout">
+                        <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" iconColor="#e74c3c"/></graphic>
+                    </MenuItem>
+                </items>
+            </MenuButton>
+
+        </HBox>
     </HBox>
 
-    <!-- ESPACE FLEXIBLE -->
-    <Pane HBox.hgrow="ALWAYS"/>
+    <!-- SÉPARATEUR -->
+    <Separator style="-fx-background-color: #e8ecef; -fx-pref-height: 1;"/>
 
-    <!-- BARRE DE RECHERCHE (déplacée à droite) -->
-    <HBox spacing="10"
-          style="-fx-alignment: CENTER; -fx-background-color: #f8f9fa; -fx-background-radius: 20; -fx-padding: 5 15;">
-        <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#7f8c8d"/>
-        <TextField fx:id="searchField" promptText="Rechercher..."
-                   style="-fx-background-color: transparent; -fx-border-width: 0; -fx-pref-width: 200;"/>
-    </HBox>
+    <!-- ============================================ -->
+    <!-- NIVEAU 2 : MENU NAVIGATION PRINCIPAL -->
+    <!-- ============================================ -->
+    <HBox spacing="0"
+          alignment="CENTER_LEFT"
+          style="-fx-padding: 0 30; -fx-background-color: #ffffff;">
 
-    <!-- ICÔNES NOTIFICATIONS -->
-    <HBox spacing="15" style="-fx-alignment: CENTER;">
-
-        <!-- NOTIFICATIONS -->
-        <StackPane styleClass="icon-container" onMouseClicked="#showNotifications">
-            <FontIcon iconLiteral="far-bell" iconSize="16"/>
-            <Label text="3" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
-        </StackPane>
-
-        <!-- MESSAGES -->
-        <StackPane styleClass="icon-container" onMouseClicked="#showMessages">
-            <FontIcon iconLiteral="far-comment-alt" iconSize="16"/>
-            <Label text="5" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
-        </StackPane>
-
-        <!-- PANIER -->
-        <StackPane styleClass="icon-container" onMouseClicked="#showCart">
-            <FontIcon iconLiteral="fas-shopping-cart" iconSize="16"/>
-            <Label text="2" style="-fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-translate-x: 8; -fx-translate-y: -8;"/>
-        </StackPane>
-
-        <!-- SEPARATEUR -->
-        <Separator orientation="VERTICAL" style="-fx-pref-height: 25; -fx-padding: 0 5;"/>
-
-        <!-- PROFIL UTILISATEUR -->
-        <MenuButton fx:id="profileMenu"
-                    style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;">
+        <!-- Dashboard -->
+        <Button fx:id="dashboardBtn"
+                onAction="#showDashboard"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
             <graphic>
-                <HBox spacing="10" style="-fx-alignment: CENTER; -fx-padding: 5;">
-                    <!-- PHOTO DE PROFIL -->
-                    <StackPane>
-                        <ImageView fx:id="profileImage" fitWidth="32" fitHeight="32" pickOnBounds="true" preserveRatio="true"/>
-                    </StackPane>
-
-
-                    <!-- INFOS UTILISATEUR -->
-                    <VBox spacing="2" style="-fx-padding: 0 5 0 0;">
-                        <Label text="John Doe" style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                        <Label text="Sales Manager" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
-                    </VBox>
-
-                    <!-- FLÈCHE -->
-                    <FontIcon iconLiteral="fas-chevron-down" iconSize="12" iconColor="#7f8c8d"/>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-chart-line" iconSize="16" iconColor="#3498db"/>
+                    <Label text="Dashboard"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
+        </Button>
 
+        <!-- Clients (MenuButton) -->
+        <MenuButton text="Clients"
+                    styleClass="nav-menu-btn"
+                    style="-fx-background-color: transparent;
+                           -fx-border-width: 0;
+                           -fx-padding: 16 20;
+                           -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-users" iconSize="16" iconColor="#9b59b6"/>
+                    <Label
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
+                </HBox>
+            </graphic>
             <items>
-                <MenuItem text="Mon Profil" onAction="#showUserProfile" >
-                    <graphic><FontIcon iconLiteral="fas-user" iconColor="#2c3e50"/></graphic>
+                <MenuItem text="Liste des clients" onAction="#showCustomerList">
+                    <graphic><FontIcon iconLiteral="fas-list" iconSize="14" iconColor="#9b59b6"/></graphic>
                 </MenuItem>
-                <MenuItem text="Paramètres du compte" onAction="#showAccountSettings" >
-                    <graphic><FontIcon iconLiteral="fas-cog" iconColor="#2c3e50"/></graphic>
-                </MenuItem>
-                <MenuItem text="Dernières mises à jour" onAction="#showLastUpdates" >
-                    <graphic><FontIcon iconLiteral="fas-sync-alt" iconColor="#2c3e50"/></graphic>
-                </MenuItem>
-                <SeparatorMenuItem/>
-                <MenuItem text="Aide / Support" onAction="#showHelpCenter" >
-                    <graphic><FontIcon iconLiteral="fas-question-circle" iconColor="#2c3e50"/></graphic>
-                </MenuItem>
-                <MenuItem text="Envoyer un feedback" onAction="#sendFeedback" >
-                    <graphic><FontIcon iconLiteral="fas-comment-dots" iconColor="#2c3e50"/></graphic>
-                </MenuItem>
-                <SeparatorMenuItem/>
-                <MenuItem text="Déconnexion" onAction="#handleLogout" >
-                    <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconColor="#e74c3c"/></graphic>
+                <MenuItem text="Historique interactions" onAction="#showCustomerHistory">
+                    <graphic><FontIcon iconLiteral="fas-history" iconSize="14" iconColor="#9b59b6"/></graphic>
                 </MenuItem>
             </items>
         </MenuButton>
+
+        <!-- Véhicules (MenuButton) -->
+        <MenuButton text="Véhicules"
+                    styleClass="nav-menu-btn"
+                    style="-fx-background-color: transparent;
+                           -fx-border-width: 0;
+                           -fx-padding: 16 20;
+                           -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-car" iconSize="16" iconColor="#e67e22"/>
+                    <Label text="Véhicules"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
+                </HBox>
+            </graphic>
+            <items>
+                <MenuItem text="Liste véhicules" onAction="#showVehicleManagement">
+                    <graphic><FontIcon iconLiteral="fas-car" iconSize="14" iconColor="#e67e22"/></graphic>
+                </MenuItem>
+                <MenuItem text="Gestion du stock" onAction="#showStockManagement">
+                    <graphic><FontIcon iconLiteral="fas-warehouse" iconSize="14" iconColor="#e67e22"/></graphic>
+                </MenuItem>
+            </items>
+        </MenuButton>
+
+        <!-- Commandes (MenuButton) -->
+        <MenuButton text="Reservations"
+                    styleClass="nav-menu-btn"
+                    style="-fx-background-color: transparent;
+                           -fx-border-width: 0;
+                           -fx-padding: 16 20;
+                           -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="16" iconColor="#27ae60"/>
+                    <Label text="Commandes"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
+                </HBox>
+            </graphic>
+            <items>
+                <MenuItem text="Réservations à confirmer" onAction="#showPendingReservations">
+                    <graphic><FontIcon iconLiteral="fas-shopping-cart" iconSize="14" iconColor="#27ae60"/></graphic>
+                </MenuItem>
+                <MenuItem text="Historique des ventes" onAction="#showSalesHistory">
+                    <graphic><FontIcon iconLiteral="fas-dollar-sign" iconSize="14" iconColor="#27ae60"/></graphic>
+                </MenuItem>
+            </items>
+        </MenuButton>
+
+        <!-- Statistiques (MenuButton) -->
+        <MenuButton text="Mes achats"
+                    styleClass="nav-menu-btn"
+                    style="-fx-background-color: transparent;
+                           -fx-border-width: 0;
+                           -fx-padding: 16 20;
+                           -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-chart-bar" iconSize="16" iconColor="#e74c3c"/>
+                    <Label text="Statistiques"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
+                </HBox>
+            </graphic>
+            <items>
+                <MenuItem text="mes achats" onAction="#showMonthlySales">
+                    <graphic><FontIcon iconLiteral="fas-chart-line" iconSize="14" iconColor="#e74c3c"/></graphic>
+                </MenuItem>
+                <MenuItem text="Revenus" onAction="#showRevenueStats">
+                    <graphic><FontIcon iconLiteral="fas-coins" iconSize="14" iconColor="#e74c3c"/></graphic>
+                </MenuItem>
+                <MenuItem text="Performances clients" onAction="#showClientPerformance">
+                    <graphic><FontIcon iconLiteral="fas-bullseye" iconSize="14" iconColor="#e74c3c"/></graphic>
+                </MenuItem>
+                <MenuItem text="Analytics ventes" onAction="#showSalesAnalytics">
+                    <graphic><FontIcon iconLiteral="fas-chart-bar" iconSize="14" iconColor="#e74c3c"/></graphic>
+                </MenuItem>
+            </items>
+        </MenuButton>
+
+        <!-- Rendez-vous -->
+        <Button onAction="#showRendezVous"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-calendar-alt" iconSize="16" iconColor="#f39c12"/>
+                    <Label text="Rendez-vous"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+            </graphic>
+        </Button>
+
+        <!-- Magasins -->
+        <Button onAction="#showMagasins"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontIcon iconLiteral="fas-store" iconSize="16" iconColor="#16a085"/>
+                    <Label text="Magasins"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+            </graphic>
+        </Button>
+
     </HBox>
-</HBox>
+
+    <!-- LIGNE INFÉRIEURE -->
+    <Separator style="-fx-background-color: #e8ecef; -fx-pref-height: 1;"/>
+
+</VBox>

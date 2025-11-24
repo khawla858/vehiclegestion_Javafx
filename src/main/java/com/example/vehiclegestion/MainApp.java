@@ -1,4 +1,5 @@
 package com.example.vehiclegestion;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,20 +10,19 @@ import java.io.IOException;
 
 public class MainApp extends Application {
     @Override
-    public void start(Stage stage) throws Exception {
-// CORRECT - Charge d'abord le LAYOUT qui contient navbar + sidebar
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/layout/vendeur-layout.fxml"));
-        Parent root = null;   // Charge le FXML une seule fois
-        try {
-            root = loader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        Scene scene = new Scene(root); // Utilise root ici
-        stage.setScene(scene);
-        stage.setTitle("Systeme Vhécules");
-        stage.show();
+
+    public void start(Stage primaryStage) throws Exception {
+        // Chargez la page de login au lieu du dashboard vendeur
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root, 1000, 700);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Connexion - Gestion Véhicules");
+        primaryStage.setMinWidth(800);
+        primaryStage.setMinHeight(600);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {

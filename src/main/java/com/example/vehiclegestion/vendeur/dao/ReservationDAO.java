@@ -21,18 +21,18 @@ public class ReservationDAO {
     public List<Reservation> getReservationsByVendeur(int idVendeur) throws SQLException {
         List<Reservation> list = new ArrayList<>();
 
-        String sql = """
-            SELECT r.id_reservation, r.id_client, 
-                   u.nom || ' ' || u.prenom AS nom_client,
-                   r.id_vehicule, a.titre, a.prix,
-                   r.date_reservation, r.statut, r.date_expiration
-            FROM reservation r
-            JOIN client c ON r.id_client = c.id_client
-            JOIN utilisateur u ON c.id_client = u.id_utilisateur
-            JOIN article a ON r.id_vehicule = a.id_article
-            WHERE a.id_vendeur = ?
-            ORDER BY r.date_reservation DESC
-        """;
+        String sql =
+                "SELECT r.id_reservation, r.id_client, " +
+                        "u.nom || ' ' || u.prenom AS nom_client, " +
+                        "r.id_vehicule, a.titre, a.prix, " +
+                        "r.date_reservation, r.statut, r.date_expiration " +
+                        "FROM reservation r " +
+                        "JOIN client c ON r.id_client = c.id_client " +
+                        "JOIN utilisateur u ON c.id_client = u.id_utilisateur " +
+                        "JOIN article a ON r.id_vehicule = a.id_article " +
+                        "WHERE a.id_vendeur = ? " +
+                        "ORDER BY r.date_reservation DESC";
+
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, idVendeur);
@@ -88,11 +88,11 @@ public class ReservationDAO {
 
     // 📌 Compter les réservations par statut
     public int countReservationsByStatus(int idVendeur, String statut) throws SQLException {
-        String sql = """
-            SELECT COUNT(*) FROM reservation r
-            JOIN article a ON r.id_vehicule = a.id_article
-            WHERE a.id_vendeur = ? AND r.statut = ?
-        """;
+        String sql =
+                "SELECT COUNT(*) FROM reservation r " +
+                        "JOIN article a ON r.id_vehicule = a.id_article " +
+                        "WHERE a.id_vendeur = ? AND r.statut = ?";
+
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, idVendeur);

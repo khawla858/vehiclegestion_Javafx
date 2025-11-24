@@ -12,6 +12,8 @@ import java.util.ResourceBundle;
 import java.util.List;
 import javafx.scene.layout.HBox;           // ✅ AJOUTE CETTE LIGNE
 import javafx.geometry.Pos;
+import com.example.vehiclegestion.auth.SessionManager;
+
 
 public class ClientListController implements Initializable {
 
@@ -24,11 +26,21 @@ public class ClientListController implements Initializable {
 
     private ClientDAO clientDAO = new ClientDAO();
     private ObservableList<Client> clientsList = FXCollections.observableArrayList();
-    private final int VENDEUR_ID = 1;
+    private int vendeurId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("🚀 Initialisation de la liste des clients...");
+
+        // 👉 Récupération du vendeur connecté
+        if (SessionManager.getInstance().estVendeur()) {
+            vendeurId = SessionManager.getInstance().getUserId();
+            System.out.println("🟢 Vendeur connecté ID = " + vendeurId);
+        } else {
+            System.err.println("❌ Erreur : Aucun vendeur connecté !");
+            return;
+        }
+
         setupTable();
         setupFilters();
         loadClients();
@@ -46,40 +58,46 @@ public class ClientListController implements Initializable {
         // Trouve la colonne Actions (la dernière colonne)
         TableColumn<Client, Void> actionsColumn = (TableColumn<Client, Void>) clientsTable.getColumns().get(9);
 
-        actionsColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button viewBtn = new Button("👁️");
-            private final Button editBtn = new Button("✏️");
-            private final Button deleteBtn = new Button("🗑️");
-            private final HBox hbox = new HBox(5, viewBtn, editBtn, deleteBtn);
-
-            {
-                // Style des boutons
-                viewBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
-                editBtn.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
-                deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
-
-                hbox.setAlignment(Pos.CENTER);
-                // Actions des boutons
-                viewBtn.setOnAction(event -> {
-                    Client client = getTableView().getItems().get(getIndex());
-                    viewClientDetails(client);
-                });
-
-                editBtn.setOnAction(event -> {
-                    Client client = getTableView().getItems().get(getIndex());
-                    editClient(client);
-                });
-
-                deleteBtn.setOnAction(event -> {
-                    Client client = getTableView().getItems().get(getIndex());
-                    deleteClient(client);
-                });
-            }
-
+        actionsColumn.setCellFactory(new javafx.util.Callback<TableColumn<Client, Void>, TableCell<Client, Void>>() {
             @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : hbox);
+            public TableCell<Client, Void> call(final TableColumn<Client, Void> param) {
+                return new TableCell<Client, Void>() {
+
+                    private final Button viewBtn = new Button("👁️");
+                    private final Button editBtn = new Button("✏️");
+                    private final Button deleteBtn = new Button("🗑️");
+                    private final HBox hbox = new HBox(5, viewBtn, editBtn, deleteBtn);
+
+                    {
+                        // Styles
+                        viewBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                        editBtn.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                        deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                        hbox.setAlignment(Pos.CENTER);
+
+                        // Actions boutons
+                        viewBtn.setOnAction(event -> {
+                            Client client = getTableView().getItems().get(getIndex());
+                            viewClientDetails(client);
+                        });
+
+                        editBtn.setOnAction(event -> {
+                            Client client = getTableView().getItems().get(getIndex());
+                            editClient(client);
+                        });
+
+                        deleteBtn.setOnAction(event -> {
+                            Client client = getTableView().getItems().get(getIndex());
+                            deleteClient(client);
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setGraphic(empty ? null : hbox);
+                    }
+                };
             }
         });
     }
@@ -141,14 +159,14 @@ public class ClientListController implements Initializable {
 
     private void loadClients() {
         try {
-            List<Client> clients = clientDAO.getClientsByVendeur(VENDEUR_ID);
+            List<Client> clients = clientDAO.getClientsByVendeur(vendeurId);
             clientsList.setAll(clients);
             System.out.println("✅ " + clients.size() + " clients chargés");
         } catch (Exception e) {
-            e.printStackTrace();
-            showError("Erreur de chargement des clients: " + e.getMessage());
+            showError("Erreur de chargement : " + e.getMessage());
         }
     }
+
 
     private void filterClients() {
         applyFilterAndSearch();
@@ -163,7 +181,7 @@ public class ClientListController implements Initializable {
         String searchTerm = searchField.getText();
 
         try {
-            List<Client> clients = clientDAO.getClientsByVendeurWithFilter(VENDEUR_ID, filter, searchTerm);
+            List<Client> clients = clientDAO.getClientsByVendeurWithFilter(vendeurId, filter, searchTerm);
             clientsList.setAll(clients);
             updateStatistics();
         } catch (Exception e) {
@@ -220,7 +238,7 @@ public class ClientListController implements Initializable {
 
         if (alert.showAndWait().get() == ButtonType.OK) {
             try {
-                boolean success = clientDAO.deleteClientVentes(client.getId());
+                boolean success = clientDAO.deleteClientVentes(client.getId(),vendeurId);
                 if (success) {
                     System.out.println("✅ Ventes du client supprimées: " + client.getFullName());
                     loadClients(); // recharge la table

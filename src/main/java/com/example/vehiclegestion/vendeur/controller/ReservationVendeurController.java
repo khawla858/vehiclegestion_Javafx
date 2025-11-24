@@ -1,10 +1,9 @@
-// ========================================
-// 3. ReservationVendeurController.java (Controller)
-// ========================================
 package com.example.vehiclegestion.vendeur.controller;
 
 import com.example.vehiclegestion.vendeur.dao.ReservationDAO;
 import com.example.vehiclegestion.vendeur.model.Reservation;
+import com.example.vehiclegestion.auth.SessionManager; // ← AJOUT IMPORT
+import com.example.vehiclegestion.auth.model.Utilisateur; // ← AJOUT IMPORT
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -37,16 +36,36 @@ public class ReservationVendeurController {
     private ObservableList<Reservation> reservations;
     private ObservableList<Reservation> allReservations;
 
-    private final int ID_VENDEUR = 1; // ⚠️ À remplacer dynamiquement
+    // ⚡ REMPLACER la constante par le SessionManager
+    private SessionManager sessionManager;
+    private int idVendeur;
 
     @FXML
     public void initialize() {
         try {
+            // ⚡ INITIALISATION de la session
+            sessionManager = SessionManager.getInstance();
+
+            // ⚡ VÉRIFICATION du rôle vendeur
+            if (!sessionManager.estConnecte() || !sessionManager.estVendeur()) {
+                showError("Accès refusé. Vous devez être connecté en tant que vendeur.");
+                // Optionnel : Rediriger vers la page de login
+                // redirectToLogin();
+                return;
+            }
+
+            // ⚡ RÉCUPÉRATION dynamique de l'ID du vendeur
+            idVendeur = sessionManager.getUserId();
+            Utilisateur utilisateur = sessionManager.getUtilisateurConnecte();
+
+            System.out.println("🔐 Vendeur connecté: " + utilisateur.getEmail() + " (ID: " + idVendeur + ")");
+
             reservationDAO = new ReservationDAO();
             setupTable();
             setupFilters();
             chargerReservations();
             updateStatistics();
+
         } catch (Exception e) {
             e.printStackTrace();
             showError("Erreur d'initialisation : " + e.getMessage());
@@ -54,7 +73,7 @@ public class ReservationVendeurController {
     }
 
     private void setupTable() {
-        // Configuration des colonnes
+        // Configuration des colonnes (inchangé)
         colClient.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().getNomClient()));
 
@@ -73,7 +92,7 @@ public class ReservationVendeurController {
         colStatut.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().getStatut()));
 
-        // Style des cellules de statut
+        // Style des cellules de statut (inchangé)
         colStatut.setCellFactory(column -> new TableCell<Reservation, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -156,12 +175,20 @@ public class ReservationVendeurController {
 
     private void chargerReservations() {
         try {
+            // ⚡ VÉRIFICATION de la session à chaque chargement
+            if (!sessionManager.estConnecte() || !sessionManager.estVendeur()) {
+                showError("Session expirée. Veuillez vous reconnecter.");
+                return;
+            }
+
             reservationDAO.updateExpiredReservations();
             allReservations = FXCollections.observableArrayList(
-                    reservationDAO.getReservationsByVendeur(ID_VENDEUR)
+                    // ⚡ UTILISATION de l'ID dynamique du vendeur
+                    reservationDAO.getReservationsByVendeur(idVendeur)
             );
             reservations = FXCollections.observableArrayList(allReservations);
             reservationsTable.setItems(reservations);
+
         } catch (SQLException e) {
             e.printStackTrace();
             showError("Erreur de chargement : " + e.getMessage());
@@ -199,6 +226,12 @@ public class ReservationVendeurController {
     }
 
     private void confirmerReservation(Reservation r) {
+        // ⚡ VÉRIFICATION de la session avant action
+        if (!sessionManager.estVendeur()) {
+            showError("Action non autorisée. Rôle vendeur requis.");
+            return;
+        }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
         alert.setHeaderText("Confirmer la réservation");
@@ -219,6 +252,12 @@ public class ReservationVendeurController {
     }
 
     private void refuserReservation(Reservation r) {
+        // ⚡ VÉRIFICATION de la session avant action
+        if (!sessionManager.estVendeur()) {
+            showError("Action non autorisée. Rôle vendeur requis.");
+            return;
+        }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Refuser");
         alert.setHeaderText("Refuser la réservation");
@@ -240,19 +279,25 @@ public class ReservationVendeurController {
 
     @FXML
     private void refreshReservations() {
+        // ⚡ VÉRIFICATION de la session avant rafraîchissement
+        if (!sessionManager.estConnecte() || !sessionManager.estVendeur()) {
+            showError("Session expirée. Veuillez vous reconnecter.");
+            return;
+        }
         chargerReservations();
         updateStatistics();
     }
 
     private void updateStatistics() {
         try {
+            // ⚡ UTILISATION de l'ID dynamique du vendeur
             lblTotal.setText(String.valueOf(allReservations.size()));
             lblEnAttente.setText(String.valueOf(
-                    reservationDAO.countReservationsByStatus(ID_VENDEUR, "en attente")));
+                    reservationDAO.countReservationsByStatus(idVendeur, "en attente")));
             lblConfirmees.setText(String.valueOf(
-                    reservationDAO.countReservationsByStatus(ID_VENDEUR, "confirmée")));
+                    reservationDAO.countReservationsByStatus(idVendeur, "confirmée")));
             lblAnnulees.setText(String.valueOf(
-                    reservationDAO.countReservationsByStatus(ID_VENDEUR, "annulée")));
+                    reservationDAO.countReservationsByStatus(idVendeur, "annulée")));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -272,5 +317,14 @@ public class ReservationVendeurController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // ⚡ MÉTHODE pour obtenir les infos du vendeur connecté (optionnel)
+    public String getVendeurInfo() {
+        if (sessionManager.estConnecte() && sessionManager.estVendeur()) {
+            Utilisateur user = sessionManager.getUtilisateurConnecte();
+            return user.getPrenom() + " " + user.getNom() + " (" + user.getEmail() + ")";
+        }
+        return "Non connecté";
     }
 }

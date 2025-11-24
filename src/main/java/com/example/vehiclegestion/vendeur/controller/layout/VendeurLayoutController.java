@@ -1,72 +1,78 @@
 package com.example.vehiclegestion.vendeur.controller.layout;
 
+import com.example.vehiclegestion.utils.NavigationManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
-import javafx.scene.Node; // Importez Node
-
 public class VendeurLayoutController {
 
-    @FXML
-    private AnchorPane navbarContainer;
+    @FXML private AnchorPane navbarContainer;
+    @FXML private StackPane contentPane;
 
-    @FXML
-    private AnchorPane sidebarContainer;
-
-    @FXML
-    private StackPane contentPane;
+    private NavigationManager navigationManager;
 
     @FXML
     public void initialize() {
+        System.out.println("\n🚀 === INITIALISATION VENDEUR LAYOUT ===");
+
         try {
-            // Charger Navbar - utilisez Node au lieu d'AnchorPane
-            FXMLLoader navbarLoader = new FXMLLoader(getClass().getResource("/view/vendeur/layout/Navbar.fxml"));
-            Node navbar = navbarLoader.load(); // Changez AnchorPane en Node
+            // ✅ ÉTAPE 1 : Charger la Navbar
+            System.out.println("📋 Chargement Navbar...");
+            FXMLLoader navbarLoader = new FXMLLoader(
+                    getClass().getResource("/view/vendeur/layout/Navbar.fxml")
+            );
+            Node navbar = navbarLoader.load();
             navbarContainer.getChildren().setAll(navbar);
+            System.out.println("✅ Navbar chargée");
 
-            // Charger Sidebar - utilisez Node au lieu de VBox
-            FXMLLoader sidebarLoader = new FXMLLoader(getClass().getResource("/view/vendeur/layout/Sidebar.fxml"));
-            Node sidebar = sidebarLoader.load(); // Changez VBox en Node
-            sidebarContainer.getChildren().setAll(sidebar);
-
-            // Récupérer le controller Sidebar pour lui passer contentPane
-            SidebarController sidebarController = sidebarLoader.getController();
-            if (sidebarController != null) {
-                sidebarController.setContentPane(contentPane);
+            // ✅ ÉTAPE 2 : Récupérer le contrôleur Navbar et lui passer contentPane
+            NavbarController navbarController = navbarLoader.getController();
+            if (navbarController != null) {
+                navbarController.setContentPane(contentPane);
+                System.out.println("✅ ContentPane injecté dans NavbarController");
             } else {
-                System.err.println("SidebarController est null");
+                System.err.println("❌ NavbarController est null !");
             }
 
-            // Charger Dashboard par défaut
-            loadDashboard();
+            // ✅ ÉTAPE 3 : Initialiser NavigationManager (NOUVEAU)
+            navigationManager = NavigationManager.getInstance();
+            navigationManager.setContentPane(contentPane);
+            System.out.println("✅ NavigationManager initialisé");
+
+            // ✅ ÉTAPE 4 : Charger Dashboard par défaut
+            navigationManager.goToDashboard();
+
+            System.out.println("🚀 === LAYOUT PRÊT ===\n");
 
         } catch (IOException e) {
+            System.err.println("❌ ERREUR INITIALISATION LAYOUT");
             e.printStackTrace();
             showErrorContent();
         } catch (Exception e) {
+            System.err.println("❌ ERREUR INATTENDUE");
             e.printStackTrace();
             showErrorContent();
         }
     }
 
-    public void loadDashboard() {
-        try {
-            Node dashboard = FXMLLoader.load(getClass().getResource("/view/vendeur/VendeurDashboard.fxml"));
-            contentPane.getChildren().setAll(dashboard);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showErrorContent();
-        }
-    }
-
+    /**
+     * Affiche un message d'erreur en cas de problème
+     */
     private void showErrorContent() {
-        // Affichez un contenu d'erreur simple
-        javafx.scene.control.Label errorLabel = new javafx.scene.control.Label("Erreur de chargement");
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
+        javafx.scene.control.Label errorLabel = new javafx.scene.control.Label(
+                "❌ Erreur de chargement de l'interface"
+        );
+        errorLabel.setStyle(
+                "-fx-text-fill: #e74c3c; " +
+                        "-fx-font-size: 18px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 50;"
+        );
         contentPane.getChildren().setAll(errorLabel);
     }
 }

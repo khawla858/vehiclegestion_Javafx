@@ -14,58 +14,40 @@ public class MagasinDAO {
     public MagasinDAO() {
         try {
             connection = DatabaseConnection.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+            System.out.println("✅ MagasinDAO: Connexion établie");
 
-    /**
-     * ✅ CORRIGÉ : Récupère TOUS les champs incluant le logo
-     */
-    public List<Magasin> getAllMagasins() {
-        List<Magasin> magasins = new ArrayList<>();
-        String sql = "SELECT * FROM Magasin";
-
-        try (Statement st = connection.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                Magasin m = new Magasin();
-
-                // Champs de base
-                m.setIdMagasin(rs.getInt("id_magasin"));
-                m.setNomMagasin(rs.getString("nom_magasin"));
-                m.setAdresse(rs.getString("adresse"));
-                m.setLocalisation(rs.getString("localisation"));
-                m.setDescription(rs.getString("description"));
-                m.setIdVendeur(rs.getInt("id_vendeur"));
-                m.setNbVentesMensuelles(rs.getInt("nb_ventes_mensuelles"));
-
-                // ✅ NOUVEAUX CHAMPS incluant le logo
-                m.setLogoMagasin(rs.getString("logo_magasin"));
-                m.setTelephone(rs.getString("telephone"));
-                m.setEmailContact(rs.getString("email_contact"));
-                m.setSiteWeb(rs.getString("site_web"));
-                m.setFacebook(rs.getString("facebook"));
-                m.setInstagram(rs.getString("instagram"));
-                m.setCategorie(rs.getString("categorie"));
-
-                magasins.add(m);
+            // ✅ VÉRIFIER QUE LA CONNEXION EST VALIDE
+            if (connection == null || connection.isClosed()) {
+                System.err.println("❌ ERREUR: La connexion à la base de données est fermée!");
             }
         } catch (SQLException e) {
+            System.err.println("❌ ERREUR: Impossible de se connecter à la base de données");
             e.printStackTrace();
         }
-        return magasins;
     }
 
     /**
-     * ✅ NOUVELLE MÉTHODE : Récupérer un magasin par ID vendeur
+     * ✅ MÉTHODE CORRIGÉE : Récupérer un magasin par ID vendeur avec logs détaillés
      */
     public Magasin getMagasinByVendeur(int idVendeur) {
+        System.out.println("\n🔍 === getMagasinByVendeur ===");
+        System.out.println("   Recherche pour vendeur ID: " + idVendeur);
+
         String sql = "SELECT * FROM Magasin WHERE id_vendeur = ? LIMIT 1";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try {
+            // ✅ VÉRIFIER LA CONNEXION
+            if (connection == null || connection.isClosed()) {
+                System.err.println("❌ ERREUR: Connexion fermée, tentative de reconnexion...");
+                connection = DatabaseConnection.getConnection();
+            }
+
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, idVendeur);
+
+            System.out.println("   📝 Requête SQL: " + sql);
+            System.out.println("   📝 Paramètre: id_vendeur = " + idVendeur);
+
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -88,24 +70,57 @@ public class MagasinDAO {
                 m.setInstagram(rs.getString("instagram"));
                 m.setCategorie(rs.getString("categorie"));
 
+                System.out.println("   ✅ MAGASIN TROUVÉ:");
+                System.out.println("      - ID Magasin: " + m.getIdMagasin());
+                System.out.println("      - Nom: " + m.getNomMagasin());
+                System.out.println("      - Adresse: " + m.getAdresse());
+                System.out.println("      - ID Vendeur: " + m.getIdVendeur());
+                System.out.println("      - Logo: " + m.getLogoMagasin());
+
+                rs.close();
+                ps.close();
                 return m;
+            } else {
+                System.out.println("   ⚠️ AUCUN RÉSULTAT trouvé dans la base de données");
+                System.out.println("   💡 Vérifiez avec: SELECT * FROM Magasin WHERE id_vendeur = " + idVendeur + ";");
+
+                rs.close();
+                ps.close();
             }
         } catch (SQLException e) {
+            System.err.println("❌ ERREUR SQL dans getMagasinByVendeur:");
+            System.err.println("   Message: " + e.getMessage());
+            System.err.println("   SQLState: " + e.getSQLState());
+            System.err.println("   ErrorCode: " + e.getErrorCode());
             e.printStackTrace();
         }
+
+        System.out.println("🔍 === Fin getMagasinByVendeur ===\n");
         return null;
     }
 
     /**
-     * Ajouter un magasin
+     * ✅ MÉTHODE CORRIGÉE : Ajouter un magasin avec logs détaillés
      */
     public void addMagasin(Magasin m) {
+        System.out.println("\n💾 === addMagasin ===");
+        System.out.println("   Ajout du magasin: " + m.getNomMagasin());
+        System.out.println("   Pour le vendeur ID: " + m.getIdVendeur());
+
         String sql = "INSERT INTO Magasin (" +
                 "nom_magasin, adresse, localisation, description, id_vendeur, " +
                 "telephone, email_contact, site_web, facebook, instagram, categorie, logo_magasin, nb_ventes_mensuelles" +
                 ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try {
+            // ✅ VÉRIFIER LA CONNEXION
+            if (connection == null || connection.isClosed()) {
+                System.err.println("❌ ERREUR: Connexion fermée, tentative de reconnexion...");
+                connection = DatabaseConnection.getConnection();
+            }
+
+            PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
             stmt.setString(1, m.getNomMagasin());
             stmt.setString(2, m.getAdresse());
             stmt.setString(3, m.getLocalisation());
@@ -120,22 +135,93 @@ public class MagasinDAO {
             stmt.setString(12, m.getLogoMagasin());
             stmt.setInt(13, m.getNbVentesMensuelles());
 
-            stmt.executeUpdate();
-            System.out.println("✅ Magasin ajouté avec succès!");
+            System.out.println("   📝 Exécution de l'insertion...");
+            int rowsAffected = stmt.executeUpdate();
+
+            System.out.println("   ✅ Insertion réussie! Lignes affectées: " + rowsAffected);
+
+            // ✅ RÉCUPÉRER L'ID GÉNÉRÉ
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int idGenere = generatedKeys.getInt(1);
+                m.setIdMagasin(idGenere);
+                System.out.println("   ✅ ID magasin généré: " + idGenere);
+            }
+
+            generatedKeys.close();
+            stmt.close();
+
+            // ✅ VÉRIFICATION IMMÉDIATE
+            System.out.println("   🔍 Vérification de l'insertion...");
+            Magasin verification = getMagasinByVendeur(m.getIdVendeur());
+            if (verification != null) {
+                System.out.println("   ✅ VÉRIFICATION OK: Le magasin est bien en base!");
+            } else {
+                System.err.println("   ❌ ERREUR: Le magasin n'a pas été trouvé après insertion!");
+            }
+
         } catch (SQLException e) {
+            System.err.println("❌ ERREUR SQL dans addMagasin:");
+            System.err.println("   Message: " + e.getMessage());
+            System.err.println("   SQLState: " + e.getSQLState());
+            System.err.println("   ErrorCode: " + e.getErrorCode());
             e.printStackTrace();
         }
+
+        System.out.println("💾 === Fin addMagasin ===\n");
+    }
+
+    /**
+     * Récupérer tous les magasins
+     */
+    public List<Magasin> getAllMagasins() {
+        List<Magasin> magasins = new ArrayList<>();
+        String sql = "SELECT * FROM Magasin";
+
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Magasin m = new Magasin();
+                m.setIdMagasin(rs.getInt("id_magasin"));
+                m.setNomMagasin(rs.getString("nom_magasin"));
+                m.setAdresse(rs.getString("adresse"));
+                m.setLocalisation(rs.getString("localisation"));
+                m.setDescription(rs.getString("description"));
+                m.setIdVendeur(rs.getInt("id_vendeur"));
+                m.setNbVentesMensuelles(rs.getInt("nb_ventes_mensuelles"));
+                m.setLogoMagasin(rs.getString("logo_magasin"));
+                m.setTelephone(rs.getString("telephone"));
+                m.setEmailContact(rs.getString("email_contact"));
+                m.setSiteWeb(rs.getString("site_web"));
+                m.setFacebook(rs.getString("facebook"));
+                m.setInstagram(rs.getString("instagram"));
+                m.setCategorie(rs.getString("categorie"));
+
+                magasins.add(m);
+            }
+
+            System.out.println("✅ getAllMagasins: " + magasins.size() + " magasin(s) trouvé(s)");
+        } catch (SQLException e) {
+            System.err.println("❌ ERREUR dans getAllMagasins: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return magasins;
     }
 
     /**
      * Supprimer un magasin
      */
     public boolean deleteMagasin(int idMagasin) {
+        System.out.println("🗑️ Suppression du magasin ID: " + idMagasin);
         String sql = "DELETE FROM Magasin WHERE id_magasin = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, idMagasin);
-            return ps.executeUpdate() > 0;
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "✅ Magasin supprimé" : "⚠️ Aucun magasin supprimé");
+            return rows > 0;
         } catch (SQLException e) {
+            System.err.println("❌ ERREUR lors de la suppression: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -145,14 +231,18 @@ public class MagasinDAO {
      * Vérifier si un vendeur a un magasin
      */
     public boolean hasMagasin(int idVendeur) {
+        System.out.println("🔍 Vérification: Le vendeur " + idVendeur + " a-t-il un magasin?");
         String sql = "SELECT COUNT(*) FROM Magasin WHERE id_vendeur = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, idVendeur);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt(1) > 0;
+                boolean hasMagasin = rs.getInt(1) > 0;
+                System.out.println(hasMagasin ? "✅ OUI" : "❌ NON");
+                return hasMagasin;
             }
         } catch (SQLException e) {
+            System.err.println("❌ ERREUR dans hasMagasin: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -174,7 +264,7 @@ public class MagasinDAO {
     }
 
     /**
-     * ✅ NOUVELLE MÉTHODE : Mettre à jour toutes les infos du magasin
+     * Mettre à jour toutes les infos du magasin
      */
     public boolean updateMagasin(Magasin m) {
         String sql = "UPDATE Magasin SET " +

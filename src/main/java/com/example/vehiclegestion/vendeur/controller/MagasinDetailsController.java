@@ -2,6 +2,8 @@ package com.example.vehiclegestion.vendeur.controller;
 
 import com.example.vehiclegestion.vendeur.model.Magasin;
 import com.example.vehiclegestion.vendeur.dao.MagasinDAO;
+import com.example.vehiclegestion.utils.DataReceiver;
+import com.example.vehiclegestion.utils.NavigationManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -14,7 +16,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.io.File;
 
-public class MagasinDetailsController {
+public class MagasinDetailsController implements DataReceiver {
 
     @FXML private ImageView logoImage;
     @FXML private Text nomMagasin;
@@ -32,51 +34,51 @@ public class MagasinDetailsController {
     @FXML private Label etageInfo;
     @FXML private Button btnItineraire;
     @FXML private Button btnVoirCarte;
+    @FXML private Button btnRetour;
 
     private Magasin magasin;
     private MagasinDAO magasinDAO;
-    private final int ID_VENDEUR = 1;
+    private NavigationManager nav = NavigationManager.getInstance();
 
     @FXML
     public void initialize() {
         try {
             magasinDAO = new MagasinDAO();
-            chargerMagasinVendeur();
             configurerActions();
+
+            // ✅ Configuration du bouton retour
+            if (btnRetour != null) {
+                btnRetour.setOnAction(e -> nav.goBack());
+                btnRetour.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; " +
+                        "-fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             showError("Erreur d'initialisation : " + e.getMessage());
         }
     }
 
-    private void chargerMagasinVendeur() {
-        try {
-            var magasins = magasinDAO.getAllMagasins();
-
-            if (magasins.isEmpty()) {
-                afficherMagasinParDefaut();
-                return;
-            }
-
-            magasin = magasins.stream()
-                    .filter(m -> m.getIdVendeur() == ID_VENDEUR)
-                    .findFirst()
-                    .orElse(null);
-
-            if (magasin != null) {
-                afficherDonneesMagasin();
-            } else {
-                afficherMagasinParDefaut();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            afficherMagasinParDefaut();
+    /**
+     * ✅ Implémentation de DataReceiver pour recevoir le magasin
+     */
+    @Override
+    public void receiveData(Object data) {
+        if (data instanceof Magasin) {
+            this.magasin = (Magasin) data;
+            System.out.println("✅ Magasin reçu dans MagasinDetailsController: " + magasin.getNomMagasin());
+            afficherDonneesMagasin();
+        } else {
+            System.err.println("❌ Données reçues non valides dans MagasinDetailsController");
+            showError("Erreur", "Impossible de charger les données du magasin");
         }
     }
 
     private void afficherDonneesMagasin() {
-        if (magasin == null) return;
+        if (magasin == null) {
+            System.err.println("❌ Aucun magasin à afficher");
+            return;
+        }
 
         nomMagasin.setText(magasin.getNomMagasin() != null ? magasin.getNomMagasin() : "Nom du magasin");
         categorieMagasin.setText(magasin.getCategorie() != null ? magasin.getCategorie() : "Catégorie non définie");
@@ -101,7 +103,7 @@ public class MagasinDetailsController {
 
         chargerLogo();
         chargerHoraires();
-        chargerImageCarte(); // ✅ Nouvelle méthode simplifiée
+        chargerImageCarte();
     }
 
     private void chargerLogo() {
@@ -136,37 +138,25 @@ public class MagasinDetailsController {
         }
     }
 
-    /**
-     * ✅ NOUVELLE MÉTHODE SIMPLIFIÉE : Charge une image statique locale
-     * L'image est stockée dans images/logos/carte-localisation.png
-     */
     private void chargerImageCarte() {
         try {
-            // OPTION 1 : Depuis le dossier images/logos (même dossier que les logos)
             File carteFile = new File("images/logos/carte-localisation.jpg");
-
             if (carteFile.exists()) {
                 Image carte = new Image(carteFile.toURI().toString());
                 carteImage.setImage(carte);
                 System.out.println("✅ Carte locale chargée : " + carteFile.getAbsolutePath());
             } else {
-                // OPTION 2 : Depuis resources
-                System.out.println("⚠️ Fichier carte non trouvé dans images/logos, essai depuis resources...");
                 chargerCarteDepuisResources();
             }
-
         } catch (Exception e) {
             System.err.println("⚠️ Erreur chargement carte locale : " + e.getMessage());
             chargerCarteDepuisResources();
         }
     }
 
-    /**
-     * Charge la carte depuis le dossier resources
-     */
     private void chargerCarteDepuisResources() {
         try {
-            Image carte = new Image(getClass().getResourceAsStream("images/logos/carte-localisation.png"));
+            Image carte = new Image(getClass().getResourceAsStream("/images/logos/carte-localisation.png"));
             carteImage.setImage(carte);
             System.out.println("✅ Carte chargée depuis resources");
         } catch (Exception e) {
@@ -175,15 +165,11 @@ public class MagasinDetailsController {
         }
     }
 
-    /**
-     * Génère une belle image placeholder si aucune carte n'est disponible
-     */
     private void genererPlaceholderCarte() {
         try {
             javafx.scene.canvas.Canvas canvas = new javafx.scene.canvas.Canvas(400, 500);
             javafx.scene.canvas.GraphicsContext gc = canvas.getGraphicsContext2D();
 
-            // Fond dégradé élégant
             javafx.scene.paint.LinearGradient gradient = new javafx.scene.paint.LinearGradient(
                     0, 0, 0, 500, false, javafx.scene.paint.CycleMethod.NO_CYCLE,
                     new javafx.scene.paint.Stop(0, javafx.scene.paint.Color.web("#f0f9ff")),
@@ -192,32 +178,26 @@ public class MagasinDetailsController {
             gc.setFill(gradient);
             gc.fillRect(0, 0, 400, 500);
 
-            // Bordure
             gc.setStroke(javafx.scene.paint.Color.web("#bae6fd"));
             gc.setLineWidth(3);
             gc.strokeRect(0, 0, 400, 500);
 
-            // Cercle de fond pour l'icône
             gc.setFill(javafx.scene.paint.Color.web("#38bdf8"));
             gc.fillOval(130, 150, 140, 140);
 
-            // Icône de carte (grand emoji)
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.setFont(javafx.scene.text.Font.font("Arial", 70));
             gc.fillText("🗺️", 160, 240);
 
-            // Texte principal
             gc.setFill(javafx.scene.paint.Color.web("#0c4a6e"));
             gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 22));
             gc.fillText("Plan de localisation", 90, 340);
 
-            // Texte secondaire
             gc.setFill(javafx.scene.paint.Color.web("#075985"));
             gc.setFont(javafx.scene.text.Font.font("Arial", 16));
             gc.fillText("Cliquez sur 'Voir en plein écran'", 70, 380);
             gc.fillText("pour ouvrir Google Maps", 90, 410);
 
-            // Convertir Canvas en Image
             javafx.scene.SnapshotParameters params = new javafx.scene.SnapshotParameters();
             params.setFill(javafx.scene.paint.Color.TRANSPARENT);
             javafx.scene.image.WritableImage image = canvas.snapshot(params, null);
@@ -295,20 +275,15 @@ public class MagasinDetailsController {
             });
         }
 
-        // ✅ Bouton Itinéraire - Ouvre Google Maps avec itinéraire
         if (btnItineraire != null) {
             btnItineraire.setOnAction(e -> ouvrirItineraire());
         }
 
-        // ✅ Bouton Voir la carte - Ouvre Google Maps en plein écran
         if (btnVoirCarte != null) {
             btnVoirCarte.setOnAction(e -> ouvrirCarteComplete());
         }
     }
 
-    /**
-     * ✅ Ouvre Google Maps avec l'itinéraire vers le magasin
-     */
     private void ouvrirItineraire() {
         if (magasin == null || magasin.getAdresse() == null) {
             showError("Adresse du magasin non disponible");
@@ -318,10 +293,7 @@ public class MagasinDetailsController {
         try {
             String adresse = construireAdresseComplete();
             String adresseEncodee = URLEncoder.encode(adresse, StandardCharsets.UTF_8);
-
-            // URL Google Maps pour itinéraire
             String urlItineraire = "https://www.google.com/maps/dir/?api=1&destination=" + adresseEncodee;
-
             ouvrirLien(urlItineraire);
             System.out.println("✅ Itinéraire ouvert vers : " + adresse);
 
@@ -331,9 +303,6 @@ public class MagasinDetailsController {
         }
     }
 
-    /**
-     * ✅ Ouvre Google Maps en plein écran pour voir la carte complète
-     */
     private void ouvrirCarteComplete() {
         if (magasin == null || magasin.getAdresse() == null) {
             showError("Adresse du magasin non disponible");
@@ -343,10 +312,7 @@ public class MagasinDetailsController {
         try {
             String adresse = construireAdresseComplete();
             String adresseEncodee = URLEncoder.encode(adresse, StandardCharsets.UTF_8);
-
-            // URL Google Maps normale
             String urlCarte = "https://www.google.com/maps/search/?api=1&query=" + adresseEncodee;
-
             ouvrirLien(urlCarte);
             System.out.println("✅ Carte ouverte pour : " + adresse);
 
@@ -356,9 +322,6 @@ public class MagasinDetailsController {
         }
     }
 
-    /**
-     * Construit l'adresse complète du magasin
-     */
     private String construireAdresseComplete() {
         StringBuilder adresse = new StringBuilder();
 
@@ -371,7 +334,6 @@ public class MagasinDetailsController {
             adresse.append(magasin.getLocalisation());
         }
 
-        // Ajouter le pays
         if (adresse.length() > 0) {
             adresse.append(", Maroc");
         }
@@ -389,18 +351,7 @@ public class MagasinDetailsController {
         }
     }
 
-    private void afficherMagasinParDefaut() {
-        nomMagasin.setText("Votre Magasin");
-        categorieMagasin.setText("Catégorie à définir");
-        adresseMagasin.setText("Adresse à renseigner");
-        telephoneMagasin.setText("Téléphone à renseigner");
-        descriptionMagasin.setText("Complétez les informations de votre magasin dans les paramètres.");
-
-        if (emailMagasin != null) emailMagasin.setText("email@exemple.com");
-        if (lienSiteWeb != null) lienSiteWeb.setText("www.votresite.com");
-        if (localisationBadge != null) localisationBadge.setText("À définir");
-    }
-
+    // ✅ Gardez cette méthode pour la compatibilité
     public void setMagasin(Magasin magasin) {
         this.magasin = magasin;
         afficherDonneesMagasin();
@@ -409,6 +360,14 @@ public class MagasinDetailsController {
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();

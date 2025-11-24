@@ -25,6 +25,9 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import java.util.HashMap;
+import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.auth.model.Utilisateur;
+
 
 
 public class VendeurDashboardController implements Initializable {
@@ -49,7 +52,6 @@ public class VendeurDashboardController implements Initializable {
 
 
     private VendeurDAO vendeurDAO;
-    private final int VENDEUR_ID = 1; // 🔹 ID du vendeur connecté
     private final DecimalFormat df = new DecimalFormat("#,##0.00");
 
     @Override
@@ -57,7 +59,17 @@ public class VendeurDashboardController implements Initializable {
         System.out.println("🚀 Initialisation du Dashboard...");
 
         try {
-            vendeurDAO = new VendeurDAO(VENDEUR_ID);
+            // 🔹 Récupérer l'utilisateur connecté
+            Utilisateur utilisateurConnecte = SessionManager.getInstance().getUtilisateurConnecte();
+
+            if (utilisateurConnecte == null || !SessionManager.getInstance().estVendeur()) {
+                System.err.println("❌ Aucun vendeur connecté ou accès refusé !");
+                // Ici tu peux rediriger vers la page login ou afficher un message
+                return;
+            }
+
+            int vendeurId = utilisateurConnecte.getIdUtilisateur(); // ✅ ID du vendeur connecté
+            vendeurDAO = new VendeurDAO(vendeurId);
 
             // 1. Initialiser les statistiques principales
             initializeStatistics();
@@ -68,7 +80,6 @@ public class VendeurDashboardController implements Initializable {
             // 3. Initialiser les graphiques
             initializeCharts();
             loadCategorySalesChart();
-
 
             // 4. Initialiser les activités dynamiques
             initializeActivities();
@@ -81,6 +92,7 @@ public class VendeurDashboardController implements Initializable {
             showErrorStatistics();
         }
     }
+
 
     private void initializeStatistics() {
         try {

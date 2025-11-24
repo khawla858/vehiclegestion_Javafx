@@ -1,5 +1,7 @@
 package com.example.vehiclegestion.vendeur.controller;
 
+import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.auth.model.Utilisateur;
 import com.example.vehiclegestion.vendeur.dao.MagasinDAO;
 import com.example.vehiclegestion.vendeur.dao.DemandeMagasinDAO;
 import com.example.vehiclegestion.vendeur.model.Magasin;
@@ -13,51 +15,102 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import org.kordamp.ikonli.javafx.FontIcon;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
-// Nouveaux imports
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import com.example.vehiclegestion.utils.NavigationManager;
+
 
 public class MagasinListController {
-    @FXML
-    private VBox magasinContainer;
-    @FXML
-    private Button btnAjouterMagasin;
+    private NavigationManager nav = NavigationManager.getInstance();
+
+
+    @FXML private VBox magasinContainer;
+    @FXML private Button btnAjouterMagasin;
+
+    // ✅ Session Manager et ID vendeur
+    private SessionManager session = SessionManager.getInstance();
+    private int idVendeurConnecte; // ✅ Nom cohérent
 
     @FXML
     public void initialize() {
+        System.out.println("\n🏪 === Initialisation MagasinListController ===");
+
+        // ✅ Vérification de la session
+        if (!session.estConnecte() || !session.estVendeur()) {
+            System.err.println("❌ Accès refusé : utilisateur non connecté ou non vendeur");
+            showErrorAlert("Accès refusé", "Connectez-vous en tant que vendeur");
+            return;
+        }
+
+        // ✅ Récupérer l'ID du vendeur connecté
+        idVendeurConnecte = session.getUserId();
+        System.out.println("✅ Vendeur connecté - ID: " + idVendeurConnecte);
+        System.out.println("   - Email: " + session.getUtilisateurConnecte().getEmail());
+        session.debugSession();
+
+        // Charger les magasins du vendeur connecté
         chargerMagasins();
-        // Supprimer l'appel à chargerLogoMagasin() sans paramètres
+
+        // Configuration du bouton d'ajout
         btnAjouterMagasin.setOnAction(e -> ouvrirAjouterMagasin());
 
+        // Effets hover sur le bouton
+        btnAjouterMagasin.setOnMouseEntered(e ->
+                btnAjouterMagasin.setStyle("-fx-font-size: 15px; -fx-background-color: #e02849; " +
+                        "-fx-text-fill: white; -fx-padding: 12 25; -fx-background-radius: 10; " +
+                        "-fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255,45,85,0.4), 12, 0, 0, 4); " +
+                        "-fx-cursor: hand;")
+        );
+        btnAjouterMagasin.setOnMouseExited(e ->
+                btnAjouterMagasin.setStyle("-fx-font-size: 15px; -fx-background-color: #ff2d55; " +
+                        "-fx-text-fill: white; -fx-padding: 12 25; -fx-background-radius: 10; " +
+                        "-fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255,45,85,0.3), 10, 0, 0, 3); " +
+                        "-fx-cursor: hand;")
+        );
 
-        // Effet hover sur le bouton principal
-        btnAjouterMagasin.setOnMouseEntered(e -> btnAjouterMagasin.setStyle("-fx-font-size: 15px; -fx-background-color: #e02849; -fx-text-fill: white; " +
-                "-fx-padding: 12 25; -fx-background-radius: 10; -fx-font-weight: bold; " +
-                "-fx-effect: dropshadow(gaussian, rgba(255,45,85,0.4), 12, 0, 0, 4); -fx-cursor: hand;")
-        );
-        btnAjouterMagasin.setOnMouseExited(e -> btnAjouterMagasin.setStyle("-fx-font-size: 15px; -fx-background-color: #ff2d55; -fx-text-fill: white; " +
-                "-fx-padding: 12 25; -fx-background-radius: 10; -fx-font-weight: bold; " +
-                "-fx-effect: dropshadow(gaussian, rgba(255,45,85,0.3), 10, 0, 0, 3); -fx-cursor: hand;")
-        );
+        System.out.println("🏪 === Fin initialisation ===\n");
+    }
+
+    private void showErrorAlert(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void ouvrirAjouterMagasin() {
+        System.out.println("\n➕ === Ouverture formulaire ajout magasin ===");
+
+        // ✅ VÉRIFICATION SESSION (protection supplémentaire)
+        if (!session.estConnecte() || !session.estVendeur()) {
+            System.err.println("❌ Session expirée ou invalide");
+            showErrorAlert("Session expirée", "Veuillez vous reconnecter");
+            return;
+        }
+
         MagasinDAO magasinDAO = new MagasinDAO();
         DemandeMagasinDAO demandeDAO = new DemandeMagasinDAO();
-        int vendeurId = 1;
 
-        if (!magasinDAO.hasMagasin(vendeurId)) {
-            if (demandeDAO.hasDemandePending(vendeurId)) {
-                showStyledAlert(Alert.AlertType.INFORMATION, "Demande en attente", "Vous avez déjà une demande de création de magasin en attente.");
+        // ✅ CORRECTION : Utiliser idVendeurConnecte (pas vendeurId)
+        System.out.println("🔍 Vérification pour vendeur ID: " + idVendeurConnecte);
+
+        // Vérifier si le vendeur a déjà un magasin
+        if (!magasinDAO.hasMagasin(idVendeurConnecte)) {
+            System.out.println("ℹ️ Le vendeur n'a pas encore de magasin");
+
+            // Vérifier s'il a déjà une demande en attente
+            if (demandeDAO.hasDemandePending(idVendeurConnecte)) {
+                System.out.println("⚠️ Demande déjà en attente pour ce vendeur");
+                showStyledAlert(Alert.AlertType.INFORMATION, "Demande en attente",
+                        "Vous avez déjà une demande de création de magasin en attente.");
                 return;
             }
 
+            // Proposer d'envoyer une demande
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Première création de magasin");
             alert.setHeaderText("Vous ne pouvez créer qu'un seul magasin !");
@@ -65,19 +118,74 @@ public class MagasinListController {
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                ouvrirFormulaireDemandeMagasin(vendeurId);
+                System.out.println("✅ Ouverture du formulaire de demande");
+                ouvrirFormulaireDemandeMagasin(idVendeurConnecte); // ✅ Utiliser idVendeurConnecte
             }
         } else {
+            System.out.println("✅ Le vendeur a déjà un magasin, ouverture du formulaire d'ajout");
+
             try {
-                Parent form = FXMLLoader.load(getClass().getResource("/view/vendeur/AjouterMagasin.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/AjouterMagasin.fxml"));
+                Parent form = loader.load();
+
+                // ✅ IMPORTANT : Le controller récupère automatiquement l'ID depuis SessionManager
+                // Pas besoin de setVendeurId() ici car AjouterMagasinController le fait dans initialize()
+                AjouterMagasinController controller = loader.getController();
+
                 Stage stage = new Stage();
                 stage.setTitle("Ajouter un Magasin");
                 stage.setScene(new Scene(form));
-                stage.show();
+
+                // ✅ Rafraîchir la liste après fermeture du formulaire
+                stage.setOnHidden(e -> {
+                    System.out.println("🔄 Fenêtre fermée - Rechargement de la liste...");
+                    chargerMagasins();
+                });
+
+                stage.showAndWait(); // Attendre la fermeture
+
             } catch (IOException ex) {
                 ex.printStackTrace();
+                System.err.println("❌ Erreur ouverture formulaire: " + ex.getMessage());
+                showStyledAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Impossible d'ouvrir le formulaire d'ajout");
             }
         }
+
+        System.out.println("➕ === Fin ouverture formulaire ===\n");
+    }
+
+    private void chargerMagasins() {
+        System.out.println("\n🔄 === RECHARGEMENT DES MAGASINS ===");
+        System.out.println("📍 ID Vendeur connecté: " + idVendeurConnecte);
+
+        magasinContainer.getChildren().clear();
+        MagasinDAO dao = new MagasinDAO();
+
+        // ✅ Récupérer LE magasin du vendeur connecté (un seul autorisé)
+        Magasin magasin = dao.getMagasinByVendeur(idVendeurConnecte);
+
+        // ✅ Logs détaillés pour débogage
+        System.out.println("🔍 Résultat de la recherche:");
+        if (magasin != null) {
+            System.out.println("   ✅ Magasin trouvé:");
+            System.out.println("      - ID Magasin: " + magasin.getIdMagasin());
+            System.out.println("      - Nom: " + magasin.getNomMagasin());
+            System.out.println("      - Adresse: " + magasin.getAdresse());
+            System.out.println("      - ID Vendeur: " + magasin.getIdVendeur());
+            System.out.println("      - Logo: " + magasin.getLogoMagasin());
+
+            // Afficher la carte du magasin
+            HBox card = createMagasinCard(magasin, dao);
+            magasinContainer.getChildren().add(card);
+            System.out.println("   ✅ Carte magasin créée et ajoutée à l'interface");
+        } else {
+            System.out.println("   ⚠️ AUCUN magasin trouvé pour ce vendeur");
+            System.out.println("   💡 Vérifiez avec: SELECT * FROM Magasin WHERE id_vendeur = " + idVendeurConnecte + ";");
+            showEmptyState();
+        }
+
+        System.out.println("🔄 === FIN RECHARGEMENT ===\n");
     }
 
     private void ouvrirFormulaireDemandeMagasin(int vendeurId) {
@@ -86,6 +194,7 @@ public class MagasinListController {
             Parent root = loader.load();
             AjouterDemandeMagasinController controller = loader.getController();
             controller.setVendeurId(vendeurId);
+
             Stage stage = new Stage();
             stage.setTitle("Envoyer une demande de création de magasin");
             stage.setScene(new Scene(root));
@@ -95,51 +204,48 @@ public class MagasinListController {
         }
     }
 
-    private void chargerMagasins() {
-        magasinContainer.getChildren().clear();
-        MagasinDAO dao = new MagasinDAO();
-        List<Magasin> magasins = dao.getAllMagasins();
-
-        if (magasins.isEmpty()) {
-            showEmptyState();
-            return;
-        }
-
-        for (Magasin m : magasins) {
-            HBox card = createMagasinCard(m, dao);
-            magasinContainer.getChildren().add(card);
-        }
-    }
-
     private HBox createMagasinCard(Magasin magasin, MagasinDAO dao) {
+        // ✅ VÉRIFICATION : Le magasin appartient bien au vendeur connecté
+        if (magasin.getIdVendeur() != idVendeurConnecte) {
+            System.err.println("⚠️ SÉCURITÉ : Tentative d'affichage d'un magasin non autorisé");
+            return new HBox(); // Retourner une carte vide
+        }
+
         HBox card = new HBox(0);
         card.setStyle("-fx-background-radius: 16; " +
+                "-fx-background-color: white; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3); " +
                 "-fx-padding: 0;");
         card.setPrefHeight(220);
         card.setMaxHeight(220);
 
+        card.setCursor(Cursor.HAND);
+
+        card.setOnMouseClicked(e -> {
+            if (e.getTarget() instanceof Button) {
+                return;
+            }
+            System.out.println("🖱️ Clic sur la carte du magasin: " + magasin.getNomMagasin());
+            ouvrirDetailMagasin(magasin);
+        });
+
         // ========== PARTIE GAUCHE : IMAGE ==========
         StackPane imagePane = new StackPane();
         imagePane.setPrefWidth(280);
         imagePane.setMaxWidth(280);
-        imagePane.setStyle("" +
-                "-fx-background-radius: 12; " +
+        imagePane.setStyle("-fx-background-radius: 12; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);");
 
-        // ✅ CHANGEMENT : ImageView pour le logo au lieu de l'icône
         ImageView logoView = new ImageView();
         logoView.setFitWidth(260);
         logoView.setFitHeight(260);
         logoView.setPreserveRatio(true);
         logoView.setSmooth(true);
 
-        // Charger le logo du magasin
         chargerLogoMagasin(magasin, logoView);
 
         StackPane.setAlignment(logoView, Pos.CENTER);
 
-        // Bouton J'aime (coeur) en haut à droite
         Button likeBtn = new Button("🤍");
         likeBtn.setStyle("-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 50%; " +
                 "-fx-font-size: 20px; -fx-padding: 8; -fx-cursor: hand; " +
@@ -148,7 +254,8 @@ public class MagasinListController {
             e.consume();
             if (likeBtn.getText().equals("🤍")) {
                 likeBtn.setText("❤️");
-                showStyledAlert(Alert.AlertType.INFORMATION, "Favori ajouté", magasin.getNomMagasin() + " a été ajouté à vos favoris !");
+                showStyledAlert(Alert.AlertType.INFORMATION, "Favori ajouté",
+                        magasin.getNomMagasin() + " a été ajouté à vos favoris !");
             } else {
                 likeBtn.setText("🤍");
             }
@@ -156,7 +263,6 @@ public class MagasinListController {
         StackPane.setAlignment(likeBtn, Pos.TOP_RIGHT);
         StackPane.setMargin(likeBtn, new Insets(15));
 
-        // Indicateurs de position (comme sur TripAdvisor)
         HBox dotsIndicator = new HBox(6);
         dotsIndicator.setAlignment(Pos.CENTER);
         for (int i = 0; i < 5; i++) {
@@ -168,7 +274,6 @@ public class MagasinListController {
         StackPane.setAlignment(dotsIndicator, Pos.BOTTOM_CENTER);
         StackPane.setMargin(dotsIndicator, new Insets(0, 0, 15, 0));
 
-        // ✅ REMPLACER bigIcon par logoView
         imagePane.getChildren().addAll(logoView, likeBtn, dotsIndicator);
 
         // ========== PARTIE DROITE : INFORMATIONS ==========
@@ -176,7 +281,6 @@ public class MagasinListController {
         infoPane.setPadding(new Insets(20, 20, 20, 25));
         HBox.setHgrow(infoPane, Priority.ALWAYS);
 
-        // Numéro et Nom du magasin
         HBox titleBox = new HBox(10);
         titleBox.setAlignment(Pos.CENTER_LEFT);
         Label numero = new Label("1.");
@@ -185,7 +289,6 @@ public class MagasinListController {
         nomLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         titleBox.getChildren().addAll(numero, nomLabel);
 
-        // Note avec étoiles
         HBox ratingBox = new HBox(8);
         ratingBox.setAlignment(Pos.CENTER_LEFT);
         Label rating = new Label("4.1");
@@ -196,25 +299,27 @@ public class MagasinListController {
         reviewCount.setStyle("-fx-font-size: 13px; -fx-text-fill: #7f8c8d;");
         ratingBox.getChildren().addAll(rating, stars, reviewCount);
 
-        // Catégorie
-        Label categoryLabel = new Label("Marchés aux puces et marchés de rue");
+        String categorieText = magasin.getCategorie() != null ?
+                magasin.getCategorie() : "Marchés aux puces et marchés de rue";
+        Label categoryLabel = new Label(categorieText);
         categoryLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #2c3e50;");
 
-        // Statut
         HBox statusBox = new HBox(8);
         statusBox.setAlignment(Pos.CENTER_LEFT);
         Label statusLabel = new Label("Ouvert");
         statusLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #7f8c8d;");
         statusBox.getChildren().add(statusLabel);
 
-        // Description avec auteur
         HBox descBox = new HBox(10);
         descBox.setAlignment(Pos.TOP_LEFT);
         Label authorIcon = new Label("👤");
         authorIcon.setStyle("-fx-font-size: 16px;");
         VBox textBox = new VBox(4);
-        Label authorLabel = new Label("Par Alxmyma");
+
+        Utilisateur user = session.getUtilisateurConnecte();
+        Label authorLabel = new Label("Par " + user.getPrenom() + " " + user.getNom());
         authorLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #7f8c8d;");
+
         String description = magasin.getDescription();
         if (description != null && description.length() > 150) {
             description = description.substring(0, 150) + "...";
@@ -225,40 +330,39 @@ public class MagasinListController {
         textBox.getChildren().addAll(authorLabel, descLabel);
         descBox.getChildren().addAll(authorIcon, textBox);
 
-        // Spacer pour pousser les boutons en bas
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        // Boutons d'action en bas
         HBox actionBox = new HBox(12);
         actionBox.setAlignment(Pos.CENTER_LEFT);
-        Button voirBilletsBtn = new Button("Voir les vhécules");
-        voirBilletsBtn.setStyle("-fx-background-color: #00aa6c; -fx-text-fill: white; " +
+
+        Button voirVehiculesBtn = new Button("Voir les véhicules");
+        voirVehiculesBtn.setStyle("-fx-background-color: #00aa6c; -fx-text-fill: white; " +
                 "-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 20; " +
                 "-fx-background-radius: 20; -fx-cursor: hand;");
-        voirBilletsBtn.setOnAction(e -> {
+        voirVehiculesBtn.setOnAction(e -> {
             e.consume();
-            System.out.println("Voir articles pour : " + magasin.getNomMagasin());
+            System.out.println("Voir véhicules pour : " + magasin.getNomMagasin());
         });
 
-        Button voirVisitesBtn = new Button("Voir les visites");
-        voirVisitesBtn.setStyle("-fx-background-color: #00aa6c; -fx-text-fill: white; " +
+        Button voirDetailsBtn = new Button("Plus de détails");
+        voirDetailsBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; " +
                 "-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 20; " +
                 "-fx-background-radius: 20; -fx-cursor: hand;");
-        voirVisitesBtn.setOnAction(e -> {
+        voirDetailsBtn.setOnAction(e -> {
             e.consume();
             ouvrirDetailMagasin(magasin);
         });
-        int nbComments = magasin.getNbCommentaires(); // Supposons que cette méthode existe
+
+        int nbComments = magasin.getNbCommentaires();
         String commentText = formatCommentCount(nbComments);
         Label commentBadge = new Label(commentText);
         commentBadge.setStyle("-fx-background-color: #e3f2fd; -fx-text-fill: #1976d2; " +
                 "-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 8; " +
                 "-fx-background-radius: 10;");
 
-        actionBox.getChildren().addAll(voirBilletsBtn, voirVisitesBtn, commentBadge);
+        actionBox.getChildren().addAll(voirVehiculesBtn, voirDetailsBtn, commentBadge);
 
-        // Boutons d'édition/suppression en haut à droite
         Region rightSpacer = new Region();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
         HBox editDeleteBox = new HBox(8);
@@ -273,13 +377,23 @@ public class MagasinListController {
         Button deleteBtn = createSmallActionButton("🗑️", "#e74c3c");
         deleteBtn.setOnAction(e -> {
             e.consume();
+
+            // ✅ SÉCURITÉ : Vérifier que le magasin appartient au vendeur
+            if (magasin.getIdVendeur() != idVendeurConnecte) {
+                showStyledAlert(Alert.AlertType.ERROR, "Action non autorisée",
+                        "Vous ne pouvez supprimer que votre propre magasin");
+                return;
+            }
+
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
             confirm.setTitle("Confirmer la suppression");
             confirm.setHeaderText("Supprimer le magasin ?");
             confirm.setContentText("Cette action est irréversible.");
             Optional<ButtonType> result = confirm.showAndWait();
+
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 dao.deleteMagasin(magasin.getIdMagasin());
+                System.out.println("✅ Magasin supprimé");
                 chargerMagasins();
             }
         });
@@ -292,18 +406,8 @@ public class MagasinListController {
 
         editDeleteBox.getChildren().addAll(editBtn, deleteBtn, locBtn);
 
-        // Assemblage de la partie info
-        infoPane.getChildren().addAll(
-                titleBox,
-                ratingBox,
-                categoryLabel,
-                statusBox,
-                descBox,
-                spacer,
-                actionBox
-        );
+        infoPane.getChildren().addAll(titleBox, ratingBox, categoryLabel, statusBox, descBox, spacer, actionBox);
 
-        // Ajout des boutons edit/delete en overlay
         HBox topRightOverlay = new HBox();
         topRightOverlay.setAlignment(Pos.TOP_RIGHT);
         topRightOverlay.setPadding(new Insets(10, 10, 0, 0));
@@ -315,7 +419,6 @@ public class MagasinListController {
         rightStack.getChildren().addAll(infoPane, topRightOverlay);
         HBox.setHgrow(rightStack, Priority.ALWAYS);
 
-        // ========== ASSEMBLAGE FINAL ==========
         card.getChildren().addAll(imagePane, rightStack);
         setupCardHoverEffect(card);
 
@@ -329,36 +432,17 @@ public class MagasinListController {
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);");
         btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 6; " +
                 "-fx-padding: 6 10; -fx-font-size: 14px; -fx-cursor: hand; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0, 0, 2);")
-        );
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0, 0, 2);"));
         btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 6; " +
                 "-fx-padding: 6 10; -fx-font-size: 14px; -fx-cursor: hand; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);")
-        );
-        return btn;
-    }
-
-    private Button createFooterButton(String text, String color) {
-        Button btn = new Button(text);
-        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + color + "; " +
-                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; " +
-                "-fx-padding: 8 15; -fx-background-radius: 8;");
-        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: " + color + "20; -fx-text-fill: " + color + "; " +
-                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; " +
-                "-fx-padding: 8 15; -fx-background-radius: 8;")
-        );
-        btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + color + "; " +
-                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand; " +
-                "-fx-padding: 8 15; -fx-background-radius: 8;")
-        );
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);"));
         return btn;
     }
 
     private void setupCardHoverEffect(HBox card) {
-        String baseStyle = "-fx-background-radius: 16; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3); " +
-                "-fx-padding: 0;";
-        String hoverStyle = "-fx-background-radius: 16; " +
+        String baseStyle = "-fx-background-radius: 16; -fx-background-color: white; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3); -fx-padding: 0;";
+        String hoverStyle = "-fx-background-radius: 16; -fx-background-color: white; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5); " +
                 "-fx-padding: 0; -fx-scale-y: 1.01; -fx-scale-x: 1.01;";
 
@@ -392,24 +476,18 @@ public class MagasinListController {
         magasinContainer.getChildren().add(empty);
     }
 
-    private void ouvrirDetailMagasin(Magasin magasin) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/MagasinDetails.fxml"));
-            Parent root = loader.load();
-            MagasinDetailsController controller = loader.getController();
-            controller.setMagasin(magasin);
-            Stage stage = new Stage();
-            stage.setTitle("Détails du magasin");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        private void ouvrirDetailMagasin(Magasin magasin) {
+            System.out.println("🖱️ Navigation vers détails du magasin: " + magasin.getNomMagasin());
+
+            // ✅ Utiliser NavigationManager pour naviguer vers les détails avec les données
+            nav.navigateWithData("/view/vendeur/MagasinDetails.fxml", magasin);
         }
-    }
+
 
     private void ouvrirLocalisation(String localisation) {
         if (localisation == null || localisation.isEmpty()) {
-            showStyledAlert(Alert.AlertType.WARNING, "Localisation manquante", "Aucune localisation n'est définie pour ce magasin.");
+            showStyledAlert(Alert.AlertType.WARNING, "Localisation manquante",
+                    "Aucune localisation n'est définie pour ce magasin.");
             return;
         }
 
@@ -437,25 +515,19 @@ public class MagasinListController {
         }
     }
 
-    /**
-     * ✅ NOUVELLE MÉTHODE : Charge le logo du magasin depuis le dossier projet/images/logos
-     */
     private void chargerLogoMagasin(Magasin magasin, ImageView logoView) {
         try {
             String logoPath = magasin.getLogoMagasin();
 
             if (logoPath != null && !logoPath.isEmpty()) {
-                // Construire le chemin complet vers le dossier images/logos
-                File projetDir = new File(System.getProperty("user.dir")); // Répertoire du projet
+                File projetDir = new File(System.getProperty("user.dir"));
                 File logosDir = new File(projetDir, "images/logos");
 
                 File logoFile;
 
-                // Si le chemin contient déjà le dossier images/logos
                 if (logoPath.contains("images/logos")) {
                     logoFile = new File(projetDir, logoPath);
                 } else {
-                    // Sinon, chercher directement dans images/logos
                     logoFile = new File(logosDir, logoPath);
                 }
 
@@ -470,7 +542,6 @@ public class MagasinListController {
                     chargerLogoParDefaut(logoView);
                 }
             } else {
-                // Aucun logo défini dans la base de données
                 System.out.println("ℹ️ Aucun logo défini pour: " + magasin.getNomMagasin());
                 chargerLogoParDefaut(logoView);
             }
@@ -480,9 +551,6 @@ public class MagasinListController {
         }
     }
 
-    /**
-     * ✅ Charge un logo par défaut depuis le dossier images/logos
-     */
     private void chargerLogoParDefaut(ImageView logoView) {
         try {
             File projetDir = new File(System.getProperty("user.dir"));
@@ -493,7 +561,6 @@ public class MagasinListController {
                 logoView.setImage(defaultLogo);
                 System.out.println("✅ Logo par défaut chargé");
             } else {
-                // Fallback: utiliser une icône
                 System.out.println("⚠️ Logo par défaut introuvable, utilisation d'une icône");
                 creerPlaceholderLogo(logoView);
             }
@@ -503,32 +570,24 @@ public class MagasinListController {
         }
     }
 
-    /**
-     * ✅ Crée un placeholder élégant si aucun logo n'est disponible
-     */
     private void creerPlaceholderLogo(ImageView logoView) {
         try {
-            // Créer un Canvas pour générer une image placeholder
             javafx.scene.canvas.Canvas canvas = new javafx.scene.canvas.Canvas(160, 160);
             javafx.scene.canvas.GraphicsContext gc = canvas.getGraphicsContext2D();
 
-            // Fond circulaire
             gc.setFill(javafx.scene.paint.Color.web("#667eea"));
             gc.fillOval(20, 20, 120, 120);
 
-            // Icône magasin
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 48));
             gc.fillText("🏪", 60, 90);
 
-            // Convertir en Image
             javafx.scene.SnapshotParameters params = new javafx.scene.SnapshotParameters();
             params.setFill(javafx.scene.paint.Color.TRANSPARENT);
             javafx.scene.image.WritableImage image = canvas.snapshot(params, null);
 
             logoView.setImage(image);
         } catch (Exception e) {
-            // Dernier recours: Label avec emoji
             System.err.println("❌ Impossible de créer le placeholder: " + e.getMessage());
         }
     }

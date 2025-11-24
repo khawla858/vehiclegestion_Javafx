@@ -1,6 +1,8 @@
 package com.example.vehiclegestion.vendeur.controller;
-
+import javafx.scene.control.Alert;
 import com.example.vehiclegestion.vendeur.model.Article;
+import com.example.vehiclegestion.utils.DataReceiver;
+import com.example.vehiclegestion.utils.NavigationManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,7 +18,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class VehicleDetailController {
+public class VehicleDetailController implements DataReceiver {
 
     @FXML
     private ScrollPane scrollPane;
@@ -55,24 +57,44 @@ public class VehicleDetailController {
     private Button contactBtn;
 
     @FXML
-    private Button closeBtn;
+    private Button backBtn;
 
     private Article article;
-    private Stage dialogStage;
+    private NavigationManager nav = NavigationManager.getInstance();
 
-    public void setArticle(Article article) {
-        this.article = article;
-        displayArticleDetails();
-    }
-
-    public void setDialogStage(Stage stage) {
-        this.dialogStage = stage;
+    /**
+     * ✅ Implémentation de DataReceiver pour recevoir l'article
+     */
+    @Override
+    public void receiveData(Object data) {
+        if (data instanceof Article) {
+            this.article = (Article) data;
+            System.out.println("✅ Article reçu dans VehicleDetailController: " + article.getTitre());
+            displayArticleDetails();
+        } else {
+            System.err.println("❌ Données reçues non valides dans VehicleDetailController");
+            showError("Erreur", "Impossible de charger les données du véhicule");
+        }
     }
 
     @FXML
     private void initialize() {
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background-color: #f5f5f5;");
+
+        // ✅ Configuration du bouton retour
+        if (backBtn != null) {
+            backBtn.setOnAction(e -> nav.goBack());
+            backBtn.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; " +
+                    "-fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
+        }
+
+        // ✅ Configuration du bouton contact
+        if (contactBtn != null) {
+            contactBtn.setOnAction(e -> handleContact());
+            contactBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; " +
+                    "-fx-padding: 12 30; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
+        }
     }
 
     private void displayArticleDetails() {
@@ -126,11 +148,19 @@ public class VehicleDetailController {
     private void setFallbackImage() {
         // Image par défaut si pas d'image
         StackPane placeholder = new StackPane();
-        placeholder.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
+        placeholder.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%); " +
+                "-fx-background-radius: 8;");
         placeholder.setPrefSize(650, 450);
         Label icon = new Label("🚗");
         icon.setStyle("-fx-font-size: 80px;");
         placeholder.getChildren().add(icon);
+
+        // Remplacer l'imageView par le placeholder
+        if (mainImageView.getParent() instanceof Pane) {
+            Pane parent = (Pane) mainImageView.getParent();
+            parent.getChildren().remove(mainImageView);
+            parent.getChildren().add(placeholder);
+        }
     }
 
     private void displayCharacteristics() {
@@ -149,28 +179,42 @@ public class VehicleDetailController {
         addCharacteristic("📏 Kilométrage", String.valueOf(article.getKilometrage()) + " km");
 
         // Boîte de vitesses
-        addCharacteristic("⚙️ Boîte de vitesses", article.getTransmission());
+        if (article.getTransmission() != null) {
+            addCharacteristic("⚙️ Boîte de vitesses", article.getTransmission());
+        }
 
         // Carburant
-        addCharacteristic("⛽ Type de carburant", article.getCarburant());
+        if (article.getCarburant() != null) {
+            addCharacteristic("⛽ Type de carburant", article.getCarburant());
+        }
 
         // Marque
-        addCharacteristic("🚗 Marque", article.getMarque());
+        if (article.getMarque() != null) {
+            addCharacteristic("🚗 Marque", article.getMarque());
+        }
 
         // Modèle
-        addCharacteristic("🏷️ Modèle", article.getModele());
+        if (article.getModele() != null) {
+            addCharacteristic("🏷️ Modèle", article.getModele());
+        }
 
         // Puissance
-        addCharacteristic("🔋 Puissance", article.getPuissance() + " ch");
+        if (article.getPuissance() > 0) {
+            addCharacteristic("🔋 Puissance", article.getPuissance() + " ch");
+        }
 
-        // Couleur
-        //addCharacteristic("🎨 Couleur", article.getCouleur());
-
-        // Première main (si tu as un attribut, sinon tu peux mettre "Non")
-        //addCharacteristic("👤 Première main", "Non");
-
-        // Origine (si tu veux un champ dynamique, sinon tu peux garder "Maroc")
+        // Origine
         addCharacteristic("🌍 Origine", "Maroc");
+
+        // État
+        if (article.getEtat() != null) {
+            addCharacteristic("⭐ État", article.getEtat());
+        }
+
+        // Catégorie
+        if (article.getCategorie() != null) {
+            addCharacteristic("📂 Catégorie", article.getCategorie());
+        }
     }
 
     private void addCharacteristic(String label, String value) {
@@ -182,7 +226,7 @@ public class VehicleDetailController {
         labelField.setStyle("-fx-text-fill: #666; -fx-font-size: 14px;");
         labelField.setPrefWidth(200);
 
-        Label valueField = new Label(value);
+        Label valueField = new Label(value != null ? value : "Non spécifié");
         valueField.setStyle("-fx-text-fill: #333; -fx-font-weight: bold; -fx-font-size: 14px;");
 
         Region spacer = new Region();
@@ -243,38 +287,34 @@ public class VehicleDetailController {
     private void handleContact() {
         System.out.println("📞 Contacter le vendeur pour: " + article.getTitre());
         // TODO: Implémenter la logique de contact
+        showInfo("Contact", "Fonctionnalité de contact bientôt disponible !");
     }
 
-    @FXML
-    private void handleClose() {
-        if (dialogStage != null) {
-            dialogStage.close();
-        }
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
-    private String extractYearFromTitle(String title) {
-        if (title == null) return "2023";
-        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("\\b(\\d{4})\\b").matcher(title);
-        if (matcher.find()) return matcher.group(1);
-        return "2023";
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
-    private String extractBrandFromTitle(String title) {
-        if (title == null) return "Hyundai";
-        String[] brands = {"Toyota", "Mercedes", "BMW", "Audi", "Renault", "Peugeot", "Hyundai", "Kia"};
-        for (String brand : brands) {
-            if (title.toLowerCase().contains(brand.toLowerCase())) {
-                return brand;
-            }
-        }
-        return "Hyundai";
+    // ✅ Gardez cette méthode pour la compatibilité
+    public void setArticle(Article article) {
+        this.article = article;
+        displayArticleDetails();
     }
 
-    private String extractModelFromTitle(String title) {
-        if (title == null) return "Creta";
-        String[] parts = title.split(" ");
-        if (parts.length > 1) return parts[1];
-        return "Creta";
+    // ✅ Gardez cette méthode pour la compatibilité (si utilisée ailleurs)
+    public void setDialogStage(Stage stage) {
+        // Ne rien faire - nous utilisons NavigationManager maintenant
     }
 
     private String getRandomCity() {

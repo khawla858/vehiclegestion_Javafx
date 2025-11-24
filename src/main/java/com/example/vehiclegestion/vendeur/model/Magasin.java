@@ -21,6 +21,8 @@ public class Magasin {
     private String siteWeb;
     private String facebook;
     private String instagram;
+    private String horaires;  // ✅ AJOUT
+
 
     // Champ supplémentaire pour la catégorie (si nécessaire)
     private String categorie;
@@ -267,5 +269,13 @@ public class Magasin {
                 ", telephone='" + telephone + '\'' +
                 ", categorie='" + categorie + '\'' +
                 '}';
+    }
+    // ✅ Getter et Setter
+    public String getHoraires() {
+        return horaires;
+    }
+
+    public void setHoraires(String horaires) {
+        this.horaires = horaires;
     }
 }

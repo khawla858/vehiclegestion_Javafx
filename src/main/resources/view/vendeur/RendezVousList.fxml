@@ -127,56 +127,53 @@
             <!-- Tableau stylé -->
             <TableView fx:id="rdvTable"
                        style="-fx-background-color: transparent;
-                             -fx-border-color: transparent;
-                             -fx-table-cell-border-color: #f0f0f0;">
+                 -fx-border-color: transparent;
+                 -fx-table-cell-border-color: #f0f0f0;">
                 <columns>
-                    <TableColumn text="ID" prefWidth="60" style="-fx-alignment: CENTER;">
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60" style="-fx-alignment: CENTER;">
                         <cellValueFactory>
                             <PropertyValueFactory property="idRdv"/>
                         </cellValueFactory>
                     </TableColumn>
 
-                    <TableColumn text="👤 Client" prefWidth="180">
+                    <TableColumn fx:id="colClient" text="👤 Client" prefWidth="160">
                         <cellValueFactory>
                             <PropertyValueFactory property="nomClient"/>
                         </cellValueFactory>
                     </TableColumn>
 
-                    <TableColumn text="📞 Téléphone" prefWidth="130">
-                        <cellValueFactory>
-                            <PropertyValueFactory property="telephoneClient"/>
-                        </cellValueFactory>
-                    </TableColumn>
-
-                    <TableColumn text="🚗 Véhicule" prefWidth="180">
+                    <TableColumn fx:id="colArticle" text="🚗 Véhicule" prefWidth="140">
                         <cellValueFactory>
                             <PropertyValueFactory property="titreArticle"/>
                         </cellValueFactory>
                     </TableColumn>
 
-                    <TableColumn text="📅 Date" prefWidth="110" style="-fx-alignment: CENTER;">
+                    <TableColumn fx:id="colDate" text="📅 Date" prefWidth="100" style="-fx-alignment: CENTER;">
                         <cellValueFactory>
                             <PropertyValueFactory property="dateRdv"/>
                         </cellValueFactory>
                     </TableColumn>
 
-                    <TableColumn text="⏰ Heure" prefWidth="90" style="-fx-alignment: CENTER;">
+                    <TableColumn fx:id="colHeure" text="⏰ Heure" prefWidth="80" style="-fx-alignment: CENTER;">
                         <cellValueFactory>
                             <PropertyValueFactory property="heureRdv"/>
                         </cellValueFactory>
                     </TableColumn>
 
-                    <TableColumn text="📋 Type" prefWidth="140">
+                    <TableColumn fx:id="colType" text="📋 Type" prefWidth="130">
                         <cellValueFactory>
                             <PropertyValueFactory property="typeRdv"/>
                         </cellValueFactory>
                     </TableColumn>
 
-                    <TableColumn text="🔔 Statut" prefWidth="120" style="-fx-alignment: CENTER;">
+                    <TableColumn fx:id="colStatut" text="🔔 Statut" prefWidth="110" style="-fx-alignment: CENTER;">
                         <cellValueFactory>
                             <PropertyValueFactory property="statut"/>
                         </cellValueFactory>
                     </TableColumn>
+
+                    <!-- ✅ COLONNE ACTIONS MANQUANTE - À AJOUTER -->
+                    <TableColumn fx:id="colActions" text="⚙️ Actions" prefWidth="180" style="-fx-alignment: CENTER;"/>
                 </columns>
 
                 <placeholder>
@@ -192,84 +189,7 @@
         <!-- ============================================ -->
         <!-- SECTION CALENDRIER ET STATISTIQUES -->
         <!-- ============================================ -->
-        <HBox spacing="20" alignment="TOP_LEFT">
 
-            <!-- Calendrier -->
-            <VBox spacing="15"
-                  style="-fx-background-color: white;
-                         -fx-padding: 20;
-                         -fx-background-radius: 12;
-                         -fx-pref-width: 350;
-                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
-
-                <Label text="📆 Calendrier des RDV"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-
-                <DatePicker fx:id="calendarPicker"
-                            style="-fx-pref-width: 310; -fx-background-radius: 8;"/>
-
-                <Separator style="-fx-background-color: #ecf0f1;"/>
-
-                <Label text="RDV du jour sélectionné:"
-                       style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
-
-                <ListView fx:id="calendarList"
-                          style="-fx-pref-height: 180;
-                                -fx-background-radius: 8;
-                                -fx-border-color: #ecf0f1;
-                                -fx-border-radius: 8;"/>
-            </VBox>
-
-            <!-- Statistiques -->
-            <VBox spacing="15" HBox.hgrow="ALWAYS">
-                <Label text="📊 Statistiques"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-
-                <HBox spacing="15">
-                    <!-- Carte Total RDV -->
-                    <VBox alignment="CENTER" spacing="8"
-                          style="-fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);
-                                 -fx-padding: 25;
-                                 -fx-background-radius: 12;
-                                 -fx-pref-width: 180;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
-                        <Label text="📅" style="-fx-font-size: 32px;"/>
-                        <Label fx:id="totalRdvLabel" text="0"
-                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                        <Label text="Total RDV"
-                               style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
-                    </VBox>
-
-                    <!-- Carte En Attente -->
-                    <VBox alignment="CENTER" spacing="8"
-                          style="-fx-background-color: linear-gradient(to bottom right, #f093fb, #f5576c);
-                                 -fx-padding: 25;
-                                 -fx-background-radius: 12;
-                                 -fx-pref-width: 180;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
-                        <Label text="⏳" style="-fx-font-size: 32px;"/>
-                        <Label fx:id="enAttenteLabel" text="0"
-                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                        <Label text="En Attente"
-                               style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
-                    </VBox>
-
-                    <!-- Carte Confirmés -->
-                    <VBox alignment="CENTER" spacing="8"
-                          style="-fx-background-color: linear-gradient(to bottom right, #4facfe, #00f2fe);
-                                 -fx-padding: 25;
-                                 -fx-background-radius: 12;
-                                 -fx-pref-width: 180;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
-                        <Label text="✅" style="-fx-font-size: 32px;"/>
-                        <Label fx:id="confirmesLabel" text="0"
-                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                        <Label text="Confirmés"
-                               style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9);"/>
-                    </VBox>
-                </HBox>
-            </VBox>
-        </HBox>
 
     </VBox>
 </ScrollPane>

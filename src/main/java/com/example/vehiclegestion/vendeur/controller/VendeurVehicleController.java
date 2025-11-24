@@ -1,5 +1,7 @@
 package com.example.vehiclegestion.vendeur.controller;
+import com.example.vehiclegestion.utils.NavigationManager;
 
+import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXML;
@@ -30,12 +32,27 @@ public class VendeurVehicleController {
     @FXML private Label resultsLabel;
 
     private ArticleDAO articleDAO = new ArticleDAO();
-    private final int VENDEUR_ID = 1;
+
+    // ✅ CORRECTION : Utiliser SessionManager au lieu d'un ID hardcodé
+    private SessionManager sessionManager = SessionManager.getInstance();
+    private int vendeurIdConnecte;
+
     private List<Article> allArticles = new ArrayList<>();
 
     @FXML
     public void initialize() {
         System.out.println("🚀 Initialisation de la page véhicules...");
+
+        // ✅ Récupérer l'ID du vendeur connecté
+        if (!sessionManager.estVendeur()) {
+            showError("❌ Erreur : Vous devez être connecté en tant que vendeur");
+            return;
+        }
+
+        vendeurIdConnecte = sessionManager.getUserId();
+        System.out.println("✅ Vendeur connecté - ID: " + vendeurIdConnecte);
+        sessionManager.debugSession();
+
         setupFilters();
         loadVehicles();
     }
@@ -137,7 +154,9 @@ public class VendeurVehicleController {
 
             AddVehicleFormController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setVendeurId(VENDEUR_ID);
+
+            // ✅ CORRECTION : Passer l'ID du vendeur connecté
+            controller.setVendeurId(vendeurIdConnecte);
 
             dialogStage.setOnHidden(e -> loadVehicles());
             dialogStage.showAndWait();
@@ -150,9 +169,12 @@ public class VendeurVehicleController {
 
     private void loadVehicles() {
         try {
-            allArticles = articleDAO.getArticlesByVendeur(VENDEUR_ID);
+            // ✅ CORRECTION : Charger uniquement les articles du vendeur connecté
+            System.out.println("📦 Chargement des articles pour vendeur ID: " + vendeurIdConnecte);
+            allArticles = articleDAO.getArticlesByVendeur(vendeurIdConnecte);
             displayVehicles(allArticles);
             updateResultsLabel(allArticles.size());
+            System.out.println("✅ " + allArticles.size() + " article(s) chargé(s)");
         } catch (SQLException e) {
             e.printStackTrace();
             showError("Erreur de chargement des véhicules: " + e.getMessage());
@@ -167,13 +189,12 @@ public class VendeurVehicleController {
             return;
         }
 
-        // FlowPane pour un affichage responsive qui remplit toute la largeur
         FlowPane flowPane = new FlowPane();
         flowPane.setHgap(20);
         flowPane.setVgap(20);
         flowPane.setStyle("-fx-padding: 20;");
         flowPane.setAlignment(Pos.TOP_LEFT);
-        flowPane.setPrefWrapLength(0); // Permet le wrap automatique
+        flowPane.setPrefWrapLength(0);
 
         for (Article article : articles) {
             VBox card = createVehicleCard(article);
@@ -277,28 +298,12 @@ public class VendeurVehicleController {
     }
 
     private void showVehicleDetails(Article article) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/VehicleDetail.fxml"));
-            BorderPane detailView = loader.load();
+        System.out.println("🖱️ Navigation vers détails du véhicule: " + article.getTitre());
 
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Détails - " + article.getTitre());
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-
-            Scene scene = new Scene(detailView, 1100, 700);
-            dialogStage.setScene(scene);
-
-            VehicleDetailController controller = loader.getController();
-            controller.setArticle(article);
-            controller.setDialogStage(dialogStage);
-
-            dialogStage.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Erreur lors de l'ouverture des détails: " + e.getMessage());
-        }
+        // ✅ Utiliser NavigationManager pour naviguer vers les détails avec les données
+        NavigationManager.getInstance().navigateWithData("/view/vendeur/VehicleDetail.fxml", article);
     }
+
 
     private void loadVehicleImage(Article article, StackPane container) {
         container.getChildren().clear();
@@ -350,7 +355,7 @@ public class VendeurVehicleController {
         icon.setStyle("-fx-font-size: 48px;");
         Label text = new Label("Aucun véhicule trouvé");
         text.setStyle("-fx-font-size: 18px; -fx-text-fill: #7f8c8d;");
-        Label subtext = new Label("Essayez de modifier vos filtres");
+        Label subtext = new Label("Essayez de modifier vos filtres ou ajoutez votre premier véhicule");
         subtext.setStyle("-fx-font-size: 14px; -fx-text-fill: #95a5a6;");
         empty.getChildren().addAll(icon, text, subtext);
         cardsContainer.getChildren().add(empty);
@@ -374,6 +379,13 @@ public class VendeurVehicleController {
 
     private void deleteVehicle(Article article) {
         System.out.println("🗑️ Supprimer: " + article.getTitre());
+
+        // ✅ Vérifier que l'article appartient bien au vendeur connecté
+        if (article.getIdVendeur() != vendeurIdConnecte) {
+            showError("❌ Vous ne pouvez supprimer que vos propres articles");
+            return;
+        }
+
         try {
             boolean ok = articleDAO.deleteArticle(article.getId());
             if (ok) {

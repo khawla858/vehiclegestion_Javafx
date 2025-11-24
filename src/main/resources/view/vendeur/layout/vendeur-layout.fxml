@@ -4,22 +4,20 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.vehiclegestion.vendeur.controller.layout.VendeurLayoutController"
-            prefWidth="1200" prefHeight="700"
+            prefWidth="1400"
+            prefHeight="800"
+            style="-fx-background-color: #f8f9fa;"
             stylesheets="@/com/example/vehiclegestion/css/vendeur.css">
-    <left>
-        <!-- Le sidebar sera chargé dynamiquement -->
-        <AnchorPane fx:id="sidebarContainer"/>
-    </left>
 
+    <!-- NAVBAR EN HAUT -->
     <top>
-        <!-- Le navbar sera chargé dynamiquement -->
         <AnchorPane fx:id="navbarContainer" />
     </top>
 
-
-
+    <!-- CONTENU PRINCIPAL AU CENTRE -->
     <center>
-        <StackPane fx:id="contentPane" style="-fx-background-color: white;"/>
+        <StackPane fx:id="contentPane"
+                   style="-fx-background-color: #f8f9fa;"/>
     </center>
 
 </BorderPane>
