@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.vehiclegestion.vendeur.controller.AddVehicleFormController"
+      spacing="20" style="-fx-padding: 30; -fx-background-color: white; -fx-background-radius: 15;"
+      prefWidth="500" prefHeight="600">
+
+    <Label text="➕ Ajouter un Véhicule" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+    <VBox spacing="15">
+        <!-- Titre -->
+        <VBox spacing="5">
+            <Label text="Titre du véhicule *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <TextField fx:id="titreField" promptText="Ex: Mercedes Classe C 2023"/>
+        </VBox>
+
+        <!-- Description -->
+        <VBox spacing="5">
+            <Label text="Description *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <TextArea fx:id="descriptionField" promptText="Décrivez le véhicule..."
+                      prefRowCount="3" wrapText="true"/>
+        </VBox>
+
+        <!-- Prix et Catégorie -->
+        <HBox spacing="15">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Prix (MAD) *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <TextField fx:id="prixField" promptText="Ex: 150000"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Catégorie *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <ComboBox fx:id="categorieComboBox" promptText="Choisir une catégorie"/>
+            </VBox>
+        </HBox>
+
+        <!-- État -->
+        <VBox spacing="5">
+            <Label text="État du véhicule *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <ComboBox fx:id="etatComboBox" promptText="Choisir l'état"/>
+        </VBox>
+
+        <!-- Image -->
+        <VBox spacing="5">
+            <Label text="Image du véhicule" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="imageField" promptText="Nom du fichier image" HBox.hgrow="ALWAYS"/>
+                <Button text="Parcourir" onAction="#browseImage"/>
+            </HBox>
+            <Label text="Ex: mercedes-classe-c.jpg" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <!-- Aperçu de l'image -->
+        <VBox spacing="5" fx:id="imagePreviewContainer" visible="false">
+            <Label text="Aperçu de l'image" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <ImageView fx:id="imagePreview" fitWidth="200" fitHeight="120" preserveRatio="true"
+                       style="-fx-border-color: #ddd; -fx-border-radius: 5;"/>
+        </VBox>
+    </VBox>
+
+    <!-- Boutons d'action -->
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Annuler" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 10 20;"
+                onAction="#cancel"/>
+        <Button text="Ajouter le véhicule"
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;"
+                onAction="#addVehicle"/>
+    </HBox>
+
+    <!-- Message d'erreur/succès -->
+    <Label fx:id="messageLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" wrapText="true"/>
+</VBox>

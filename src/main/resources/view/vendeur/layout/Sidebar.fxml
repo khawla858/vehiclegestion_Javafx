@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.vehiclegestion.vendeur.controller.layout.SidebarController"
+      fx:id="sidebar"
+      spacing="0"
+      style="-fx-background-color: #2c3e50; -fx-pref-width: 60; -fx-min-width: 60; -fx-max-width: 255;"
+      prefHeight="600">
+
+    <!-- BOUTON TOGGLE POUR AGRANDIR/RÉTRÉCIR LA SIDEBAR -->
+    <HBox style="-fx-padding: 10; -fx-alignment: center-right;">
+        <Button fx:id="toggleBtn" text="☰" style="-fx-background-color: transparent; -fx-text-fill: #bdc3c7; -fx-font-size: 16px; -fx-border-color: transparent;" onAction="#toggleSidebar"/>
+    </HBox>
+
+    <!-- MENU PRINCIPAL -->
+    <VBox fx:id="menuContainer" spacing="1" style="-fx-padding: 20 0;">
+
+        <!-- SECTION PRINCIPALE - CORRIGÉ -->
+        <VBox style="-fx-padding: 0 20 10 20;">
+            <Label fx:id="mainNavLabel" text="MAIN NAVIGATION" style="-fx-text-fill: #95a5a6; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+        </VBox>
+        <!-- DASHBOARD -->
+        <Button fx:id="dashboardBtn" text="" styleClass="sidebar-btn-active" onAction="#showDashboard">
+            <graphic>
+                <Label fx:id="dashboardText" text="📊 Dashboard" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+            </graphic>
+        </Button>
+
+        <!-- SECTION CLIENTS (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="clientBtn" text="👥" styleClass="sidebar-btn-menu" onAction="#toggleClientMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="clientText" text="Clients" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label fx:id="clientArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="clientSubMenu" style="-fx-padding: 0 0 0 25;" visible="false" managed="false">
+                <Button text="📋 Liste des clients" styleClass="sidebar-sub-btn" onAction="#showCustomerList"/>
+                <Button text="➕ Ajouter un client" styleClass="sidebar-sub-btn" onAction="#showAddCustomer"/>
+                <Button text="📊 Historique des interactions" styleClass="sidebar-sub-btn" onAction="#showCustomerHistory"/>
+            </VBox>
+        </VBox>
+
+        <!-- SECTION PRODUITS / VÉHICULES (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="productBtn" text="🚗" styleClass="sidebar-btn-menu" onAction="#toggleProductMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="productText" text="Produits / Véhicules" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label fx:id="productArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="productSubMenu" style="-fx-padding: 0 0 0 25;" visible="false" managed="false">
+                <Button text="📋 Liste des produits" styleClass="sidebar-sub-btn" onAction="#showVehicleManagement"/>
+                <Button text="➕ Ajouter un produit" styleClass="sidebar-sub-btn" onAction="#showAddProduct"/>
+                <Button text="📦 Gestion du stock" styleClass="sidebar-sub-btn" onAction="#showStockManagement"/>
+                <Button text="🚗 Gestion des véhicules" styleClass="sidebar-sub-btn" onAction="#showVehicleManagement"/>
+            </VBox>
+        </VBox>
+
+        <!-- SECTION COMMANDES / RÉSERVATIONS (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="orderBtn" text="📦" styleClass="sidebar-btn-menu" onAction="#toggleOrderMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="orderText" text="Commandes / Réservations" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label fx:id="orderArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="orderSubMenu" style="-fx-padding: 0 0 0 25;" visible="false" managed="false">
+                <Button text="⏳ Commandes en cours" styleClass="sidebar-sub-btn" onAction="#showCurrentOrders"/>
+                <Button text="✅ Commandes terminées" styleClass="sidebar-sub-btn" onAction="#showCompletedOrders"/>
+                <Button text="📅 Réservations à confirmer" styleClass="sidebar-sub-btn" onAction="#showPendingReservations"/>
+                <Button text="🛒 Gestion des demandes" styleClass="sidebar-sub-btn" onAction="#showPurchaseRequests"/>
+                <Button text="💰 Historique des ventes" styleClass="sidebar-sub-btn" onAction="#showSalesHistory"/>
+            </VBox>
+        </VBox>
+
+        <!-- SECTION ACHATS & PANIER (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="cartBtn" text="🛒" styleClass="sidebar-btn-menu" onAction="#toggleCartMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="cartText" text="Achats / Panier" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label fx:id="cartArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="cartSubMenu" style="-fx-padding: 0 0 0 25;" visible="false" managed="false">
+                <Button text="🛒 Mon panier" styleClass="sidebar-sub-btn" onAction="#showMyCart"/>
+                <Button text="💳 Mes achats" styleClass="sidebar-sub-btn" onAction="#showMyPurchases"/>
+            </VBox>
+        </VBox>
+
+        <!-- SECTION STATISTIQUES (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="statsBtn" text="📈" styleClass="sidebar-btn-menu" onAction="#toggleStatsMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="statsText" text="Statistiques" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label fx:id="statsArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="statsSubMenu" style="-fx-padding: 0 0 0 25;" visible="false" managed="false">
+                <Button text="📊 Ventes mensuelles" styleClass="sidebar-sub-btn" onAction="#showMonthlySales"/>
+                <Button text="💰 Revenus" styleClass="sidebar-sub-btn" onAction="#showRevenueStats"/>
+                <Button text="🎯 Performances clients" styleClass="sidebar-sub-btn" onAction="#showClientPerformance"/>
+                <Button text="📈 Analytics ventes" styleClass="sidebar-sub-btn" onAction="#showSalesAnalytics"/>
+                <Button text="📊 Lead Funnel" styleClass="sidebar-sub-btn" onAction="#showLeadFunnel"/>
+            </VBox>
+        </VBox>
+
+        <!-- SECTION MESSAGES / NOTIFICATIONS (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="messageBtn" text="✉️" styleClass="sidebar-btn-menu" onAction="#toggleMessageMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="messageText" text="Liste des rendez-vous" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <!--<Label fx:id="messageArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>-->
+                    </HBox>
+                </graphic>
+            </Button>
+
+        </VBox>
+
+        <!-- SECTION PARAMÈTRES (Menu déroulant) -->
+        <VBox>
+            <Button fx:id="settingsBtn" text="⚙️" styleClass="sidebar-btn-menu" onAction="#toggleSettingsMenu">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="settingsText" text="Paramètres" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label fx:id="settingsArrow" text="▶" style="-fx-text-fill: #bdc3c7; -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <Button fx:id="MagasinBtn" text="" styleClass="sidebar-btn-active" onAction="#showMagasines">
+                <graphic>
+                    <Label fx:id="MagasinText" text="📊 Mes magasins" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                </graphic>
+            </Button>
+
+            <VBox fx:id="settingsSubMenu" style="-fx-padding: 0 0 0 25;" visible="false" managed="false">
+                <Button text="👤 Profil" styleClass="sidebar-sub-btn" onAction="#showProfile"/>
+                <Button text="⚙️ Préférences" styleClass="sidebar-sub-btn" onAction="#showPreferences"/>
+                <Button text="🛡️ Confidentialité / Sécurité" styleClass="sidebar-sub-btn" onAction="#showPrivacySecurity"/>
+            </VBox>
+        </VBox>
+
+    </VBox>
+</VBox>

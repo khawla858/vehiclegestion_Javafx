@@ -17,21 +17,15 @@
                 <Insets top="20" right="40" bottom="15" left="40"/>
             </padding>
 
-            <!-- Titre et bouton retour -->
+            <!-- Titre - BOUTON RETOUR SUPPRIMÉ -->
             <HBox alignment="CENTER_LEFT" spacing="20">
-                <Button fx:id="backButton" text="← Retour aux véhicules"
-                        style="-fx-background-color: #F5F5F5; -fx-text-fill: #333333; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <!-- BOUTON RETOUR SUPPRIMÉ -->
 
                 <VBox spacing="5">
                     <Label text="Mes Favoris ❤️" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #FF0000;"/>
                     <Label fx:id="favoriteCountLabel" text="0 véhicule(s) favori(s)"
                            style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
                 </VBox>
-
-
-
-
-
 
                 <Region HBox.hgrow="ALWAYS"/>
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.paint.Color?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.vehiclegestion.vendeur.controller.MagasinListController"
+      spacing="20">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- Header avec titre et bouton Ajouter -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Liste des Magasins" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+        <Pane HBox.hgrow="ALWAYS"/> <!-- pousse le bouton à droite -->
+        <Button fx:id="btnAjouterMagasin" text="+ Ajouter Magasin"
+                style="-fx-background-color: #ff2d55; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;"/>
+    </HBox>
+
+    <!-- Conteneur pour les cartes -->
+    <VBox fx:id="magasinContainer" spacing="15"/>
+
+</VBox>

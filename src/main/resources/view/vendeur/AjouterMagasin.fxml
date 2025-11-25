@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.vehiclegestion.vendeur.controller.AjouterMagasinController"
+      alignment="CENTER"
+      spacing="15"
+      style="-fx-padding: 20;">
+
+    <Label text="Ajouter un Magasin" style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="txtNom" promptText="Nom du magasin" prefWidth="250"/>
+    <TextField fx:id="txtAdresse" promptText="Adresse" prefWidth="250"/>
+    <TextField fx:id="txtLocalisation" promptText="Localisation" prefWidth="250"/>
+    <TextArea fx:id="txtDescription" promptText="Description" prefWidth="250"/>
+
+    <Button text="Ajouter" onAction="#ajouterMagasin"
+            style="-fx-background-color:#28a745; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+    <Button text="Fermer" onAction="#closeWindow"
+            style="-fx-background-color:#dc3545; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+</VBox>

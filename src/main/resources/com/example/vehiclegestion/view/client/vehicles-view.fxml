@@ -114,10 +114,6 @@
 
                     <Region HBox.hgrow="ALWAYS" />
 
-                    <!-- NOUVEAU BOUTON MES FAVORIS -->
-                    <Button text="❤️ Mes Favoris" onAction="#openFavoritesView"
-                            style="-fx-background-color: #FF0000; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 20; -fx-cursor: hand; -fx-margin: 0 15 0 0;"/>
-
                     <!-- Tri -->
                     <HBox spacing="10" alignment="CENTER_RIGHT">
                         <Label text="Trier par:" style="-fx-font-size: 13; -fx-text-fill: #666;" />
