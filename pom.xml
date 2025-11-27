@@ -16,7 +16,8 @@
     </properties>
 
     <dependencies>
-        <!-- JavaFX modules -->
+
+        <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -27,33 +28,29 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
 
-        <!-- PostgreSQL (si besoin) -->
-
+        <!-- PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
         </dependency>
 
-        <!-- Ikonli Core -->
+        <!-- Ikonli CORE -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-core</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+
+        <!-- Ikonli JavaFX -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
             <version>12.3.1</version>
         </dependency>
 
-        <!-- FontAwesome icons -->
+        <!-- FontAwesome 5 pack -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-fontawesome5-pack</artifactId>
@@ -62,12 +59,10 @@
 
     </dependencies>
 
-
-
-
     <build>
         <plugins>
-            <!-- Plugin pour JavaFX -->
+
+            <!-- JavaFX Maven Plugin -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -76,6 +71,8 @@
                     <mainClass>com.example.vehiclegestion.MainApp</mainClass>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 </project>

@@ -29,7 +29,7 @@ public class ClientFavoritesController implements Initializable {
     @FXML private VBox emptyState;
     @FXML private Label favoriteCountLabel;
     @FXML private ScrollPane scrollPane;
-    @FXML private Button clearAllButton; // backButton supprimé
+    @FXML private Button clearAllButton;
 
     private FavoriteDAO favoriteDAO = new FavoriteDAO();
     private VehicleDAO vehicleDAO = new VehicleDAO();
@@ -39,6 +39,8 @@ public class ClientFavoritesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("✅ Initialisation de ClientFavoritesController...");
+
         // Vérifier la session avec votre SessionManager
         if (!sessionManager.estConnecte()) {
             showAlert("Erreur", "Veuillez vous connecter pour accéder aux favoris");
@@ -59,8 +61,12 @@ public class ClientFavoritesController implements Initializable {
     }
 
     private void setupEventHandlers() {
-        // backButton supprimé - seulement clearAllButton reste
-        clearAllButton.setOnAction(e -> clearAllFavorites());
+        // Vérifier que le bouton existe avant d'ajouter l'event handler
+        if (clearAllButton != null) {
+            clearAllButton.setOnAction(e -> clearAllFavorites());
+        } else {
+            System.err.println("❌ clearAllButton est null dans setupEventHandlers");
+        }
     }
 
     private void loadFavorites() {
@@ -75,11 +81,18 @@ public class ClientFavoritesController implements Initializable {
             System.out.println("✅ " + favoriteVehicles.size() + " favoris chargés pour l'utilisateur ID: " + currentClientId);
         } catch (Exception e) {
             System.err.println("❌ Erreur chargement favoris: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Erreur", "Impossible de charger vos favoris");
         }
     }
 
     private void displayFavorites(List<Vehicle> favorites) {
+        // Vérifier que favoritesGrid n'est pas null
+        if (favoritesGrid == null) {
+            System.err.println("❌ ERREUR: favoritesGrid est null dans displayFavorites");
+            return;
+        }
+
         favoritesGrid.getChildren().clear();
 
         if (favorites.isEmpty()) {
@@ -95,7 +108,7 @@ public class ClientFavoritesController implements Initializable {
 
         int column = 0;
         int row = 0;
-        int columns = 3;
+        int columns = 4;
 
         for (Vehicle vehicle : favorites) {
             try {
@@ -386,19 +399,17 @@ public class ClientFavoritesController implements Initializable {
         }
     }
 
-    // Méthode goBackToVehicles supprimée car le bouton n'existe plus
-
     @FXML
     private void goToVehicles() {
-        // Utiliser favoritesGrid pour obtenir la scène puisque backButton n'existe plus
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/client/vehicles-view.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/client/ClientVehiclesView.fxml"));
             Stage stage = (Stage) favoritesGrid.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
             System.err.println("❌ Erreur navigation vers véhicules: " + e.getMessage());
             e.printStackTrace();
+            showAlert("Erreur", "Impossible de naviguer vers la page des véhicules");
         }
     }
 
@@ -409,7 +420,6 @@ public class ClientFavoritesController implements Initializable {
     private void redirectToLogin() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/login.fxml"));
-            // Utiliser favoritesGrid pour obtenir la scène puisque backButton n'existe plus
             Stage stage = (Stage) favoritesGrid.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Connexion - Gestion Véhicules");

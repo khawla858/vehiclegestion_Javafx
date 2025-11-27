@@ -5,42 +5,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.client.controller.ClientFavoritesController"
             style="-fx-background-color: #FAFAFA;">
 
-    <!-- Header -->
-    <top>
-        <VBox spacing="15" style="-fx-background-color: white; -fx-border-color: #e8e8e8; -fx-border-width: 0 0 1 0;">
-            <padding>
-                <Insets top="20" right="40" bottom="15" left="40"/>
-            </padding>
-
-            <!-- Titre - BOUTON RETOUR SUPPRIMÉ -->
-            <HBox alignment="CENTER_LEFT" spacing="20">
-                <!-- BOUTON RETOUR SUPPRIMÉ -->
-
-                <VBox spacing="5">
-                    <Label text="Mes Favoris ❤️" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #FF0000;"/>
-                    <Label fx:id="favoriteCountLabel" text="0 véhicule(s) favori(s)"
-                           style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
-                </VBox>
-
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <Button fx:id="clearAllButton" text="🗑️ Tout supprimer"
-                        style="-fx-background-color: #FFEBEE; -fx-text-fill: #FF0000; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
-            </HBox>
-
-            <!-- Message d'information -->
-            <HBox spacing="10" style="-fx-background-color: #E3F2FD; -fx-padding: 12 15; -fx-background-radius: 8; -fx-border-color: #90CAF9; -fx-border-width: 1; -fx-border-radius: 8;">
-                <Label text="ℹ️" style="-fx-font-size: 14px;"/>
-                <Label text="Cliquez sur la croix rouge pour retirer un véhicule de vos favoris"
-                       style="-fx-text-fill: #1976D2; -fx-font-size: 13px;"/>
-            </HBox>
-        </VBox>
-    </top>
+   
 
     <!-- Contenu principal -->
     <center>
