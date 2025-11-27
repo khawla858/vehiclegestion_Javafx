@@ -111,7 +111,7 @@ public class LoginController {
      * Redirection vers le dashboard client
      */
     private void redirectToClientDashboard() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/vehiclegestion/view/client/client-dashboard.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/vehiclegestion/view/client/main-layout.fxml"));
         Parent root = loader.load();
 
         Stage stage = (Stage) emailField.getScene().getWindow();

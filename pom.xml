@@ -11,7 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>23</java.version>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
         <javafx.version>25.0.1</javafx.version>
     </properties>
 
@@ -36,21 +37,17 @@
             <version>42.7.3</version>
         </dependency>
 
-        <!-- Ikonli CORE -->
+        <!-- Ikonli -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-core</artifactId>
             <version>12.3.1</version>
         </dependency>
-
-        <!-- Ikonli JavaFX -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
             <version>12.3.1</version>
         </dependency>
-
-        <!-- FontAwesome 5 pack -->
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-fontawesome5-pack</artifactId>
@@ -62,7 +59,7 @@
     <build>
         <plugins>
 
-            <!-- JavaFX Maven Plugin -->
+            <!-- JavaFX Maven Plugin (VERSION CORRIGÉE) -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>

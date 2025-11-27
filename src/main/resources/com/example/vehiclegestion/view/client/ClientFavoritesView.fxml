@@ -9,8 +9,9 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.client.controller.ClientFavoritesController"
             style="-fx-background-color: #FAFAFA;">
+    <Label text="Mes Favoris" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
 
-   
+
 
     <!-- Contenu principal -->
     <center>
