@@ -71,4 +71,7 @@ public class Client {
 
     public LocalDate getDernierAchat() { return dernierAchat; }
     public void setDernierAchat(LocalDate dernierAchat) { this.dernierAchat = dernierAchat; }
+    public String getNomComplet() {
+        return prenom + " " + nom;
+    }
 }

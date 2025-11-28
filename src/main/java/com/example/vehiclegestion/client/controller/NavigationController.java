@@ -41,11 +41,11 @@ public class NavigationController {
      * Méthodes spécifiques pour chaque vue
      */
     public static void loadDashboard() {
-        loadView("/com/example/vehiclegestion/view/client/client-dashboard.fxml");
+        loadView("/view/client/client-dashboard.fxml");
     }
 
     public static void loadFavorites() {
-        loadView("/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml");
+        loadView("/view/client/favorites.fxml");
     }
 
     public static void loadVehicles() {
@@ -53,14 +53,14 @@ public class NavigationController {
     }
 
     public static void loadHistory() {
-        loadView("/com/example/vehiclegestion/view/client/history.fxml");
+        loadView("/view/client/history.fxml");
     }
 
     public static void loadProfile() {
-        loadView("/com/example/vehiclegestion/view/client/profile.fxml");
+        loadView("/view/client/profile.fxml");
     }
 
     public static void loadLogin() {
-        loadView("/com/example/vehiclegestion/view/auth/login.fxml");
+        loadView("/view/auth/login.fxml");
     }
 }

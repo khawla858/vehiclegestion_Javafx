@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.vehiclegestion.vendeur.controller.AjouterMagasinController"
-      alignment="CENTER"
-      spacing="15"
-      style="-fx-padding: 20;">
+      spacing="10" style="-fx-padding: 20;" alignment="TOP_CENTER">
 
-    <Label text="Ajouter un Magasin" style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+    <Label text="Ajouter un Magasin" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
 
-    <TextField fx:id="txtNom" promptText="Nom du magasin" prefWidth="250"/>
-    <TextField fx:id="txtAdresse" promptText="Adresse" prefWidth="250"/>
-    <TextField fx:id="txtLocalisation" promptText="Localisation" prefWidth="250"/>
-    <TextArea fx:id="txtDescription" promptText="Description" prefWidth="250"/>
+    <TextField fx:id="txtNom" promptText="Nom du magasin"/>
+    <TextField fx:id="txtAdresse" promptText="Adresse"/>
+    <TextField fx:id="txtLocalisation" promptText="Localisation (ex: 33.5731,-7.5898)"/>
+    <TextArea fx:id="txtDescription" promptText="Description"/>
 
-    <Button text="Ajouter" onAction="#ajouterMagasin"
-            style="-fx-background-color:#28a745; -fx-text-fill:white; -fx-font-weight:bold;"/>
+    <TextField fx:id="txtTelephone" promptText="Téléphone"/>
+    <TextField fx:id="txtEmail" promptText="Email contact"/>
+    <TextField fx:id="txtSiteWeb" promptText="Site web"/>
+    <TextField fx:id="txtFacebook" promptText="Facebook"/>
+    <TextField fx:id="txtInstagram" promptText="Instagram"/>
+    <TextField fx:id="txtCategorie" promptText="Catégorie"/>
 
-    <Button text="Fermer" onAction="#closeWindow"
-            style="-fx-background-color:#dc3545; -fx-text-fill:white; -fx-font-weight:bold;"/>
+    <Label text="Horaires d'ouverture (format JSON)" style="-fx-font-size: 14px; -fx-font-weight: bold;">
 
+    </Label>
+    <TextArea fx:id="txtHoraires" promptText='{"Lundi":"09:00-18:00", "Dimanche":"Fermé"}' prefRowCount="5"/>
+
+    <!-- Logo -->
+    <HBox spacing="10">
+        <TextField fx:id="logoField" promptText="Logo du magasin" editable="false" prefWidth="250"/>
+        <Button text="Parcourir" onAction="#browseLogo"/>
+    </HBox>
+    <ImageView fx:id="logoPreview" fitWidth="150" fitHeight="100" preserveRatio="true"/>
+
+    <HBox spacing="10">
+        <Button text="Ajouter" onAction="#ajouterMagasin" style="-fx-background-color:#28a745; -fx-text-fill:white;"/>
+        <Button text="Fermer" onAction="#closeWindow" style="-fx-background-color:#dc3545; -fx-text-fill:white;"/>
+    </HBox>
+
+    <Label fx:id="messageLabel" style="-fx-text-fill:red;"/>
 </VBox>

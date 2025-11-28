@@ -46,28 +46,28 @@ public class ClientNavigationController {
 
     // Navigation spécifique client
     public static void loadClientDashboard() {
-        loadClientView("/com/example/vehiclegestion/view/client/client-dashboard.fxml");
+        loadClientView("/view/client/client-dashboard.fxml");
     }
 
     public static void loadClientVehicles() {
-        loadClientView("/com/example/vehiclegestion/view/client/client-vehicles.fxml");
+        loadClientView("/view/client/client-vehicles.fxml");
     }
 
     public static void loadClientFavorites() {
-        loadClientView("/com/example/vehiclegestion/view/client/client-favorites.fxml");
+        loadClientView("/view/client/client-favorites.fxml");
     }
 
     public static void loadClientHistory() {
-        loadClientView("/com/example/vehiclegestion/view/client/client-history.fxml");
+        loadClientView("/view/client/client-history.fxml");
     }
 
     public static void loadClientProfile() {
-        loadClientView("/com/example/vehiclegestion/view/client/client-profile.fxml");
+        loadClientView("/view/client/client-profile.fxml");
     }
 
     public static void loadLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(ClientNavigationController.class.getResource("/com/example/vehiclegestion/view/auth/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(ClientNavigationController.class.getResource("/view/auth/login.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root, 1200, 800);
             primaryStage.setScene(scene);

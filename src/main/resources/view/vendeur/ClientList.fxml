@@ -8,133 +8,317 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.ClientListController"
             fitToWidth="true"
-            style="-fx-background-color: #f8fafc;"
-            vbarPolicy="ALWAYS">
+            style="-fx-background-color: #f5f7fa;"
+            vbarPolicy="AS_NEEDED">
 
-    <VBox spacing="20" style="-fx-padding: 25;">
-        <!-- Cartes statistiques -->
+    <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #f5f7fa;">
+
+        <!-- ============================================ -->
+        <!-- HEADER: TITRE À GAUCHE + BOUTONS À DROITE -->
+        <!-- ============================================ -->
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <!-- Titre à gauche -->
+            <Label text="👥 Gestion des Clients"
+                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e293b;">
+                <HBox.hgrow>ALWAYS</HBox.hgrow>
+            </Label>
+
+            <!-- Spacer pour pousser les boutons à droite -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Groupe de boutons à droite -->
+
+        </HBox>
+
+        <!-- ============================================ -->
+        <!-- CARTES STATISTIQUES AVEC GRADIENTS GRIS/BLEU -->
+        <!-- ============================================ -->
         <HBox spacing="20" alignment="CENTER">
-            <VBox alignment="CENTER" spacing="5" prefWidth="150"
-                  style="-fx-background-color: #e8f6f3; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <Label text="👥" style="-fx-font-size: 20px;"/>
-                <Label fx:id="totalClientsLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                <Label text="Clients totaux" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            <!-- Carte Clients Totaux -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="220"
+                  style="-fx-background-color: linear-gradient(to bottom right, #1e40af, #1e3a8a);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="👥" style="-fx-font-size: 36px;"/>
+                <Label fx:id="totalClientsLabel" text="0"
+                       style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Clients Totaux"
+                       style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
             </VBox>
 
-            <VBox alignment="CENTER" spacing="5" prefWidth="150"
-                  style="-fx-background-color: #fff9e6; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <Label text="⭐" style="-fx-font-size: 20px;"/>
-                <Label fx:id="activeClientsLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                <Label text="Clients actifs" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            <!-- Carte Clients Actifs -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="220"
+                  style="-fx-background-color: linear-gradient(to bottom right, #3b82f6, #2563eb);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="⭐" style="-fx-font-size: 36px;"/>
+                <Label fx:id="activeClientsLabel" text="0"
+                       style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Clients Actifs"
+                       style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
             </VBox>
 
-            <VBox alignment="CENTER" spacing="5" prefWidth="150"
-                  style="-fx-background-color: #e6f7ff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <Label text="🛒" style="-fx-font-size: 20px;"/>
-                <Label fx:id="buyersLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                <Label text="Acheteurs" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            <!-- Carte Acheteurs -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="220"
+                  style="-fx-background-color: linear-gradient(to bottom right, #475569, #334155);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="🛒" style="-fx-font-size: 36px;"/>
+                <Label fx:id="buyersLabel" text="0"
+                       style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Acheteurs"
+                       style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- Carte Total Dépensé -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="220"
+                  style="-fx-background-color: linear-gradient(to bottom right, #1e293b, #0f172a);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="💰" style="-fx-font-size: 36px;"/>
+                <Label fx:id="totalRevenueLabel" text="0 DH"
+                       style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Total Dépensé"
+                       style="-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
             </VBox>
         </HBox>
 
-        <!-- En-tête -->
-        <HBox spacing="15" alignment="CENTER_LEFT">
-            <Label text="📋 Liste des Clients" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <Button text="➕ Nouveau Client"
-                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(46,204,113,0.3), 5, 0, 0, 2);"
-                    onAction="#addNewClient"/>
+        <!-- ============================================ -->
+        <!-- BARRE DE RECHERCHE + FILTRES + BOUTONS SUR LA MÊME LIGNE -->
+        <!-- ============================================ -->
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-background-color: white;
+                     -fx-padding: 20;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+            <!-- Barre de recherche principale -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 350;">
+                <Label text="🔍" style="-fx-font-size: 18px;"/>
+                <TextField fx:id="searchField"
+                           promptText="Rechercher par nom, email ou téléphone..."
+                           style="-fx-pref-width: 300;
+                                 -fx-padding: 10;
+                                 -fx-background-radius: 8;
+                                 -fx-border-color: #cbd5e1;
+                                 -fx-border-radius: 8;
+                                 -fx-border-width: 1.5;
+                                 -fx-font-size: 13px;"/>
+            </HBox>
+
+            <!-- Séparateur vertical -->
+            <Separator orientation="VERTICAL" style="-fx-pref-height: 35;"/>
+
+            <!-- Filtres -->
+            <VBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="Filtrer par:"
+                       style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="filterComboBox"
+                          promptText="📊 Statut client"
+                          style="-fx-pref-width: 180;
+                                -fx-background-radius: 8;
+                                -fx-border-radius: 8;"/>
+            </VBox>
+
+            <!-- Séparateur vertical -->
+            <Separator orientation="VERTICAL" style="-fx-pref-height: 35;"/>
+
+            <!-- Tri -->
+            <VBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="Trier par:"
+                       style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="sortComboBox"
+                          promptText="🔢 Trier par"
+                          style="-fx-pref-width: 180;
+                                -fx-background-radius: 8;"/>
+            </VBox>
+
+            <!-- Spacer pour pousser les boutons à droite -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Boutons alignés à droite -->
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Button text="➕ Nouveau Client"
+                        onAction="#addNewClient"
+                        style="-fx-background-color: linear-gradient(to bottom, #3b82f6, #2563eb);
+                               -fx-text-fill: white;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+
+                <Button text="🔄 Actualiser"
+                        onAction="#refreshClients"
+                        style="-fx-background-color: linear-gradient(to bottom, #64748b, #475569);
+                               -fx-text-fill: white;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+
+                <Button text="📤 Exporter"
+                        style="-fx-background-color: linear-gradient(to bottom, #334155, #1e293b);
+                               -fx-text-fill: white;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+            </HBox>
         </HBox>
 
-        <!-- Barre de recherche et filtres -->
-        <HBox spacing="15" alignment="CENTER_LEFT">
-            <TextField fx:id="searchField" promptText="🔍 Rechercher un client..."
-                       style="-fx-pref-width: 300; -fx-padding: 8; -fx-background-radius: 5; -fx-border-color: #ddd; -fx-border-radius: 5;"/>
-            <ComboBox fx:id="filterComboBox" promptText="Tous les clients"
-                      style="-fx-pref-width: 200; -fx-background-radius: 5;"/>
-            <Button text="🔄 Actualiser"
-                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5;"
-                    onAction="#refreshClients"/>
+        <!-- ============================================ -->
+        <!-- TABLEAU DES CLIENTS MODERNE -->
+        <!-- ============================================ -->
+        <VBox spacing="15"
+              style="
+                     -fx-padding: 25;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+            <!-- En-tête du tableau -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📋 Liste des Clients"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="countLabel" text="Total: 0 clients"
+                       style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <Separator style="-fx-background-color: #e2e8f0;"/>
+
+            <!-- Tableau stylé -->
+            <TableView fx:id="clientsTable"
+                       style="-fx-background-color: transparent;
+                             -fx-border-color: transparent;
+                             -fx-table-cell-border-color: #f1f5f9;">
+                <columns>
+                    <TableColumn text="ID" prefWidth="60" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="id"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="👤 Nom Complet" prefWidth="180">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="fullName"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📞 Téléphone" prefWidth="130">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="telephone"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📧 Email" prefWidth="220">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="email"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="🏠 Adresse" prefWidth="180">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="adresse"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📊 Statut" prefWidth="110" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="statutClient"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="🛒 Nb Ventes" prefWidth="100" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="nbVentes"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="💰 Total Dépensé" prefWidth="130" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="totalDepense"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="📅 Dernier Achat" prefWidth="120" style="-fx-alignment: CENTER;">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="dernierAchat"/>
+                        </cellValueFactory>
+                    </TableColumn>
+
+                    <TableColumn text="⚙️ Actions" prefWidth="120" style="-fx-alignment: CENTER;">
+                        <!-- Les actions seront ajoutées via le contrôleur -->
+                    </TableColumn>
+                </columns>
+
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 40;">
+                        <Label text="👤" style="-fx-font-size: 48px; -fx-opacity: 0.5;"/>
+                        <Label text="Aucun client trouvé"
+                               style="-fx-font-size: 16px; -fx-text-fill: #64748b;"/>
+                        <Label text="Ajoutez votre premier client en cliquant sur le bouton ci-dessus"
+                               style="-fx-font-size: 13px; -fx-text-fill: #94a3b8;"/>
+                    </VBox>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- ============================================ -->
+        <!-- SECTION INSIGHTS CLIENTS -->
+        <!-- ============================================ -->
+        <HBox spacing="20">
+            <!-- Top 5 Meilleurs Clients -->
+            <VBox spacing="15" prefWidth="450"
+                  style="-fx-background-color: white;
+                         -fx-padding: 20;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="🏆 Top 5 Meilleurs Clients"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                </HBox>
+
+                <Separator style="-fx-background-color: #e2e8f0;"/>
+
+                <ListView fx:id="topClientsList"
+                          style="-fx-pref-height: 200;
+                                -fx-background-radius: 8;
+                                -fx-border-color: #e2e8f0;
+                                -fx-border-radius: 8;"/>
+            </VBox>
+
+            <!-- Activité récente -->
+            <VBox spacing="15" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white;
+                         -fx-padding: 20;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="🔔 Activité Récente"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                </HBox>
+
+                <Separator style="-fx-background-color: #e2e8f0;"/>
+
+                <ListView fx:id="recentActivityList"
+                          style="-fx-pref-height: 200;
+                                -fx-background-radius: 8;
+                                -fx-border-color: #e2e8f0;
+                                -fx-border-radius: 8;"/>
+            </VBox>
         </HBox>
 
-        <!-- Tableau des clients -->
-        <TableView fx:id="clientsTable" style="-fx-background-color: transparent; -fx-border-color: #e1e5e9; -fx-border-radius: 8;">
-            <columns>
-                <TableColumn text="ID" prefWidth="80">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="id" />
-                    </cellValueFactory>
-                    <style>
-                        -fx-alignment: CENTER;
-                        -fx-font-weight: bold;
-                        -fx-text-fill: #2c3e50;
-                    </style>
-                </TableColumn>
-                <TableColumn text="Nom Complet" prefWidth="200">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="fullName" />
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Téléphone" prefWidth="150">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="telephone" />
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Email" prefWidth="250">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="email" />
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Statut" prefWidth="120">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="statutClient" />
-                    </cellValueFactory>
-                    <style>
-                        -fx-alignment: CENTER;
-                    </style>
-                </TableColumn>
-
-                <TableColumn text="Nb Ventes" prefWidth="100">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="nbVentes"/>
-                    </cellValueFactory>
-                    <style>-fx-alignment: CENTER;</style>
-                </TableColumn>
-
-                <TableColumn text="Total dépensé" prefWidth="120">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="totalDepense"/>
-                    </cellValueFactory>
-                    <style>-fx-alignment: CENTER-RIGHT;</style>
-                </TableColumn>
-
-                <TableColumn text="Dernier achat" prefWidth="120">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="dernierAchat"/>
-                    </cellValueFactory>
-                    <style>-fx-alignment: CENTER;</style>
-                </TableColumn>
-
-                <TableColumn text="Adresse" prefWidth="200">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="adresse" />
-                    </cellValueFactory>
-                </TableColumn>
-                <TableColumn text="Actions" prefWidth="150">
-                    <style>
-                        -fx-alignment: CENTER;
-                    </style>
-                </TableColumn>
-            </columns>
-
-            <!-- Style du tableau -->
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
-
-            <style>
-                -fx-font-size: 14px;
-                -fx-table-cell-border-color: transparent;
-                -fx-table-header-border-color: #bdc3c7;
-            </style>
-        </TableView>
     </VBox>
 </ScrollPane>

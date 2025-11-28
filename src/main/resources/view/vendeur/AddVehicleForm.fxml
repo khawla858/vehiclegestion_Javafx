@@ -2,30 +2,27 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
-<?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.vehiclegestion.vendeur.controller.AddVehicleFormController"
       spacing="20" style="-fx-padding: 30; -fx-background-color: white; -fx-background-radius: 15;"
-      prefWidth="500" prefHeight="600">
+      prefWidth="500" prefHeight="500">
 
-    <Label text="➕ Ajouter un Véhicule" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
 
     <VBox spacing="15">
-        <!-- Titre -->
+        <!-- Titre et Description -->
         <VBox spacing="5">
             <Label text="Titre du véhicule *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
             <TextField fx:id="titreField" promptText="Ex: Mercedes Classe C 2023"/>
         </VBox>
 
-        <!-- Description -->
         <VBox spacing="5">
             <Label text="Description *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
             <TextArea fx:id="descriptionField" promptText="Décrivez le véhicule..."
                       prefRowCount="3" wrapText="true"/>
         </VBox>
 
-        <!-- Prix et Catégorie -->
+        <!-- Prix, Catégorie et État -->
         <HBox spacing="15">
             <VBox spacing="5" HBox.hgrow="ALWAYS">
                 <Label text="Prix (MAD) *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
@@ -35,41 +32,82 @@
                 <Label text="Catégorie *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                 <ComboBox fx:id="categorieComboBox" promptText="Choisir une catégorie"/>
             </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="État *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <ComboBox fx:id="etatComboBox" promptText="Neuf / Occasion"/>
+            </VBox>
         </HBox>
 
-        <!-- État -->
-        <VBox spacing="5">
-            <Label text="État du véhicule *" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <ComboBox fx:id="etatComboBox" promptText="Choisir l'état"/>
-        </VBox>
+        <!-- Marque et Modèle -->
+        <HBox spacing="15">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Marque *"/>
+                <TextField fx:id="marqueField" promptText="Ex: Mercedes"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Modèle *"/>
+                <TextField fx:id="modeleField" promptText="Ex: Classe C"/>
+            </VBox>
+        </HBox>
+
+        <!-- Année et Kilométrage -->
+        <HBox spacing="15">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Année *"/>
+                <TextField fx:id="anneeField" promptText="Ex: 2023"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Kilométrage (km) *"/>
+                <TextField fx:id="kilometrageField" promptText="Ex: 150000"/>
+            </VBox>
+        </HBox>
+
+        <!-- Transmission et Carburant -->
+        <HBox spacing="15">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Transmission *"/>
+                <ComboBox fx:id="transmissionComboBox" promptText="Manuelle / Automatique"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Carburant *"/>
+                <ComboBox fx:id="carburantComboBox" promptText="Essence / Diesel / Hybride / Electrique"/>
+            </VBox>
+        </HBox>
+
+        <!-- Puissance et Couleur -->
+        <HBox spacing="15">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Puissance (ch)"/>
+                <TextField fx:id="puissanceField" promptText="Ex: 150"/>
+            </VBox>
+
+        </HBox>
+
+        <!-- Réduction et Prix Promo -->
+
 
         <!-- Image -->
         <VBox spacing="5">
-            <Label text="Image du véhicule" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label text="Image du véhicule"/>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <TextField fx:id="imageField" promptText="Nom du fichier image" HBox.hgrow="ALWAYS"/>
                 <Button text="Parcourir" onAction="#browseImage"/>
             </HBox>
-            <Label text="Ex: mercedes-classe-c.jpg" style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;"/>
+            <Label text="Ex: mercedes-classe-c.jpg" style="-fx-font-size: 11px;"/>
         </VBox>
 
-        <!-- Aperçu de l'image -->
+        <!-- Aperçu image -->
         <VBox spacing="5" fx:id="imagePreviewContainer" visible="false">
-            <Label text="Aperçu de l'image" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <ImageView fx:id="imagePreview" fitWidth="200" fitHeight="120" preserveRatio="true"
-                       style="-fx-border-color: #ddd; -fx-border-radius: 5;"/>
+            <Label text="Aperçu de l'image"/>
+            <ImageView fx:id="imagePreview" fitWidth="100" fitHeight="100" preserveRatio="true"/>
         </VBox>
     </VBox>
 
-    <!-- Boutons d'action -->
+    <!-- Boutons -->
     <HBox spacing="15" alignment="CENTER_RIGHT">
-        <Button text="Annuler" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 10 20;"
-                onAction="#cancel"/>
-        <Button text="Ajouter le véhicule"
-                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;"
-                onAction="#addVehicle"/>
+        <Button text="Annuler" style="-fx-background-color: #95a5a6; -fx-text-fill: white;" onAction="#cancel"/>
+        <Button text="Ajouter le véhicule" style="-fx-background-color: #27ae60; -fx-text-fill: white;" onAction="#addVehicle"/>
     </HBox>
 
-    <!-- Message d'erreur/succès -->
-    <Label fx:id="messageLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" wrapText="true"/>
+    <Label fx:id="messageLabel" wrapText="true" style="-fx-text-fill: #e74c3c;"/>
 </VBox>

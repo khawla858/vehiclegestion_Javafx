@@ -11,7 +11,7 @@ public class UtilisateurDAO {
     /**
      * Inscrit un nouvel utilisateur
      */
-    public boolean inscrire(Utilisateur user, String password) {
+    public boolean inscrire(Utilisateur user, String password) { // Ajouter le paramètre password
         String sql = "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, role, statut) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -20,7 +20,7 @@ public class UtilisateurDAO {
             stmt.setString(1, user.getNom());
             stmt.setString(2, user.getPrenom());
             stmt.setString(3, user.getEmail());
-            stmt.setString(4, PasswordUtils.hashPassword(password));
+            stmt.setString(4, PasswordUtils.hashPassword(password)); // Maintenant password est défini
             stmt.setString(5, user.getRole());
             stmt.setString(6, "actif");
 

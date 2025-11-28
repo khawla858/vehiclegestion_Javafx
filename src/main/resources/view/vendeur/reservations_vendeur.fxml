@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.vendeur.controller.ReservationVendeurController"
+            fitToWidth="true"
+            style="-fx-background-color: #f5f7fa;">
+
+    <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #f5f7fa;">
+
+        <!-- ============================================ -->
+        <!-- HEADER -->
+        <!-- ============================================ -->
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <Label text="📋 Gestion des Réservations"
+                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e293b;">
+                <HBox.hgrow>ALWAYS</HBox.hgrow>
+            </Label>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="🔄 Actualiser"
+                    onAction="#refreshReservations"
+                    style="-fx-background-color: linear-gradient(to bottom, #3b82f6, #2563eb);
+                           -fx-text-fill: white;
+                           -fx-padding: 12 24;
+                           -fx-background-radius: 8;
+                           -fx-font-size: 14px;
+                           -fx-font-weight: bold;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+        </HBox>
+
+        <!-- ============================================ -->
+        <!-- STATISTIQUES -->
+        <!-- ============================================ -->
+        <HBox spacing="20" alignment="CENTER">
+            <!-- Total -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="200"
+                  style="-fx-background-color: linear-gradient(to bottom right, #1e40af, #1e3a8a);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="📊" style="-fx-font-size: 32px;"/>
+                <Label fx:id="lblTotal" text="0"
+                       style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Total"
+                       style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- En Attente -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="200"
+                  style="-fx-background-color: linear-gradient(to bottom right, #f59e0b, #d97706);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="⏳" style="-fx-font-size: 32px;"/>
+                <Label fx:id="lblEnAttente" text="0"
+                       style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="En Attente"
+                       style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- Confirmées -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="200"
+                  style="-fx-background-color: linear-gradient(to bottom right, #10b981, #059669);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="✅" style="-fx-font-size: 32px;"/>
+                <Label fx:id="lblConfirmees" text="0"
+                       style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Confirmées"
+                       style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- Annulées -->
+            <VBox alignment="CENTER" spacing="8" prefWidth="200"
+                  style="-fx-background-color: linear-gradient(to bottom right, #ef4444, #dc2626);
+                         -fx-padding: 25;
+                         -fx-background-radius: 12;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 3);">
+                <Label text="❌" style="-fx-font-size: 32px;"/>
+                <Label fx:id="lblAnnulees" text="0"
+                       style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Annulées"
+                       style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9); -fx-font-weight: bold;"/>
+            </VBox>
+        </HBox>
+
+        <!-- ============================================ -->
+        <!-- BARRE DE RECHERCHE + FILTRES -->
+        <!-- ============================================ -->
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-background-color: white;
+                     -fx-padding: 20;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+            <!-- Recherche -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 400;">
+                <Label text="🔍" style="-fx-font-size: 18px;"/>
+                <TextField fx:id="searchField"
+                           promptText="Rechercher par client ou article..."
+                           style="-fx-pref-width: 350;
+                                 -fx-padding: 10;
+                                 -fx-background-radius: 8;
+                                 -fx-border-color: #cbd5e1;
+                                 -fx-border-radius: 8;
+                                 -fx-border-width: 1.5;
+                                 -fx-font-size: 13px;"/>
+            </HBox>
+
+            <Separator orientation="VERTICAL" style="-fx-pref-height: 35;"/>
+
+            <!-- Filtre -->
+            <VBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="Filtrer par statut:"
+                       style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="filterComboBox"
+                          style="-fx-pref-width: 220;
+                                -fx-background-radius: 8;"/>
+            </VBox>
+        </HBox>
+
+        <!-- ============================================ -->
+        <!-- TABLEAU DES RÉSERVATIONS -->
+        <!-- ============================================ -->
+        <VBox spacing="15"
+              style="-fx-background-color: white;
+                     -fx-padding: 25;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📋 Liste des Réservations"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+            </HBox>
+
+            <Separator style="-fx-background-color: #e2e8f0;"/>
+
+            <TableView fx:id="reservationsTable"
+                       style="-fx-background-color: transparent;
+                             -fx-border-color: transparent;
+                             -fx-table-cell-border-color: #f1f5f9;">
+                <columns>
+                    <TableColumn text="👤 Client" fx:id="colClient" prefWidth="150"/>
+                    <TableColumn text="🚗 Article" fx:id="colArticle" prefWidth="200"/>
+                    <TableColumn text="💰 Prix" fx:id="colPrix" prefWidth="100" style="-fx-alignment: CENTER;"/>
+                    <TableColumn text="📅 Date Réservation" fx:id="colDate" prefWidth="150" style="-fx-alignment: CENTER;"/>
+                    <TableColumn text="⏰ Expiration" fx:id="colExpiration" prefWidth="150" style="-fx-alignment: CENTER;"/>
+                    <TableColumn text="📊 Statut" fx:id="colStatut" prefWidth="120" style="-fx-alignment: CENTER;"/>
+                    <TableColumn text="⚙️ Actions" fx:id="colActions" prefWidth="200" style="-fx-alignment: CENTER;"/>
+                </columns>
+
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 40;">
+                        <Label text="📋" style="-fx-font-size: 48px; -fx-opacity: 0.5;"/>
+                        <Label text="Aucune réservation"
+                               style="-fx-font-size: 16px; -fx-text-fill: #64748b;"/>
+                        <Label text="Les réservations de vos clients apparaîtront ici"
+                               style="-fx-font-size: 13px; -fx-text-fill: #94a3b8;"/>
+                    </VBox>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

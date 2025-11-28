@@ -13,7 +13,7 @@
             fitToWidth="true"
             style="-fx-background-color: #f4f6f9;"
             vbarPolicy="ALWAYS"
-            stylesheets="@/com.example.vehiclegestion/css/vendeur.css">
+            stylesheets="@/com/example/vehiclegestion/css/vendeur.css">
 
 
     <!-- Contenu principal encapsulé dans le ScrollPane -->
@@ -98,10 +98,29 @@
 
                 <!-- Répartition des produits -->
                 <VBox spacing="10">
-                    <Label text="Répartition des produits vendus"
-                           style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
-                    <PieChart fx:id="productsPieChart" prefWidth="700" prefHeight="300"/>
+
+                    <HBox spacing="20"> <!-- Conteneur horizontal pour les deux graphiques -->
+                        <VBox>
+                            <Label text="Répartition des produits vendus"
+                                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+                            <PieChart fx:id="productsPieChart" prefWidth="350" prefHeight="300"/>
+                        </VBox>
+
+                        <VBox>
+                            <Label text="Ventes par catégorie par mois (%)"
+                                   style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+                            <StackedBarChart fx:id="categorySalesChart" prefWidth="390" prefHeight="320">
+                                <xAxis>
+                                    <CategoryAxis label="Mois"/>
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis label="Pourcentage (%)"/>
+                                </yAxis>
+                            </StackedBarChart>
+                        </VBox>
+                    </HBox>
                 </VBox>
+
             </VBox>
 
             <!-- DROITE : ACTIVITÉS RÉCENTES -->

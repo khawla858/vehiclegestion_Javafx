@@ -224,4 +224,43 @@ public class VendeurDAO {
         }
         return status;
     }
+    public Map<String, Map<String, Double>> getMonthlyCategoryRevenuePercentage() throws SQLException {
+        Map<String, Map<String, Double>> result = new LinkedHashMap<>();
+        String sql = "SELECT categorie, TO_CHAR(date_vente, 'Mon') AS mois, SUM(montant_total) AS revenu " +
+                "FROM Vente v JOIN Article a ON v.id_article = a.id_article " +
+                "WHERE v.id_vendeur = ? AND v.statut_vente = 'terminée' " +
+                "GROUP BY categorie, TO_CHAR(date_vente, 'Mon'), EXTRACT(MONTH FROM date_vente) " +
+                "ORDER BY EXTRACT(MONTH FROM date_vente)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, vendeurId);
+            ResultSet rs = stmt.executeQuery();
+
+            Map<String, Double> totalPerMonth = new HashMap<>();
+
+            // Calcul total par mois pour pourcentage
+            while (rs.next()) {
+                String month = rs.getString("mois");
+                double revenu = rs.getDouble("revenu");
+                totalPerMonth.put(month, totalPerMonth.getOrDefault(month, 0.0) + revenu);
+
+                // Stock temporaire pour chaque catégorie
+                result.computeIfAbsent(rs.getString("categorie"), k -> new HashMap<>())
+                        .put(month, revenu);
+            }
+
+            // Convertir en pourcentage
+            for (Map.Entry<String, Map<String, Double>> entry : result.entrySet()) {
+                Map<String, Double> monthMap = entry.getValue();
+                for (String month : monthMap.keySet()) {
+                    double total = totalPerMonth.get(month);
+                    double percent = total == 0 ? 0 : (monthMap.get(month) / total) * 100;
+                    monthMap.put(month, percent);
+                }
+            }
+        }
+        return result;
+    }
+
 }

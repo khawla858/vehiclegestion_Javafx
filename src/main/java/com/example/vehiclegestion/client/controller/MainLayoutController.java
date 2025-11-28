@@ -28,31 +28,31 @@ public class MainLayoutController {
     // Méthodes de navigation
     @FXML
     private void showDashboard() {
-        loadPage("/com/example/vehiclegestion/client/views/DashboardView.fxml");
+        loadPage("/view/client/DashboardView.fxml");
         setActiveMenu("dashboard");
     }
 
     @FXML
     private void showVehicles() {
-        loadPage("/com/example/vehiclegestion/client/views/VehiclesView.fxml");
+        loadPage("/view/client/VehiclesView.fxml");
         setActiveMenu("vehicles");
     }
 
     @FXML
     private void showFavorites() {
-        loadPage("/com/example/vehiclegestion/client/views/FavoritesView.fxml");
+        loadPage("/view/client/FavoritesView.fxml");
         setActiveMenu("favorites");
     }
 
     @FXML
     private void showHistory() {
-        loadPage("/com/example/vehiclegestion/client/views/HistoryView.fxml");
+        loadPage("/view/client/HistoryView.fxml");
         setActiveMenu("history");
     }
 
     @FXML
     private void showProfile() {
-        loadPage("/com/example/vehiclegestion/client/views/ProfileView.fxml");
+        loadPage("/view/client/ProfileView.fxml");
         setActiveMenu("profile");
     }
 

@@ -13,6 +13,7 @@ public class Vehicle {
     private LocalDateTime dateAdded;
     private int sellerId;
     private String sellerName;
+    private String sellerEmail;
 
     // Constructeurs
     public Vehicle() {}
@@ -35,15 +36,7 @@ public class Vehicle {
     // Getters et Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-    private String sellerEmail;
 
-    public String getSellerEmail() {
-        return sellerEmail;
-    }
-
-    public void setSellerEmail(String sellerEmail) {
-        this.sellerEmail = sellerEmail;
-    }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
@@ -59,6 +52,11 @@ public class Vehicle {
     public String getState() { return state; }
     public void setState(String state) { this.state = state; }
 
+    // AJOUTER CETTE MÉTHODE POUR COMPATIBILITÉ
+    public String getStatutVehicule() {
+        return state;
+    }
+
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
 
@@ -70,6 +68,9 @@ public class Vehicle {
 
     public String getSellerName() { return sellerName; }
     public void setSellerName(String sellerName) { this.sellerName = sellerName; }
+
+    public String getSellerEmail() { return sellerEmail; }
+    public void setSellerEmail(String sellerEmail) { this.sellerEmail = sellerEmail; }
 
     public String getFormattedPrice() {
         return String.format("%,.2f €", price);

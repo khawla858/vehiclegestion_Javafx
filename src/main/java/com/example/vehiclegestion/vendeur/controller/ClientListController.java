@@ -8,9 +8,12 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.List;
+import javafx.scene.layout.HBox;           // ✅ AJOUTE CETTE LIGNE
+import javafx.geometry.Pos;
+import com.example.vehiclegestion.auth.SessionManager;
+
 
 public class ClientListController implements Initializable {
 
@@ -21,23 +24,21 @@ public class ClientListController implements Initializable {
     @FXML private Label activeClientsLabel;
     @FXML private Label buyersLabel;
 
-    private ClientDAO clientDAO;
+    private ClientDAO clientDAO = new ClientDAO();
     private ObservableList<Client> clientsList = FXCollections.observableArrayList();
-    private final int VENDEUR_ID = 1;
+    private int vendeurId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("🚀 Initialisation de la liste des clients...");
 
-        // ✅ Initialiser ClientDAO avec gestion d'exception
-        try {
-            clientDAO = new ClientDAO();
-            System.out.println("✅ Connexion à la base de données établie");
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur de connexion à la base de données: " + e.getMessage());
-            e.printStackTrace();
-            showError("Impossible de se connecter à la base de données.\nVérifiez votre configuration.");
-            return; // Arrêter l'initialisation si la connexion échoue
+        // 👉 Récupération du vendeur connecté
+        if (SessionManager.getInstance().estVendeur()) {
+            vendeurId = SessionManager.getInstance().getUserId();
+            System.out.println("🟢 Vendeur connecté ID = " + vendeurId);
+        } else {
+            System.err.println("❌ Erreur : Aucun vendeur connecté !");
+            return;
         }
 
         setupTable();
@@ -49,6 +50,56 @@ public class ClientListController implements Initializable {
     private void setupTable() {
         clientsTable.setItems(clientsList);
         setupContextMenu();
+        setupActionsColumn(); // ✅ AJOUTE CETTE LIGNE
+
+
+    }
+    private void setupActionsColumn() {
+        // Trouve la colonne Actions (la dernière colonne)
+        TableColumn<Client, Void> actionsColumn = (TableColumn<Client, Void>) clientsTable.getColumns().get(9);
+
+        actionsColumn.setCellFactory(new javafx.util.Callback<TableColumn<Client, Void>, TableCell<Client, Void>>() {
+            @Override
+            public TableCell<Client, Void> call(final TableColumn<Client, Void> param) {
+                return new TableCell<Client, Void>() {
+
+                    private final Button viewBtn = new Button("👁️");
+                    private final Button editBtn = new Button("✏️");
+                    private final Button deleteBtn = new Button("🗑️");
+                    private final HBox hbox = new HBox(5, viewBtn, editBtn, deleteBtn);
+
+                    {
+                        // Styles
+                        viewBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                        editBtn.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                        deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                        hbox.setAlignment(Pos.CENTER);
+
+                        // Actions boutons
+                        viewBtn.setOnAction(event -> {
+                            Client client = getTableView().getItems().get(getIndex());
+                            viewClientDetails(client);
+                        });
+
+                        editBtn.setOnAction(event -> {
+                            Client client = getTableView().getItems().get(getIndex());
+                            editClient(client);
+                        });
+
+                        deleteBtn.setOnAction(event -> {
+                            Client client = getTableView().getItems().get(getIndex());
+                            deleteClient(client);
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setGraphic(empty ? null : hbox);
+                    }
+                };
+            }
+        });
     }
 
     private void setupFilters() {
@@ -70,69 +121,72 @@ public class ClientListController implements Initializable {
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem viewItem = new MenuItem("👁️ Voir détails");
-        viewItem.setOnAction(e -> viewClientDetails());
+        viewItem.setOnAction(e -> {
+            Client selected = clientsTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                viewClientDetails(selected);  // ✅ Passe le client
+            } else {
+                showAlert("Aucune sélection", "Veuillez sélectionner un client");
+            }
+        });
 
         MenuItem editItem = new MenuItem("✏️ Modifier");
-        editItem.setOnAction(e -> editClient());
+        editItem.setOnAction(e -> {
+            Client selected = clientsTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                editClient(selected);  // ✅ Passe le client
+            } else {
+                showAlert("Aucune sélection", "Veuillez sélectionner un client à modifier");
+            }
+        });
 
         MenuItem contactItem = new MenuItem("📞 Contacter");
         contactItem.setOnAction(e -> contactClient());
 
         MenuItem deleteItem = new MenuItem("🗑️ Supprimer");
-        deleteItem.setOnAction(e -> deleteClient());
+        deleteItem.setOnAction(e -> {
+            Client selected = clientsTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                deleteClient(selected);  // ✅ Passe le client
+            } else {
+                showAlert("Aucune sélection", "Veuillez sélectionner un client à supprimer");
+            }
+        });
 
         contextMenu.getItems().addAll(viewItem, editItem, contactItem, new SeparatorMenuItem(), deleteItem);
         clientsTable.setContextMenu(contextMenu);
     }
 
     private void loadClients() {
-        // ✅ Vérifier que clientDAO est initialisé
-        if (clientDAO == null) {
-            showError("La connexion à la base de données n'est pas disponible.");
-            return;
-        }
-
         try {
-            List<Client> clients = clientDAO.getClientsByVendeur(VENDEUR_ID);
+            List<Client> clients = clientDAO.getClientsByVendeur(vendeurId);
             clientsList.setAll(clients);
             System.out.println("✅ " + clients.size() + " clients chargés");
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL lors du chargement des clients: " + e.getMessage());
-            e.printStackTrace();
-            showError("Erreur de chargement des clients: " + e.getMessage());
+        } catch (Exception e) {
+            showError("Erreur de chargement : " + e.getMessage());
         }
     }
 
+
     private void filterClients() {
-        String filter = filterComboBox.getValue();
-        if (filter == null || filter.equals("Tous les clients")) {
-            loadClients();
-        } else {
-            // Implémentez le filtrage selon le critère choisi
-            System.out.println("Filtrage par: " + filter);
-        }
+        applyFilterAndSearch();
     }
 
     private void searchClients() {
-        String searchTerm = searchField.getText().toLowerCase();
-        if (searchTerm.isEmpty()) {
-            loadClients();
-        } else {
-            // ✅ Vérifier que clientDAO est initialisé
-            if (clientDAO == null) {
-                showError("La connexion à la base de données n'est pas disponible.");
-                return;
-            }
+        applyFilterAndSearch();
+    }
 
-            try {
-                List<Client> results = clientDAO.searchClients(searchTerm);
-                clientsList.setAll(results);
-                System.out.println("🔍 Recherche: " + searchTerm + " - " + results.size() + " résultats");
-            } catch (SQLException e) {
-                System.err.println("❌ Erreur lors de la recherche: " + e.getMessage());
-                e.printStackTrace();
-                showError("Erreur de recherche: " + e.getMessage());
-            }
+    private void applyFilterAndSearch() {
+        String filter = filterComboBox.getValue();
+        String searchTerm = searchField.getText();
+
+        try {
+            List<Client> clients = clientDAO.getClientsByVendeurWithFilter(vendeurId, filter, searchTerm);
+            clientsList.setAll(clients);
+            updateStatistics();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de la récupération des clients : " + e.getMessage());
         }
     }
 
@@ -166,23 +220,35 @@ public class ClientListController implements Initializable {
         updateStatistics();
     }
 
-    private void viewClientDetails() {
-        Client selected = clientsTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            System.out.println("🔍 Voir détails: " + selected.getFullName());
-            showAlert("Détails Client", "Détails de: " + selected.getFullName());
-        } else {
-            showAlert("Aucune sélection", "Veuillez sélectionner un client");
-        }
+    private void viewClientDetails(Client client) {
+        System.out.println("🔍 Voir détails: " + client.getFullName());
+        showAlert("Détails Client", "Détails de: " + client.getFullName());
     }
 
-    private void editClient() {
-        Client selected = clientsTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            System.out.println("✏️ Modifier: " + selected.getFullName());
-            showAlert("Modification", "Modifier: " + selected.getFullName());
-        } else {
-            showAlert("Aucune sélection", "Veuillez sélectionner un client à modifier");
+    private void editClient(Client client) {
+        System.out.println("✏️ Modifier: " + client.getFullName());
+        showAlert("Modification", "Modifier: " + client.getFullName());
+    }
+
+    private void deleteClient(Client client) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation suppression");
+        alert.setHeaderText("Supprimer les ventes du client");
+        alert.setContentText("Voulez-vous supprimer toutes les ventes de " + client.getFullName() + " pour ce vendeur ?");
+
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            try {
+                boolean success = clientDAO.deleteClientVentes(client.getId(),vendeurId);
+                if (success) {
+                    System.out.println("✅ Ventes du client supprimées: " + client.getFullName());
+                    loadClients(); // recharge la table
+                    updateStatistics();
+                    showAlert("Succès", "Toutes les ventes du client ont été supprimées avec succès");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                showError("Erreur lors de la suppression des ventes: " + e.getMessage());
+            }
         }
     }
 
@@ -196,41 +262,7 @@ public class ClientListController implements Initializable {
         }
     }
 
-    private void deleteClient() {
-        Client selected = clientsTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation suppression");
-            alert.setHeaderText("Supprimer le client");
-            alert.setContentText("Êtes-vous sûr de vouloir supprimer " + selected.getFullName() + "?");
 
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                // ✅ Vérifier que clientDAO est initialisé
-                if (clientDAO == null) {
-                    showError("La connexion à la base de données n'est pas disponible.");
-                    return;
-                }
-
-                try {
-                    boolean success = clientDAO.deleteClient(selected.getId());
-                    if (success) {
-                        System.out.println("✅ Client supprimé: " + selected.getFullName());
-                        loadClients();
-                        updateStatistics();
-                        showAlert("Succès", "Client supprimé avec succès");
-                    } else {
-                        showAlert("Erreur", "Impossible de supprimer le client");
-                    }
-                } catch (SQLException e) {
-                    System.err.println("❌ Erreur lors de la suppression: " + e.getMessage());
-                    e.printStackTrace();
-                    showError("Erreur lors de la suppression: " + e.getMessage());
-                }
-            }
-        } else {
-            showAlert("Aucune sélection", "Veuillez sélectionner un client à supprimer");
-        }
-    }
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -243,7 +275,7 @@ public class ClientListController implements Initializable {
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");
-        alert.setHeaderText("Erreur de base de données");
+        alert.setHeaderText("Erreur de chargement");
         alert.setContentText(message);
         alert.showAndWait();
     }

@@ -232,7 +232,7 @@ private void showDashboard() {
 
     @FXML
     private void showStockManagement() {
-        showAlert("Produits", "Gestion du stock");
+        loadContent("/view/vendeur/MagasinDetails.fxml");
     }
 
     @FXML
@@ -254,7 +254,7 @@ private void showDashboard() {
 
     @FXML
     private void showPendingReservations() {
-        showAlert("Réservations", "Réservations à confirmer");
+        loadContent("/view/vendeur/reservations_vendeur.fxml");
     }
 
     @FXML

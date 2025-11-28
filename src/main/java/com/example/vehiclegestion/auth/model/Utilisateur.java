@@ -2,7 +2,7 @@ package com.example.vehiclegestion.auth.model;
 
 import java.time.LocalDateTime;
 
-public class Utilisateur {
+public class Utilisateur extends com.example.vehiclegestion.vendeur.model.Utilisateur {
     private int idUtilisateur;
     private String nom;
     private String prenom;

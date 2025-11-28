@@ -66,14 +66,14 @@ public class MainController {
     private void showVehicles() {
         System.out.println("🚗 Navigation vers Véhicules");
         setActiveMenu(vehiclesBtn);
-        loadContent("/com/example/vehiclegestion/view/client/vehicles-view.fxml");
+        loadContent("/view/client/vehicles-view.fxml");
     }
 
     @FXML
     private void showFavorites() {
         System.out.println("❤️ Navigation vers Favoris");
         setActiveMenu(favoritesBtn);
-        loadContent("/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml");
+        loadContent("/view/client/ClientFavoritesView.fxml");
     }
 
     @FXML
@@ -81,14 +81,14 @@ public class MainController {
         System.out.println("📊 Navigation vers Historique");
         setActiveMenu(historyBtn);
         // Pour l'instant, rediriger vers les favoris en attendant de créer history-view.fxml
-        loadContent("/com/example/vehiclegestion/view/client/ClientFavoritesView.fxml");
+        loadContent("/view/client/ClientFavoritesView.fxml");
     }
 
     @FXML
     private void showProfile() {
         System.out.println("👤 Navigation vers Profil");
         setActiveMenu(profileBtn);
-        loadContent("/com/example/vehiclegestion/view/client/profile-view.fxml");
+        loadContent("/view/client/profile-view.fxml");
     }
 
     @FXML
@@ -154,7 +154,7 @@ public class MainController {
 
     private void redirectToLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/vehiclegestion/view/auth/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
             Parent loginPage = loader.load();
             Stage stage = (Stage) userNameLabel.getScene().getWindow();
             stage.setScene(new Scene(loginPage));

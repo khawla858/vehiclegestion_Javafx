@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.paint.Color?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.vehiclegestion.vendeur.controller.MagasinListController"
-      spacing="20">
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.vehiclegestion.vendeur.controller.MagasinListController"
+            fitToWidth="true"
+            style="-fx-background-color: #f8f9fa;"
+            vbarPolicy="ALWAYS">
 
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+    <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #f8f9fa;">
 
-    <!-- Header avec titre et bouton Ajouter -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Liste des Magasins" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-        <Pane HBox.hgrow="ALWAYS"/> <!-- pousse le bouton à droite -->
-        <Button fx:id="btnAjouterMagasin" text="+ Ajouter Magasin"
-                style="-fx-background-color: #ff2d55; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;"/>
-    </HBox>
+        <!-- HEADER SECTION -->
+        <VBox spacing="10">
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="🏪 Mes Magasins"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnAjouterMagasin" text="➕ Créer un magasin"
+                        style="-fx-font-size: 15px; -fx-background-color: #ff2d55; -fx-text-fill: white;
+                               -fx-padding: 12 25; -fx-background-radius: 10; -fx-font-weight: bold;
+                               -fx-effect: dropshadow(gaussian, rgba(255,45,85,0.3), 10, 0, 0, 3);
+                               -fx-cursor: hand;"/>
+            </HBox>
+            <Label text="Gérez vos points de vente et leur catalogue"
+                   style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+        </VBox>
 
-    <!-- Conteneur pour les cartes -->
-    <VBox fx:id="magasinContainer" spacing="15"/>
+        <!-- STATISTIQUES RAPIDES (optionnel) -->
 
-</VBox>
+
+        <!-- CONTENEUR DES CARTES DE MAGASINS -->
+        <VBox fx:id="magasinContainer" spacing="20">
+            <!-- Les cartes seront ajoutées dynamiquement depuis le controller -->
+        </VBox>
+
+    </VBox>
+</ScrollPane>

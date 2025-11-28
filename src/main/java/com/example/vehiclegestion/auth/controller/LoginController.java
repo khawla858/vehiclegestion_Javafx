@@ -1,8 +1,8 @@
 package com.example.vehiclegestion.auth.controller;
 
+import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.dao.UtilisateurDAO;
 import com.example.vehiclegestion.auth.model.Utilisateur;
-import com.example.vehiclegestion.auth.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
 
 import java.io.IOException;
 
@@ -54,23 +55,26 @@ public class LoginController {
             hideError();
 
             // ✅ DÉMARRER LA SESSION
+            System.out.println("✅ Connexion réussie pour: " + user.getEmail());
+            System.out.println("🎭 Rôle: " + user.getRole());
+            System.out.println("🆔 ID: " + user.getIdUtilisateur());
+
             sessionManager.demarrerSession(user);
 
-            System.out.println("👤 Session démarrée - ID: " + user.getIdUtilisateur() +
-                    " - Rôle: " + user.getRole() +
-                    " - Nom: " + user.getPrenom() + " " + user.getNom());
+            // Debug après démarrage session
+            sessionManager.debugSession();
 
             // Redirection selon le rôle
             try {
                 switch (user.getRole()) {
                     case "client":
-                        redirectToClientDashboard();
+                        redirectToClientDashboard(user);
                         break;
                     case "vendeur":
-                        redirectToVendeurDashboard();
+                        redirectToVendeurDashboard(user);
                         break;
                     case "admin":
-                        redirectToAdminDashboard();
+                        redirectToAdminDashboard(user);
                         break;
                     default:
                         showError("Rôle utilisateur inconnu");
@@ -90,7 +94,7 @@ public class LoginController {
     @FXML
     private void handleForgotPassword() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/ForgotPassword.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/view/auth/ForgotPassword.fxml"));
             Stage stage = (Stage) emailField.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (IOException e) {
@@ -110,35 +114,56 @@ public class LoginController {
     /**
      * Redirection vers le dashboard client
      */
-    private void redirectToClientDashboard() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/vehiclegestion/view/client/main-layout.fxml"));
+    private void redirectToClientDashboard(Utilisateur user) throws IOException {
+        // ⚠️ VÉRIFICATION AVANT REDIRECTION
+        if (!sessionManager.estConnecte()) {
+            System.out.println("🚨 ERREUR: Session non démarrée avant redirection!");
+            showError("Erreur de session");
+            return;
+        }
+
+        // ✅ CORRECTION : CHEMIN CORRECT
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/client/main-layout.fxml"));
         Parent root = loader.load();
 
         Stage stage = (Stage) emailField.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.setTitle("Gestion Véhicules - Client");
         stage.setMaximized(true);
-
-        System.out.println("🎯 Redirection vers le dashboard client");
     }
 
     /**
      * Redirection vers le dashboard vendeur
      */
-    private void redirectToVendeurDashboard() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/VendeurDashboard.fxml"));
+    private void redirectToVendeurDashboard(Utilisateur user) throws IOException {
+        System.out.println("🔄 Redirection vers dashboard vendeur...");
+
+        // ⚠️ VÉRIFICATION AVANT REDIRECTION
+        if (!sessionManager.estConnecte()) {
+            System.out.println("🚨 ERREUR: Session non démarrée avant redirection!");
+            showError("Erreur de session");
+            return;
+        }
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/layout/vendeur-layout.fxml"));
         Parent root = loader.load();
+
+        // ⚠️ OPTIONNEL: Injection de la session dans le contrôleur suivant
+        Object controller = loader.getController();
+        System.out.println("🎯 Contrôleur chargé: " + controller.getClass().getSimpleName());
 
         Stage stage = (Stage) emailField.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.setTitle("Gestion Véhicules - Vendeur");
         stage.setMaximized(true);
+
+        System.out.println("✅ Redirection vendeur réussie");
     }
 
     /**
      * Redirection vers le dashboard admin
      */
-    private void redirectToAdminDashboard() throws IOException {
+    private void redirectToAdminDashboard(Utilisateur user) throws IOException {
         // TODO: Créer le dashboard admin
         showError("Dashboard admin en cours de développement");
     }
@@ -148,33 +173,23 @@ public class LoginController {
      */
     @FXML
     private void handleGoToRegister() {
-        debugRegisterPath();
-
         try {
-            System.out.println("Tentative de chargement Register.fxml...");
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/Register.fxml"));
+            // ✅ UTILISEZ UNIQUEMENT LE CHEMIN QUI FONCTIONNE
+            String workingPath = "/view/auth/Register.fxml";
+            System.out.println("🔄 Chargement depuis: " + workingPath);
+
+            Parent root = FXMLLoader.load(getClass().getResource(workingPath));
 
             Stage stage = (Stage) emailField.getScene().getWindow();
             stage.setScene(new Scene(root, 1000, 700));
             stage.setTitle("Inscription - Gestion Véhicules");
-            System.out.println("✅ Redirection réussie vers Register!");
 
-        } catch (IOException e1) {
-            System.err.println("❌ Erreur chemin 1: " + e1.getMessage());
+            System.out.println("✅ Inscription chargée avec succès!");
 
-            try {
-                Parent root = FXMLLoader.load(getClass().getResource("/view/auth/Register.fxml"));
-
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(new Scene(root, 1000, 700));
-                stage.setTitle("Inscription - Gestion Véhicules");
-                System.out.println("✅ Redirection réussie avec chemin alternatif!");
-
-            } catch (IOException e2) {
-                System.err.println("❌ Erreur chemin 2: " + e2.getMessage());
-                showError("Register.fxml introuvable. Vérifiez la console.");
-                e2.printStackTrace();
-            }
+        } catch (IOException e) {
+            System.err.println("❌ Erreur critique: " + e.getMessage());
+            e.printStackTrace();
+            showError("Impossible de charger la page d'inscription. Contactez l'administrateur.");
         }
     }
 
@@ -223,9 +238,10 @@ public class LoginController {
             }
         }
 
+        // Test supplémentaire avec ClassLoader
         System.out.println("=== TEST CLASSLOADER ===");
         try {
-            java.net.URL url = getClass().getClassLoader().getResource("com/example/vehiclegestion/view/auth/Register.fxml");
+            java.net.URL url = getClass().getClassLoader().getResource("/view/auth/Register.fxml");
             System.out.println("ClassLoader: " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
             if (url != null) {
                 System.out.println("   URL: " + url);

@@ -19,11 +19,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
+
+import java.net.URL;
+
+import com.example.vehiclegestion.vendeur.controller.VehicleDetailController;
+import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+
 public class ClientVehiclesController {
 
     @FXML private TextField minPriceField;
@@ -48,8 +54,6 @@ public class ClientVehiclesController {
     private int currentClientId;
 
     private Map<Integer, Button> favoriteButtons = new HashMap<>();
-    private Map<Integer, Button> reservationButtons = new HashMap<>();
-
     private boolean filtersVisible = false;
     private static final int FILTERS_WIDTH = 280;
     private static final int COLUMNS_WITH_FILTERS = 3;
@@ -90,11 +94,9 @@ public class ClientVehiclesController {
     }
 
     private void setupFilterAnimations() {
-        // Animation pour le bouton filtre - survol et clic
         filterToggleBtn.setOnMouseEntered(e -> showFilters());
         filterToggleBtn.setOnMouseClicked(e -> toggleFilters());
 
-        // Garder les filtres visibles si la souris est dessus
         filterSidebar.setOnMouseEntered(e -> keepFiltersVisible());
         filterSidebar.setOnMouseExited(e -> hideFiltersAfterDelay());
     }
@@ -128,10 +130,9 @@ public class ClientVehiclesController {
     }
 
     private void hideFiltersAfterDelay() {
-        // Cacher les filtres après un petit délai pour éviter les fermetures accidentelles
         new Thread(() -> {
             try {
-                Thread.sleep(500); // Délai de 500ms
+                Thread.sleep(500);
                 javafx.application.Platform.runLater(() -> {
                     if (filtersVisible && !filterSidebar.isHover() && !filterToggleBtn.isHover()) {
                         hideFilters();
@@ -239,7 +240,6 @@ public class ClientVehiclesController {
     private void displayVehicles() {
         vehiclesGrid.getChildren().clear();
         favoriteButtons.clear();
-        reservationButtons.clear();
 
         if (filteredVehicles.isEmpty()) {
             emptyState.setVisible(true);
@@ -278,10 +278,12 @@ public class ClientVehiclesController {
 
     private VBox createModernVehicleCard(Vehicle vehicle) {
         VBox card = new VBox(0);
-        // Ajuster la largeur en fonction du nombre de colonnes
         int cardWidth = filtersVisible ? 280 : 300;
-        card.setStyle("-fx-background-color: white; -fx-border-color: #e8e8e8; -fx-border-radius: 8; " +
-                "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
+        card.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #e8e8e8; " +
+                "-fx-border-radius: 8; " +
+                "-fx-background-radius: 8; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
         card.setPrefWidth(cardWidth);
         card.setMaxWidth(cardWidth);
         card.setCursor(javafx.scene.Cursor.HAND);
@@ -289,11 +291,19 @@ public class ClientVehiclesController {
         // Header avec info vendeur
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-padding: 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;");
+        header.setStyle("-fx-padding: 12 15; " +
+                "-fx-border-color: #f0f0f0; " +
+                "-fx-border-width: 0 0 1 0; " +
+                "-fx-background-color: white; " +
+                "-fx-background-radius: 8 8 0 0;");
 
         StackPane avatar = new StackPane();
-        avatar.setStyle("-fx-background-color: " + getRandomColor() + "; -fx-background-radius: 20; -fx-min-width: 35; " +
-                "-fx-min-height: 35; -fx-max-width: 35; -fx-max-height: 35;");
+        avatar.setStyle("-fx-background-color: " + getRandomColor() + "; " +
+                "-fx-background-radius: 20; " +
+                "-fx-min-width: 35; " +
+                "-fx-min-height: 35; " +
+                "-fx-max-width: 35; " +
+                "-fx-max-height: 35;");
 
         String sellerInitials = getInitials(vehicle.getSellerName());
         Label avatarText = new Label(sellerInitials);
@@ -313,29 +323,37 @@ public class ClientVehiclesController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Label premiumBadge = new Label("⭐ Premium");
-        premiumBadge.setStyle("-fx-background-color: #FFF3E0; -fx-text-fill: #FF9800; -fx-padding: 4 8; " +
-                "-fx-background-radius: 4; -fx-font-size: 11; -fx-font-weight: bold;");
+        premiumBadge.setStyle("-fx-background-color: #FFF3E0; " +
+                "-fx-text-fill: #FF9800; " +
+                "-fx-padding: 4 8; " +
+                "-fx-background-radius: 4; " +
+                "-fx-font-size: 11; " +
+                "-fx-font-weight: bold;");
 
         header.getChildren().addAll(avatar, vendorInfo, spacer, premiumBadge);
 
         // Image du véhicule
         StackPane imageContainer = new StackPane();
-        imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 8;");
+        imageContainer.setStyle("-fx-background-color: #f5f5f5; " +
+                "-fx-background-radius: 0;");
         imageContainer.setPrefHeight(180);
         imageContainer.setMaxHeight(180);
 
         loadVehicleImage(vehicle, imageContainer);
 
         Label photoCount = new Label("📷 " + getRandomPhotoCount());
-        photoCount.setStyle("-fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 10; " +
-                "-fx-background-radius: 15; -fx-font-size: 11;");
+        photoCount.setStyle("-fx-background-color: rgba(0,0,0,0.6); " +
+                "-fx-text-fill: white; " +
+                "-fx-padding: 5 10; " +
+                "-fx-background-radius: 15; " +
+                "-fx-font-size: 11;");
         StackPane.setAlignment(photoCount, Pos.BOTTOM_LEFT);
         StackPane.setMargin(photoCount, new Insets(10));
         imageContainer.getChildren().add(photoCount);
 
         // Contenu de la carte
         VBox content = new VBox(10);
-        content.setStyle("-fx-padding: 15;");
+        content.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 0;");
 
         HBox locationBox = new HBox(5);
         locationBox.setAlignment(Pos.CENTER_LEFT);
@@ -370,10 +388,14 @@ public class ClientVehiclesController {
 
         specs.getChildren().addAll(year, transmission, fuel);
 
-        // Footer avec prix, bouton réservation et bouton favori
+        // Footer avec prix, indicateur disponibilité et bouton favori
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER_LEFT);
-        footer.setStyle("-fx-padding: 15 15 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;");
+        footer.setStyle("-fx-padding: 15 15 12 15; " +
+                "-fx-border-color: #f0f0f0; " +
+                "-fx-border-width: 1 0 0 0; " +
+                "-fx-background-color: white; " +
+                "-fx-background-radius: 0 0 8 8;");
 
         VBox priceBox = new VBox(2);
         Label price = new Label(String.format("%,.0f DH", vehicle.getPrice()));
@@ -388,9 +410,8 @@ public class ClientVehiclesController {
         Region priceSpacer = new Region();
         HBox.setHgrow(priceSpacer, Priority.ALWAYS);
 
-        // Bouton de réservation
-        Button reserveButton = createReservationButton(vehicle);
-        reservationButtons.put(vehicle.getId(), reserveButton);
+        // INDICATEUR DE DISPONIBILITÉ
+        Button availabilityBtn = createAvailabilityButton(vehicle);
 
         // Bouton favori avec état dynamique
         Button favoriteBtn = createFavoriteButton(vehicle);
@@ -398,7 +419,7 @@ public class ClientVehiclesController {
 
         HBox buttonsContainer = new HBox(5);
         buttonsContainer.setAlignment(Pos.CENTER_RIGHT);
-        buttonsContainer.getChildren().addAll(reserveButton, favoriteBtn);
+        buttonsContainer.getChildren().addAll(availabilityBtn, favoriteBtn);
 
         footer.getChildren().addAll(priceBox, priceSpacer, buttonsContainer);
 
@@ -406,8 +427,8 @@ public class ClientVehiclesController {
         card.getChildren().addAll(header, imageContainer, content, footer);
 
         card.setOnMouseClicked(e -> {
-            if (e.getTarget() != favoriteBtn && e.getTarget() != reserveButton &&
-                    !favoriteBtn.getParent().equals(e.getTarget()) && !reserveButton.getParent().equals(e.getTarget())) {
+            if (e.getTarget() != favoriteBtn && e.getTarget() != availabilityBtn &&
+                    !favoriteBtn.getParent().equals(e.getTarget()) && !availabilityBtn.getParent().equals(e.getTarget())) {
                 viewVehicleDetails(vehicle);
             }
         });
@@ -417,114 +438,123 @@ public class ClientVehiclesController {
         return card;
     }
 
-    // ... (Les autres méthodes restent identiques : createReservationButton, handleReservation, etc.)
-    // Toutes les méthodes suivantes restent exactement les mêmes que dans votre code original
+    // NOUVELLE MÉTHODE : Indicateur de disponibilité (remplace réservation)
+    private Button createAvailabilityButton(Vehicle vehicle) {
+        Button availabilityBtn = new Button();
 
-    private Button createReservationButton(Vehicle vehicle) {
-        // Même code que précédemment...
-        Button reserveButton = new Button();
+        // Récupérer le statut réel depuis la base de données
+        String statut = vehicle.getStatutVehicule() != null ? vehicle.getStatutVehicule().toLowerCase() : "disponible";
+        boolean estReserve = reservationDAO.isVehiculeReserved(vehicle.getId());
+        boolean estReserveParMoi = reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId());
 
-        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
-            if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
-                reserveButton.setText("✅ Déjà réservé");
-                reserveButton.setStyle(
-                        "-fx-background-color: #E8F5E8; " +
-                                "-fx-text-fill: #2E7D32; " +
-                                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
-                                "-fx-background-radius: 12; -fx-cursor: default;"
+        // Logique d'affichage basée sur le statut réel
+        switch (statut) {
+            case "vendu":
+                availabilityBtn.setText("⛔ VENDU");
+                availabilityBtn.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #D32F2F, #B71C1C); " +
+                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(211,47,47,0.3), 4, 0, 0, 2); " +
+                                "-fx-cursor: default; -fx-border-color: #C62828; -fx-border-width: 1;"
                 );
-                reserveButton.setDisable(true);
-            } else {
-                reserveButton.setText("⛔ Déjà réservé");
-                reserveButton.setStyle(
-                        "-fx-background-color: #FFEBEE; " +
-                                "-fx-text-fill: #C62828; " +
-                                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
-                                "-fx-background-radius: 12; -fx-cursor: default;"
+                break;
+
+            case "reserve":
+            case "réservé":
+                if (estReserveParMoi) {
+                    availabilityBtn.setText("⭐ VOTRE RÉSERVATION");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #FFD54F, #FFB300); " +
+                                    "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                    "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(255,183,0,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #FFA000; -fx-border-width: 1;"
+                    );
+                } else {
+                    availabilityBtn.setText("🔒 RÉSERVÉ");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #FFB74D, #FF9800); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(255,152,0,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #F57C00; -fx-border-width: 1;"
+                    );
+                }
+                break;
+
+            case "en attente":
+                availabilityBtn.setText("⏳ EN ATTENTE");
+                availabilityBtn.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #FFCC80, #FFA726); " +
+                                "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(255,167,38,0.3), 4, 0, 0, 2); " +
+                                "-fx-cursor: default; -fx-border-color: #FF9800; -fx-border-width: 1;"
                 );
-                reserveButton.setDisable(true);
-            }
-        } else {
-            reserveButton.setText("📅 Réserver");
-            reserveButton.setStyle(
-                    "-fx-background-color: #4CAF50; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 12; " +
-                            "-fx-background-radius: 12; -fx-cursor: hand;"
-            );
-            reserveButton.setOnAction(e -> handleReservation(vehicle, reserveButton));
+                break;
+
+            case "indisponible":
+                availabilityBtn.setText("🚫 INDISPONIBLE");
+                availabilityBtn.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #90A4AE, #78909C); " +
+                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(120,144,156,0.3), 4, 0, 0, 2); " +
+                                "-fx-cursor: default; -fx-border-color: #607D8B; -fx-border-width: 1;"
+                );
+                break;
+
+            case "disponible":
+            case "en stock":
+            default:
+                if (estReserve) {
+                    availabilityBtn.setText("📝 EN COURS");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #81C784, #4CAF50); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                    "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(76,175,80,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #388E3C; -fx-border-width: 1;"
+                    );
+                } else {
+                    availabilityBtn.setText("✅ DISPONIBLE");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #66BB6A, #43A047); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(67,160,71,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #2E7D32; -fx-border-width: 1;"
+                    );
+                }
+                break;
         }
 
-        return reserveButton;
+        availabilityBtn.setDisable(true);
+        return availabilityBtn;
     }
 
-    private void handleReservation(Vehicle vehicle, Button reserveButton) {
-        // Même code que précédemment...
-        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
-            showAlert("Réservation impossible", "❌ Ce véhicule a déjà été réservé par un autre client.");
-            updateReservationButton(reserveButton, vehicle);
-            return;
-        }
-
-        if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
-            showAlert("Réservation existante", "ℹ️ Vous avez déjà réservé ce véhicule.");
-            updateReservationButton(reserveButton, vehicle);
-            return;
-        }
-
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Confirmation de réservation");
-        confirmation.setHeaderText("Confirmer la réservation");
-        confirmation.setContentText("Voulez-vous réserver le véhicule : " + vehicle.getTitle() + " ?\n\n" +
-                "Prix: " + String.format("%,.0f DH", vehicle.getPrice()) + "\n" +
-                "La réservation sera valable pendant 24 heures.");
-
-        if (confirmation.showAndWait().get() == ButtonType.OK) {
-            boolean success = reservationDAO.createReservation(currentClientId, vehicle.getId());
-            if (success) {
-                showAlert("Réservation confirmée", "✅ Véhicule réservé avec succès!\n\n" +
-                        "Vous avez 24 heures pour finaliser votre achat.\n" +
-                        "Véhicule: " + vehicle.getTitle());
-                updateReservationButton(reserveButton, vehicle);
-            } else {
-                showAlert("Erreur", "❌ Impossible de réserver le véhicule. Veuillez réessayer.");
-            }
-        }
-    }
-
-    // ... (Toutes les autres méthodes restent identiques)
-
-    private void updateReservationButton(Button reserveButton, Vehicle vehicle) {
-        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
-            if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
-                reserveButton.setText("✅ Déjà réservé");
-                reserveButton.setStyle(
-                        "-fx-background-color: #E8F5E8; " +
-                                "-fx-text-fill: #2E7D32; " +
-                                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
-                                "-fx-background-radius: 12; -fx-cursor: default;"
-                );
-                reserveButton.setDisable(true);
-            } else {
-                reserveButton.setText("⛔ Déjà réservé");
-                reserveButton.setStyle(
-                        "-fx-background-color: #FFEBEE; " +
-                                "-fx-text-fill: #C62828; " +
-                                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
-                                "-fx-background-radius: 12; -fx-cursor: default;"
-                );
-                reserveButton.setDisable(true);
-            }
-        }
+    private String getButtonStyle(String backgroundColor, String textColor) {
+        return "-fx-background-color: " + backgroundColor + "; " +
+                "-fx-text-fill: " + textColor + "; " +
+                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
+                "-fx-background-radius: 12; -fx-cursor: default;";
     }
 
     private Button createFavoriteButton(Vehicle vehicle) {
         boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
 
-        Button favoriteBtn = new Button(isFav ? "❤" : "♡");
+        Button favoriteBtn = new Button("🛒");
         favoriteBtn.setStyle(
-                "-fx-background-color: #f5f5f5; " +
-                        "-fx-text-fill: " + (isFav ? "#FF0000" : "#FF6B35") + "; " +
+                "-fx-background-color: " + (isFav ? "#4CAF50" : "#f5f5f5") + "; " +
+                        "-fx-text-fill: " + (isFav ? "white" : "#666") + "; " +
                         "-fx-font-size: 16; -fx-padding: 6 8; " +
                         "-fx-background-radius: 20; -fx-cursor: hand; -fx-border-width: 0;"
         );
@@ -540,9 +570,9 @@ public class ClientVehiclesController {
         if (isFav) {
             boolean success = favoriteDAO.removeFavorite(currentClientId, vehicle.getId());
             if (success) {
-                button.setText("♡");
+                button.setText("🛒");
                 button.setStyle(
-                        "-fx-background-color: #f5f5f5; -fx-text-fill: #FF6B35; " +
+                        "-fx-background-color: #f5f5f5; -fx-text-fill: #666; " +
                                 "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
                                 "-fx-cursor: hand; -fx-border-width: 0;"
                 );
@@ -550,16 +580,15 @@ public class ClientVehiclesController {
         } else {
             boolean success = favoriteDAO.addFavorite(currentClientId, vehicle.getId());
             if (success) {
-                button.setText("❤");
+                button.setText("🛒");
                 button.setStyle(
-                        "-fx-background-color: #f5f5f5; -fx-text-fill: #FF0000; " +
+                        "-fx-background-color: #4CAF50; -fx-text-fill: white; " +
                                 "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
                                 "-fx-cursor: hand; -fx-border-width: 0;"
                 );
             }
         }
     }
-
     private void loadVehicleImage(Vehicle vehicle, StackPane container) {
         if (vehicle.getImage() != null && !vehicle.getImage().trim().isEmpty()) {
             try {
@@ -763,12 +792,87 @@ public class ClientVehiclesController {
     }
 
     private void viewVehicleDetails(Vehicle vehicle) {
-        showAlert("Détails du véhicule",
-                vehicle.getTitle() + "\n\n" +
-                        "Prix: " + String.format("%,.0f DH", vehicle.getPrice()) + "\n" +
-                        "Catégorie: " + vehicle.getCategory() + "\n" +
-                        "Vendeur: " + vehicle.getSellerName() + "\n" +
-                        "Description: " + vehicle.getDescription());
+        System.out.println("🎯 DEBUT viewVehicleDetails pour: " + vehicle.getTitle());
+
+        try {
+            String fxmlPath = "/view/vendeur/VehicleDetail.fxml";
+            System.out.println("🔍 Chemin FXML testé: " + fxmlPath);
+
+            URL url = getClass().getResource(fxmlPath);
+            System.out.println("📁 URL trouvée: " + (url != null ? "✅ OUI" : "❌ NON"));
+
+            if (url == null) {
+                String[] testPaths = {
+                        "/com/example/vehiclegestion/view/vendeur/VehicleDetail.fxml",
+                        "/view/vendeur/VehicleDetail.fxml",
+                        "/vendeur/VehicleDetail.fxml",
+                        "VehicleDetail.fxml"
+                };
+
+                for (String path : testPaths) {
+                    url = getClass().getResource(path);
+                    System.out.println("Test '" + path + "' → " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
+                    if (url != null) {
+                        fxmlPath = path;
+                        break;
+                    }
+                }
+            }
+
+            if (url == null) {
+                throw new IOException("Fichier FXML introuvable: Vehicle-detail.fxml");
+            }
+
+            System.out.println("✅ Chargement FXML depuis: " + fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent root = loader.load();
+            System.out.println("✅ FXML chargé avec succès");
+
+            VehicleDetailController controller = loader.getController();
+            System.out.println("✅ Contrôleur récupéré: " + controller.getClass().getSimpleName());
+
+            Article article = convertVehicleToArticle(vehicle);
+            System.out.println("✅ Article converti: " + article.getTitre());
+
+            controller.receiveData(article);
+            System.out.println("✅ Données transmises au contrôleur");
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.setTitle("Détails du véhicule - " + vehicle.getTitle());
+
+            System.out.println("✅ Nouvelle fenêtre créée");
+
+            stage.show();
+            System.out.println("🎉 Fenêtre de détails affichée avec succès!");
+
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR CRITIQUE dans viewVehicleDetails: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible d'ouvrir les détails du véhicule: " + e.getMessage());
+        }
+    }
+
+    private Article convertVehicleToArticle(Vehicle vehicle) {
+        Article article = new Article();
+
+        article.setTitre(vehicle.getTitle());
+        article.setPrix(vehicle.getPrice());
+        article.setDescription(vehicle.getDescription());
+        article.setImage(vehicle.getImage());
+        article.setCategorie(vehicle.getCategory());
+
+        article.setAnnee(2023);
+        article.setKilometrage(50000);
+        article.setTransmission("Manuelle");
+        article.setCarburant("Essence");
+        article.setMarque(extractBrandFromTitle(vehicle.getTitle()));
+        article.setModele(vehicle.getTitle());
+        article.setPuissance(120);
+        article.setEtat("Excellent");
+
+        return article;
     }
 
     private void showAlert(String title, String message) {
