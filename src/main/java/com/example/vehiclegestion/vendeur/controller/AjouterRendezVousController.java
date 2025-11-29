@@ -86,7 +86,7 @@ public class AjouterRendezVousController implements Initializable {
 
         // Types de rendez-vous (stockés dans description)
         typeCombo.setItems(FXCollections.observableArrayList(
-                "Visite véhicule", "Essai routier", "Négociation prix",
+                "Visite véhicule", "Essai routier",
                 "Signature contrat", "Livraison véhicule", "Service après-vente"
         ));
         typeCombo.getSelectionModel().selectFirst();
@@ -242,16 +242,17 @@ public class AjouterRendezVousController implements Initializable {
             rdv.setEmailClient(emailField.getText());
             rdv.setDateRdv(datePicker.getValue());
             rdv.setHeureRdv(LocalTime.parse(heureCombo.getValue() + ":00"));
-
-            // ✅ Le type est stocké dans typeRdv (qui sera sauvegardé dans description en BD)
             rdv.setTypeRdv(typeCombo.getValue());
-            rdv.setStatut("en attente");
+
+            // ✅ MODIFICATION: Statut "confirmé" au lieu de "en attente"
+            rdv.setStatut("confirmé"); // ← CHANGEMENT ICI
+
             rdv.setDuree(Integer.parseInt(dureeCombo.getValue().split(" ")[0]));
 
             // Sauvegarde
             if (rendezVousDAO.addRendezVous(rdv)) {
-                System.out.println("✅ RDV enregistré avec succès! ID: " + rdv.getIdRdv());
-                showAlert("Succès", "Rendez-vous créé avec succès!", Alert.AlertType.INFORMATION);
+                System.out.println("✅ RDV confirmé et enregistré avec succès! ID: " + rdv.getIdRdv());
+                showAlert("Succès", "Rendez-vous confirmé et créé avec succès!", Alert.AlertType.INFORMATION);
                 fermerFenetre();
             } else {
                 throw new Exception("Erreur lors de l'insertion en base");

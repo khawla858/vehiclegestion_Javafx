@@ -1,5 +1,5 @@
 package com.example.vehiclegestion.vendeur.controller;
-
+import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.model.Magasin;
 import com.example.vehiclegestion.vendeur.dao.MagasinDAO;
 import com.example.vehiclegestion.utils.DataReceiver;
@@ -30,11 +30,12 @@ public class MagasinDetailsController implements DataReceiver {
     @FXML private Text descriptionMagasin;
     @FXML private Button btnFacebook;
     @FXML private Button btnInstagram;
-    @FXML private ImageView carteImage;
+    @FXML private ImageView carteImage; // ✅ ImageView au lieu de WebView
     @FXML private Label etageInfo;
     @FXML private Button btnItineraire;
     @FXML private Button btnVoirCarte;
     @FXML private Button btnRetour;
+    @FXML private Button btnVoirVehicules;
 
     private Magasin magasin;
     private MagasinDAO magasinDAO;
@@ -46,10 +47,14 @@ public class MagasinDetailsController implements DataReceiver {
             magasinDAO = new MagasinDAO();
             configurerActions();
 
-            // ✅ Configuration du bouton retour
             if (btnRetour != null) {
                 btnRetour.setOnAction(e -> nav.goBack());
                 btnRetour.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; " +
+                        "-fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
+            }
+            if (btnVoirVehicules != null) {
+                btnVoirVehicules.setOnAction(e -> voirVehiculesMagasin());
+                btnVoirVehicules.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; " +
                         "-fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
             }
 
@@ -59,9 +64,6 @@ public class MagasinDetailsController implements DataReceiver {
         }
     }
 
-    /**
-     * ✅ Implémentation de DataReceiver pour recevoir le magasin
-     */
     @Override
     public void receiveData(Object data) {
         if (data instanceof Magasin) {
@@ -72,6 +74,18 @@ public class MagasinDetailsController implements DataReceiver {
             System.err.println("❌ Données reçues non valides dans MagasinDetailsController");
             showError("Erreur", "Impossible de charger les données du magasin");
         }
+    }
+
+    private void voirVehiculesMagasin() {
+        if (magasin == null) {
+            showError("Aucun magasin sélectionné");
+            return;
+        }
+
+        System.out.println("🚗 Navigation vers véhicules du magasin: " + magasin.getNomMagasin());
+        SessionManager.getInstance().setCurrentMagasinId(magasin.getIdMagasin());
+        SessionManager.getInstance().setCurrentMagasinNom(magasin.getNomMagasin());
+        NavigationManager.getInstance().navigateWithData("/view/vendeur/VendeurVehicle.fxml", null);
     }
 
     private void afficherDonneesMagasin() {
@@ -103,7 +117,7 @@ public class MagasinDetailsController implements DataReceiver {
 
         chargerLogo();
         chargerHoraires();
-        chargerImageCarte();
+        chargerImageCarte(); // ✅ Méthode originale pour ImageView
     }
 
     private void chargerLogo() {
@@ -351,7 +365,6 @@ public class MagasinDetailsController implements DataReceiver {
         }
     }
 
-    // ✅ Gardez cette méthode pour la compatibilité
     public void setMagasin(Magasin magasin) {
         this.magasin = magasin;
         afficherDonneesMagasin();

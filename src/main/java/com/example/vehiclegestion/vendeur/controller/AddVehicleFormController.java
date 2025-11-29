@@ -2,6 +2,7 @@ package com.example.vehiclegestion.vendeur.controller;
 
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.Article;
+import com.example.vehiclegestion.auth.SessionManager; // ✅ AJOUT IMPORT
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -15,13 +16,10 @@ import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import javafx.stage.FileChooser;
-import javafx.scene.image.Image;
 
 public class AddVehicleFormController implements Initializable {
 
@@ -46,16 +44,31 @@ public class AddVehicleFormController implements Initializable {
     @FXML private TextField reductionField;
     @FXML private TextField prixPromoField;
 
-
     private ArticleDAO articleDAO;
     private Stage dialogStage;
     private int vendeurId;
     private String selectedImagePath;
+    private SessionManager sessionManager = SessionManager.getInstance(); // ✅ AJOUT
+    private Integer currentMagasinId; // ✅ AJOUT: Pour stocker l'ID du magasin
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         articleDAO = new ArticleDAO();
         setupForm();
+
+        // ✅ AJOUT: Récupérer l'ID du magasin courant depuis SessionManager
+        currentMagasinId = sessionManager.getCurrentMagasinId();
+        String magasinNom = sessionManager.getCurrentMagasinNom();
+
+        if (currentMagasinId != null) {
+            System.out.println("✅ AddVehicleForm - Magasin courant détecté: " + magasinNom + " (ID: " + currentMagasinId + ")");
+            if (messageLabel != null) {
+                messageLabel.setText("Ajout au magasin: " + magasinNom);
+                messageLabel.setStyle("-fx-text-fill: #17a2b8; -fx-font-size: 12px;");
+            }
+        } else {
+            System.out.println("ℹ️ AddVehicleForm - Aucun magasin spécifique");
+        }
     }
 
     private void setupForm() {
@@ -64,10 +77,7 @@ public class AddVehicleFormController implements Initializable {
                 "Utilitaire", "4x4", "Luxe", "Cabriolet", "Break"
         );
         transmissionComboBox.getItems().addAll("Manuelle", "Automatique", "Semi-automatique");
-
         carburantComboBox.getItems().addAll("Essence", "Diesel", "Électrique", "Hybride", "GPL");
-
-
         etatComboBox.getItems().addAll("neuf", "occasion");
 
         prixField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -86,6 +96,7 @@ public class AddVehicleFormController implements Initializable {
 
     public void setVendeurId(int vendeurId) {
         this.vendeurId = vendeurId;
+        System.out.println("✅ Vendeur ID défini dans formulaire: " + vendeurId);
     }
 
     @FXML
@@ -100,32 +111,22 @@ public class AddVehicleFormController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(dialogStage);
         if (selectedFile != null) {
             try {
-                // dossier de stockage (externe, à côté du jar ou dans le répertoire de travail)
                 Path imagesDir = Path.of(System.getProperty("user.dir"), "images", "articles");
                 if (!Files.exists(imagesDir)) Files.createDirectories(imagesDir);
 
-                // extension d'origine
                 String originalName = selectedFile.getName();
                 String ext = "";
                 int i = originalName.lastIndexOf('.');
                 if (i > 0) ext = originalName.substring(i);
 
-                // nom unique
                 String newName = "article_" + System.currentTimeMillis() + ext;
-
                 Path dest = imagesDir.resolve(newName);
 
-                // copier le fichier sélectionné vers le dossier de l'application
                 Files.copy(selectedFile.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
 
-                // stocker le chemin RELATIF (par rapport au dossier de l'application)
-                // tu peux stocker "images/articles/..." ou absolute file: URI selon ton choix.
                 selectedImagePath = "images/articles/" + newName;
-
-                // afficher le nom dans le champ
                 imageField.setText(newName);
 
-                // afficher un aperçu (utiliser file: URI)
                 Image image = new Image(dest.toUri().toString(), true);
                 imagePreview.setImage(image);
                 imagePreviewContainer.setManaged(true);
@@ -158,48 +159,42 @@ public class AddVehicleFormController implements Initializable {
             article.setTransmission(transmissionComboBox.getValue());
             article.setCarburant(carburantComboBox.getValue());
             article.setPuissance(!puissanceField.getText().isEmpty() ? Integer.parseInt(puissanceField.getText()) : 0);
-            //article.setCouleur(couleurField.getText().trim());
-            //article.setReduction(!reductionField.getText().isEmpty() ? Integer.parseInt(reductionField.getText()) : 0);
-            //article.setPrixPromo(!prixPromoField.getText().isEmpty() ? Double.parseDouble(prixPromoField.getText()) : article.getPrix());
 
+            // ✅ AJOUT CRITIQUE: Associer l'article au magasin courant
+            if (currentMagasinId != null) {
+                article.setIdMagasin(currentMagasinId);
+                System.out.println("✅ Véhicule associé au magasin ID: " + currentMagasinId);
+            } else {
+                System.out.println("⚠️ Aucun magasin spécifique détecté, l'article n'aura pas de magasin associé");
+                article.setIdMagasin(0); // ou null selon votre modèle
+            }
 
-            // ================================================
-            // 1. SAUVEGARDE DE L’IMAGE DANS LE PROJET
-            // ================================================
+            // Gestion de l'image
             String imageRelativePath = null;
-
             if (selectedImagePath != null && !selectedImagePath.isEmpty()) {
-
-                // dossier où tu veux stocker les images dans ton projet
                 File destDir = new File("images/articles");
                 if (!destDir.exists()) destDir.mkdirs();
 
-                // nom unique pour éviter les conflits
                 String fileName = "article_" + System.currentTimeMillis() + ".png";
-
                 File source = new File(selectedImagePath);
                 File destination = new File(destDir, fileName);
 
-                // copier l'image dans le projet
-                java.nio.file.Files.copy(
-                        source.toPath(),
-                        destination.toPath(),
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                );
-
-                // chemin RELATIF que tu stockes dans la base
+                Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 imageRelativePath = "images/articles/" + fileName;
             }
 
             article.setImage(imageRelativePath);
 
-            // ================================================
-            // 2. INSERTION DANS LA BASE
-            // ================================================
-            boolean success = articleDAO.addArticle(article, vendeurId);
+            // Insertion dans la base
+            boolean success = articleDAO.addArticle(article, this.vendeurId);
 
             if (success) {
-                showMessage("✅ Véhicule ajouté avec succès!", false);
+                String successMessage = "✅ Véhicule ajouté avec succès!";
+                if (currentMagasinId != null) {
+                    String magasinNom = sessionManager.getCurrentMagasinNom();
+                    successMessage += " (Magasin: " + magasinNom + ")";
+                }
+                showMessage(successMessage, false);
                 clearForm();
 
                 new java.util.Timer().schedule(
@@ -227,7 +222,6 @@ public class AddVehicleFormController implements Initializable {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void cancel() {

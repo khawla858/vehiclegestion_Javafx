@@ -33,7 +33,7 @@ public class MagasinDAO {
         System.out.println("\n🔍 === getMagasinByVendeur ===");
         System.out.println("   Recherche pour vendeur ID: " + idVendeur);
 
-        String sql = "SELECT * FROM Magasin WHERE id_vendeur = ? LIMIT 1";
+        String sql = "SELECT * FROM Magasin WHERE id_vendeur = ? ";
 
         try {
             // ✅ VÉRIFIER LA CONNEXION
@@ -174,12 +174,23 @@ public class MagasinDAO {
     /**
      * Récupérer tous les magasins
      */
-    public List<Magasin> getAllMagasins() {
-        List<Magasin> magasins = new ArrayList<>();
-        String sql = "SELECT * FROM Magasin";
+    // Dans MagasinDAO.java
+    public List<Magasin> getAllMagasinsByVendeur(int idVendeur) {
+        System.out.println("\n🔍 === getAllMagasinsByVendeur ===");
+        System.out.println("   Recherche TOUS les magasins pour vendeur ID: " + idVendeur);
 
-        try (Statement st = connection.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        List<Magasin> magasins = new ArrayList<>();
+        String sql = "SELECT * FROM Magasin WHERE id_vendeur = ? ORDER BY id_magasin DESC";
+
+        try {
+            if (connection == null || connection.isClosed()) {
+                connection = DatabaseConnection.getConnection();
+            }
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, idVendeur);
+
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 Magasin m = new Magasin();
@@ -199,13 +210,19 @@ public class MagasinDAO {
                 m.setCategorie(rs.getString("categorie"));
 
                 magasins.add(m);
+                System.out.println("   ✅ Magasin trouvé - ID: " + m.getIdMagasin() + ", Nom: " + m.getNomMagasin());
             }
 
-            System.out.println("✅ getAllMagasins: " + magasins.size() + " magasin(s) trouvé(s)");
+            rs.close();
+            ps.close();
+
+            System.out.println("   📊 Total magasins trouvés: " + magasins.size());
+
         } catch (SQLException e) {
-            System.err.println("❌ ERREUR dans getAllMagasins: " + e.getMessage());
+            System.err.println("❌ ERREUR SQL dans getAllMagasinsByVendeur: " + e.getMessage());
             e.printStackTrace();
         }
+
         return magasins;
     }
 

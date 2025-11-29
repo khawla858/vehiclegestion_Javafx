@@ -49,6 +49,7 @@ public class SessionManager {
         return estConnecte() && "client".equals(utilisateurConnecte.getRole());
     }
 
+
     public boolean estVendeur() {
         return estConnecte() && "vendeur".equals(utilisateurConnecte.getRole());
     }
@@ -65,5 +66,38 @@ public class SessionManager {
         System.out.println("Utilisateur: " + (utilisateurConnecte != null ?
                 utilisateurConnecte.getEmail() + " (" + utilisateurConnecte.getRole() + ")" : "null"));
         System.out.println("=====================");
+    }
+    public String getUserRole() {
+        return utilisateurConnecte != null ? utilisateurConnecte.getRole() : null;
+    }
+    // ✅ NOUVEAUX champs pour stocker le magasin courant
+    private Integer currentMagasinId = null;
+    private String currentMagasinNom = null;
+
+    // ... vos méthodes existantes ...
+
+    // ✅ MÉTHODES pour gérer le magasin courant
+    public void setCurrentMagasinId(Integer magasinId) {
+        this.currentMagasinId = magasinId;
+        System.out.println("✅ SessionManager - Magasin ID défini: " + magasinId);
+    }
+
+    public Integer getCurrentMagasinId() {
+        return currentMagasinId;
+    }
+
+    public void setCurrentMagasinNom(String magasinNom) {
+        this.currentMagasinNom = magasinNom;
+        System.out.println("✅ SessionManager - Magasin Nom défini: " + magasinNom);
+    }
+
+    public String getCurrentMagasinNom() {
+        return currentMagasinNom;
+    }
+
+    public void clearCurrentMagasin() {
+        this.currentMagasinId = null;
+        this.currentMagasinNom = null;
+        System.out.println("✅ SessionManager - Magasin courant effacé");
     }
 }

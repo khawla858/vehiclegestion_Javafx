@@ -2,15 +2,13 @@ package com.example.vehiclegestion.vendeur.controller;
 
 import com.example.vehiclegestion.vendeur.dao.ReservationDAO;
 import com.example.vehiclegestion.vendeur.model.Reservation;
-import com.example.vehiclegestion.auth.SessionManager; // ← AJOUT IMPORT
-import com.example.vehiclegestion.auth.model.Utilisateur; // ← AJOUT IMPORT
+import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.auth.model.Utilisateur;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.geometry.Pos;
 
 import java.sql.SQLException;
 
@@ -23,7 +21,6 @@ public class ReservationVendeurController {
     @FXML private TableColumn<Reservation, String> colStatut;
     @FXML private TableColumn<Reservation, String> colDate;
     @FXML private TableColumn<Reservation, String> colExpiration;
-    @FXML private TableColumn<Reservation, Void> colActions;
 
     @FXML private Label lblTotal;
     @FXML private Label lblEnAttente;
@@ -35,26 +32,19 @@ public class ReservationVendeurController {
     private ReservationDAO reservationDAO;
     private ObservableList<Reservation> reservations;
     private ObservableList<Reservation> allReservations;
-
-    // ⚡ REMPLACER la constante par le SessionManager
     private SessionManager sessionManager;
     private int idVendeur;
 
     @FXML
     public void initialize() {
         try {
-            // ⚡ INITIALISATION de la session
             sessionManager = SessionManager.getInstance();
 
-            // ⚡ VÉRIFICATION du rôle vendeur
             if (!sessionManager.estConnecte() || !sessionManager.estVendeur()) {
                 showError("Accès refusé. Vous devez être connecté en tant que vendeur.");
-                // Optionnel : Rediriger vers la page de login
-                // redirectToLogin();
                 return;
             }
 
-            // ⚡ RÉCUPÉRATION dynamique de l'ID du vendeur
             idVendeur = sessionManager.getUserId();
             Utilisateur utilisateur = sessionManager.getUtilisateurConnecte();
 
@@ -73,7 +63,7 @@ public class ReservationVendeurController {
     }
 
     private void setupTable() {
-        // Configuration des colonnes (inchangé)
+        // Configuration des colonnes
         colClient.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().getNomClient()));
 
@@ -92,7 +82,7 @@ public class ReservationVendeurController {
         colStatut.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(cellData.getValue().getStatut()));
 
-        // Style des cellules de statut (inchangé)
+        // Style des cellules de statut
         colStatut.setCellFactory(column -> new TableCell<Reservation, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -102,7 +92,7 @@ public class ReservationVendeurController {
                     setStyle("");
                 } else {
                     setText(item);
-                    String style = switch (item) {
+                    String style = switch (item.toLowerCase()) {
                         case "en attente" -> "-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-padding: 5; -fx-background-radius: 5;";
                         case "confirmée" -> "-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 5; -fx-background-radius: 5;";
                         case "annulée" -> "-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-padding: 5; -fx-background-radius: 5;";
@@ -110,49 +100,6 @@ public class ReservationVendeurController {
                         default -> "";
                     };
                     setStyle(style);
-                }
-            }
-        });
-
-        setupActionsColumn();
-    }
-
-    private void setupActionsColumn() {
-        colActions.setCellFactory(param -> new TableCell<>() {
-            private final Button btnConfirmer = new Button("✅ Confirmer");
-            private final Button btnRefuser = new Button("❌ Refuser");
-            private final HBox hbox = new HBox(8, btnConfirmer, btnRefuser);
-
-            {
-                btnConfirmer.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 6 12; -fx-background-radius: 5; -fx-cursor: hand;");
-                btnRefuser.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 6 12; -fx-background-radius: 5; -fx-cursor: hand;");
-
-                hbox.setAlignment(Pos.CENTER);
-
-                btnConfirmer.setOnAction(e -> {
-                    Reservation r = getTableView().getItems().get(getIndex());
-                    confirmerReservation(r);
-                });
-
-                btnRefuser.setOnAction(e -> {
-                    Reservation r = getTableView().getItems().get(getIndex());
-                    refuserReservation(r);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    Reservation r = getTableView().getItems().get(getIndex());
-                    // Désactiver les boutons si déjà traité
-                    if (!r.getStatut().equals("en attente")) {
-                        setGraphic(null);
-                    } else {
-                        setGraphic(hbox);
-                    }
                 }
             }
         });
@@ -175,7 +122,6 @@ public class ReservationVendeurController {
 
     private void chargerReservations() {
         try {
-            // ⚡ VÉRIFICATION de la session à chaque chargement
             if (!sessionManager.estConnecte() || !sessionManager.estVendeur()) {
                 showError("Session expirée. Veuillez vous reconnecter.");
                 return;
@@ -183,7 +129,6 @@ public class ReservationVendeurController {
 
             reservationDAO.updateExpiredReservations();
             allReservations = FXCollections.observableArrayList(
-                    // ⚡ UTILISATION de l'ID dynamique du vendeur
                     reservationDAO.getReservationsByVendeur(idVendeur)
             );
             reservations = FXCollections.observableArrayList(allReservations);
@@ -225,61 +170,8 @@ public class ReservationVendeurController {
         }
     }
 
-    private void confirmerReservation(Reservation r) {
-        // ⚡ VÉRIFICATION de la session avant action
-        if (!sessionManager.estVendeur()) {
-            showError("Action non autorisée. Rôle vendeur requis.");
-            return;
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("Confirmer la réservation");
-        alert.setContentText("Confirmer la réservation de " + r.getNomClient() + " ?");
-
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            try {
-                if (reservationDAO.confirmerReservation(r.getIdReservation())) {
-                    r.setStatut("confirmée");
-                    reservationsTable.refresh();
-                    updateStatistics();
-                    showSuccess("Réservation confirmée avec succès !");
-                }
-            } catch (SQLException e) {
-                showError("Erreur : " + e.getMessage());
-            }
-        }
-    }
-
-    private void refuserReservation(Reservation r) {
-        // ⚡ VÉRIFICATION de la session avant action
-        if (!sessionManager.estVendeur()) {
-            showError("Action non autorisée. Rôle vendeur requis.");
-            return;
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Refuser");
-        alert.setHeaderText("Refuser la réservation");
-        alert.setContentText("Refuser la réservation de " + r.getNomClient() + " ?");
-
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            try {
-                if (reservationDAO.refuserReservation(r.getIdReservation())) {
-                    r.setStatut("annulée");
-                    reservationsTable.refresh();
-                    updateStatistics();
-                    showSuccess("Réservation refusée.");
-                }
-            } catch (SQLException e) {
-                showError("Erreur : " + e.getMessage());
-            }
-        }
-    }
-
     @FXML
     private void refreshReservations() {
-        // ⚡ VÉRIFICATION de la session avant rafraîchissement
         if (!sessionManager.estConnecte() || !sessionManager.estVendeur()) {
             showError("Session expirée. Veuillez vous reconnecter.");
             return;
@@ -290,7 +182,6 @@ public class ReservationVendeurController {
 
     private void updateStatistics() {
         try {
-            // ⚡ UTILISATION de l'ID dynamique du vendeur
             lblTotal.setText(String.valueOf(allReservations.size()));
             lblEnAttente.setText(String.valueOf(
                     reservationDAO.countReservationsByStatus(idVendeur, "en attente")));
@@ -317,14 +208,5 @@ public class ReservationVendeurController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    // ⚡ MÉTHODE pour obtenir les infos du vendeur connecté (optionnel)
-    public String getVendeurInfo() {
-        if (sessionManager.estConnecte() && sessionManager.estVendeur()) {
-            Utilisateur user = sessionManager.getUtilisateurConnecte();
-            return user.getPrenom() + " " + user.getNom() + " (" + user.getEmail() + ")";
-        }
-        return "Non connecté";
     }
 }

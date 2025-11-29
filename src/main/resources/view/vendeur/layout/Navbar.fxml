@@ -209,118 +209,72 @@
                        -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-chart-line" iconSize="16" iconColor="#3498db"/>
                     <Label text="Dashboard"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
-
-        <!-- Clients (MenuButton) -->
-        <MenuButton text="Clients"
-                    styleClass="nav-menu-btn"
-                    style="-fx-background-color: transparent;
-                           -fx-border-width: 0;
-                           -fx-padding: 16 20;
-                           -fx-cursor: hand;">
+        <Button onAction="#showPendingReservations"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-users" iconSize="16" iconColor="#9b59b6"/>
-                    <Label
+                    <Label text="Home"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
-                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
                 </HBox>
             </graphic>
-            <items>
-                <MenuItem text="Liste des clients" onAction="#showCustomerList">
-                    <graphic><FontIcon iconLiteral="fas-list" iconSize="14" iconColor="#9b59b6"/></graphic>
-                </MenuItem>
-                <MenuItem text="Historique interactions" onAction="#showCustomerHistory">
-                    <graphic><FontIcon iconLiteral="fas-history" iconSize="14" iconColor="#9b59b6"/></graphic>
-                </MenuItem>
-            </items>
-        </MenuButton>
+        </Button>
 
-        <!-- Véhicules (MenuButton) -->
-        <MenuButton text="Véhicules"
-                    styleClass="nav-menu-btn"
-                    style="-fx-background-color: transparent;
-                           -fx-border-width: 0;
-                           -fx-padding: 16 20;
-                           -fx-cursor: hand;">
+        <!-- Clients (Bouton Simple) -->
+        <Button onAction="#showCustomerList"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-car" iconSize="16" iconColor="#e67e22"/>
+                    <Label text="Clients"
+                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+            </graphic>
+        </Button>
+
+        <!-- Véhicules (Bouton Simple) -->
+        <Button onAction="#showVehicleManagement"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
                     <Label text="Véhicules"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
-                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
                 </HBox>
             </graphic>
-            <items>
-                <MenuItem text="Liste véhicules" onAction="#showVehicleManagement">
-                    <graphic><FontIcon iconLiteral="fas-car" iconSize="14" iconColor="#e67e22"/></graphic>
-                </MenuItem>
-                <MenuItem text="Gestion du stock" onAction="#showStockManagement">
-                    <graphic><FontIcon iconLiteral="fas-warehouse" iconSize="14" iconColor="#e67e22"/></graphic>
-                </MenuItem>
-            </items>
-        </MenuButton>
+        </Button>
 
         <!-- Commandes (MenuButton) -->
-        <MenuButton text="Reservations"
-                    styleClass="nav-menu-btn"
-                    style="-fx-background-color: transparent;
-                           -fx-border-width: 0;
-                           -fx-padding: 16 20;
-                           -fx-cursor: hand;">
-            <graphic>
-                <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="16" iconColor="#27ae60"/>
-                    <Label text="Commandes"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
-                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
-                </HBox>
-            </graphic>
-            <items>
-                <MenuItem text="Réservations à confirmer" onAction="#showPendingReservations">
-                    <graphic><FontIcon iconLiteral="fas-shopping-cart" iconSize="14" iconColor="#27ae60"/></graphic>
-                </MenuItem>
-                <MenuItem text="Historique des ventes" onAction="#showSalesHistory">
-                    <graphic><FontIcon iconLiteral="fas-dollar-sign" iconSize="14" iconColor="#27ae60"/></graphic>
-                </MenuItem>
-            </items>
-        </MenuButton>
 
-        <!-- Statistiques (MenuButton) -->
-        <MenuButton text="Mes achats"
-                    styleClass="nav-menu-btn"
-                    style="-fx-background-color: transparent;
-                           -fx-border-width: 0;
-                           -fx-padding: 16 20;
-                           -fx-cursor: hand;">
+        <Button onAction="#showPendingReservations"
+                styleClass="nav-item-btn"
+                style="-fx-background-color: transparent;
+                       -fx-border-width: 0;
+                       -fx-padding: 16 20;
+                       -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-chart-bar" iconSize="16" iconColor="#e74c3c"/>
-                    <Label text="Statistiques"
+                    <Label text="Réservations"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
-                    <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
                 </HBox>
             </graphic>
-            <items>
-                <MenuItem text="mes achats" onAction="#showMonthlySales">
-                    <graphic><FontIcon iconLiteral="fas-chart-line" iconSize="14" iconColor="#e74c3c"/></graphic>
-                </MenuItem>
-                <MenuItem text="Revenus" onAction="#showRevenueStats">
-                    <graphic><FontIcon iconLiteral="fas-coins" iconSize="14" iconColor="#e74c3c"/></graphic>
-                </MenuItem>
-                <MenuItem text="Performances clients" onAction="#showClientPerformance">
-                    <graphic><FontIcon iconLiteral="fas-bullseye" iconSize="14" iconColor="#e74c3c"/></graphic>
-                </MenuItem>
-                <MenuItem text="Analytics ventes" onAction="#showSalesAnalytics">
-                    <graphic><FontIcon iconLiteral="fas-chart-bar" iconSize="14" iconColor="#e74c3c"/></graphic>
-                </MenuItem>
-            </items>
-        </MenuButton>
+        </Button>
+
+        <!-- Statistiques (Bouton Simple) -->
 
         <!-- Rendez-vous -->
         <Button onAction="#showRendezVous"
@@ -331,7 +285,6 @@
                        -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-calendar-alt" iconSize="16" iconColor="#f39c12"/>
                     <Label text="Rendez-vous"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
@@ -347,12 +300,12 @@
                        -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <FontIcon iconLiteral="fas-store" iconSize="16" iconColor="#16a085"/>
                     <Label text="Magasins"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
+
 
     </HBox>
 

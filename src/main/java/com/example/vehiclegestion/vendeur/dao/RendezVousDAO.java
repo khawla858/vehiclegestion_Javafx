@@ -1,4 +1,6 @@
 package com.example.vehiclegestion.vendeur.dao;
+import com.example.vehiclegestion.vendeur.dao.ReservationDAO; // ⬅️ AJOUTE
+
 
 import com.example.vehiclegestion.vendeur.model.RendezVous;
 import com.example.vehiclegestion.common.dao.DatabaseConnection;
@@ -10,10 +12,14 @@ import java.util.List;
 public class RendezVousDAO {
 
     private Connection connection;
+    private ReservationDAO reservationDAO; // ⬅️ AJOUTE
+
 
     public RendezVousDAO() {
         try {
             connection = DatabaseConnection.getConnection();
+            reservationDAO = new ReservationDAO(); // ⬅️ AJOUTE
+
             System.out.println("✅ RendezVousDAO: Connexion établie");
 
             if (connection == null || connection.isClosed()) {
@@ -181,39 +187,168 @@ public class RendezVousDAO {
     }
 
     public boolean confirmRendezVous(int idRdv) {
-        String query = "UPDATE RendezVous SET statut = 'confirmé' WHERE id_rdv = ?";
+        Connection conn = null;
+        PreparedStatement stmtRdv = null;
+        PreparedStatement stmtReserv = null;
+        ResultSet rs = null;
+
         try {
-            if (connection == null || connection.isClosed()) {
-                connection = DatabaseConnection.getConnection();
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            // ✅ 1. Récupérer les infos du RDV
+            String queryRdv = "SELECT id_client, id_article, date_rdv, heure_rdv FROM RendezVous WHERE id_rdv = ?";
+            stmtRdv = conn.prepareStatement(queryRdv);
+            stmtRdv.setInt(1, idRdv);
+            rs = stmtRdv.executeQuery();
+
+            if (!rs.next()) {
+                System.err.println("⚠️ RDV introuvable (ID: " + idRdv + ")");
+                conn.rollback();
+                return false;
             }
-            PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setInt(1, idRdv);
-            boolean result = stmt.executeUpdate() > 0;
-            stmt.close();
-            System.out.println(result ? "✅ RDV confirmé" : "⚠️ RDV non trouvé");
-            return result;
+
+            int idClient = rs.getInt("id_client");
+            int idArticle = rs.getInt("id_article");
+            java.sql.Date dateRdv = rs.getDate("date_rdv");
+            java.sql.Time heureRdv = rs.getTime("heure_rdv");
+
+            // ⚠️ Si pas d'article lié, on confirme quand même le RDV
+            if (idArticle == 0) {
+                String updateRdv = "UPDATE RendezVous SET statut = 'confirmé' WHERE id_rdv = ?";
+                PreparedStatement stmt = conn.prepareStatement(updateRdv);
+                stmt.setInt(1, idRdv);
+                stmt.executeUpdate();
+                conn.commit();
+                System.out.println("✅ RDV confirmé (sans véhicule associé)");
+                return true;
+            }
+
+            // ✅ 2. Créer une réservation qui COMMENCE le jour du RDV
+            // La date_reservation = date du RDV (pas maintenant)
+            // La durée = 24h, donc elle expire 24h après le RDV
+            String queryReserv = "INSERT INTO reservation (id_client, id_vehicule, date_reservation, statut, duree_limite) " +
+                    "VALUES (?, ?, ?::timestamp, 'confirmée', INTERVAL '24 hours') " +
+                    "RETURNING id_reservation";
+            stmtReserv = conn.prepareStatement(queryReserv);
+            stmtReserv.setInt(1, idClient);
+            stmtReserv.setInt(2, idArticle);
+
+            // 🎯 Combiner date_rdv + heure_rdv en timestamp
+            java.sql.Timestamp timestampRdv = new java.sql.Timestamp(
+                    dateRdv.getTime() + heureRdv.getTime()
+            );
+            stmtReserv.setTimestamp(3, timestampRdv);
+
+            ResultSet rsReserv = stmtReserv.executeQuery();
+            int idReservation = 0;
+            if (rsReserv.next()) {
+                idReservation = rsReserv.getInt("id_reservation");
+            }
+            rsReserv.close();
+
+            // ✅ 3. L'article reste 'disponible' pour l'instant
+            // (il deviendra 'reserve' automatiquement le jour du RDV)
+
+            // ✅ 4. Lier la réservation au RDV et confirmer
+            String updateRdv = "UPDATE RendezVous SET statut = 'confirmé', id_reservation = ? WHERE id_rdv = ?";
+            PreparedStatement stmtUpdate = conn.prepareStatement(updateRdv);
+            stmtUpdate.setInt(1, idReservation);
+            stmtUpdate.setInt(2, idRdv);
+            stmtUpdate.executeUpdate();
+
+            conn.commit();
+
+            System.out.println("✅ RDV confirmé (ID: " + idRdv + ")");
+            System.out.println("✅ Réservation programmée pour le: " + dateRdv + " " + heureRdv);
+            System.out.println("📅 Article sera réservé du " + dateRdv + " jusqu'au lendemain");
+
+            return true;
+
         } catch (SQLException e) {
-            System.err.println("❌ Erreur: " + e.getMessage());
+            System.err.println("❌ Erreur confirmation RDV: " + e.getMessage());
+            e.printStackTrace();
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmtRdv != null) stmtRdv.close();
+                if (stmtReserv != null) stmtReserv.close();
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public boolean cancelRendezVous(int idRdv, String raison) {
-        // ✅ Annulation - on ne modifie que le statut
-        String query = "UPDATE RendezVous SET statut = 'annulé' WHERE id_rdv = ?";
+        Connection conn = null;
         try {
-            if (connection == null || connection.isClosed()) {
-                connection = DatabaseConnection.getConnection();
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Récupérer l'id_reservation et id_article
+            String queryGet = "SELECT id_reservation, id_article FROM RendezVous WHERE id_rdv = ?";
+            PreparedStatement stmtGet = conn.prepareStatement(queryGet);
+            stmtGet.setInt(1, idRdv);
+            ResultSet rs = stmtGet.executeQuery();
+
+            Integer idReservation = null;
+            Integer idArticle = null;
+            if (rs.next()) {
+                idReservation = rs.getInt("id_reservation");
+                if (rs.wasNull()) idReservation = null;
+
+                idArticle = rs.getInt("id_article");
+                if (rs.wasNull()) idArticle = null;
             }
-            PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setInt(1, idRdv);
-            boolean result = stmt.executeUpdate() > 0;
-            stmt.close();
-            System.out.println(result ? "✅ RDV annulé (raison: " + raison + ")" : "⚠️ RDV non trouvé");
+            rs.close();
+
+            // 2. Annuler la réservation si elle existe
+            if (idReservation != null) {
+                String cancelReserv = "UPDATE reservation SET statut = 'annulée' WHERE id_reservation = ?";
+                PreparedStatement stmtReserv = conn.prepareStatement(cancelReserv);
+                stmtReserv.setInt(1, idReservation);
+                stmtReserv.executeUpdate();
+            }
+
+            // 3. Remettre l'article en 'disponible' si nécessaire
+            if (idArticle != null) {
+                String updateArticle = "UPDATE Article SET statut_vehicule = 'disponible' WHERE id_article = ?";
+                PreparedStatement stmtArticle = conn.prepareStatement(updateArticle);
+                stmtArticle.setInt(1, idArticle);
+                stmtArticle.executeUpdate();
+            }
+
+            // 4. Annuler le RDV
+            String updateRdv = "UPDATE RendezVous SET statut = 'annulé' WHERE id_rdv = ?";
+            PreparedStatement stmtRdv = conn.prepareStatement(updateRdv);
+            stmtRdv.setInt(1, idRdv);
+            boolean result = stmtRdv.executeUpdate() > 0;
+
+            conn.commit();
+            System.out.println("✅ RDV annulé (raison: " + raison + ")");
             return result;
+
         } catch (SQLException e) {
-            System.err.println("❌ Erreur: " + e.getMessage());
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) {}
+            System.err.println("❌ Erreur annulation: " + e.getMessage());
             return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {}
         }
     }
 
