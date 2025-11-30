@@ -112,24 +112,27 @@
 
             <!-- MESSAGES -->
             <StackPane styleClass="top-icon-btn" onMouseClicked="#showMessages">
-                <StackPane style="
-                                  -fx-background-radius: 50;
-                                  -fx-pref-width: 42;
-                                  -fx-pref-height: 42;
-                                  -fx-cursor: hand;">
+                <StackPane style="-fx-background-radius: 50;
+                      -fx-pref-width: 42;
+                      -fx-pref-height: 42;
+                      -fx-cursor: hand;">
                     <FontIcon iconLiteral="far-envelope" iconSize="18" iconColor="#7f8c8d"/>
                 </StackPane>
-                <Label text="5"
+
+                <!-- ✅ AJOUT DU fx:id="messageBadge" -->
+                <Label fx:id="messageBadge"
+                       text="0"
+                       visible="false"
                        style="-fx-text-fill: white;
-                              -fx-font-size: 9px;
-                              -fx-font-weight: bold;
-                              -fx-translate-x: 12;
-                              -fx-translate-y: -12;
-                              -fx-background-color: #3498db;
-                              -fx-background-radius: 10;
-                              -fx-padding: 2 6;
-                              -fx-min-width: 18;
-                              -fx-alignment: center;"/>
+                  -fx-font-size: 9px;
+                  -fx-font-weight: bold;
+                  -fx-translate-x: 12;
+                  -fx-translate-y: -12;
+                  -fx-background-color: #3498db;
+                  -fx-background-radius: 10;
+                  -fx-padding: 2 6;
+                  -fx-min-width: 18;
+                  -fx-alignment: center;"/>
             </StackPane>
 
             <!-- SÉPARATEUR -->
@@ -214,7 +217,7 @@
                 </HBox>
             </graphic>
         </Button>
-        <Button onAction="#showPendingReservations"
+        <Button onAction="#showVehicleManagement"
                 styleClass="nav-item-btn"
                 style="-fx-background-color: transparent;
                        -fx-border-width: 0;
@@ -237,30 +240,18 @@
                        -fx-cursor: hand;">
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
-                    <Label text="Clients"
+                    <Label text="Ventes"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
 
         <!-- Véhicules (Bouton Simple) -->
-        <Button onAction="#showVehicleManagement"
-                styleClass="nav-item-btn"
-                style="-fx-background-color: transparent;
-                       -fx-border-width: 0;
-                       -fx-padding: 16 20;
-                       -fx-cursor: hand;">
-            <graphic>
-                <HBox spacing="8" alignment="CENTER">
-                    <Label text="Véhicules"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
-                </HBox>
-            </graphic>
-        </Button>
+
 
         <!-- Commandes (MenuButton) -->
 
-        <Button onAction="#showPendingReservations"
+        <!--<Button onAction="#showPendingReservations"
                 styleClass="nav-item-btn"
                 style="-fx-background-color: transparent;
                        -fx-border-width: 0;
@@ -272,7 +263,7 @@
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
-        </Button>
+        </Button>-->
 
         <!-- Statistiques (Bouton Simple) -->
 

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 /**
- * 🎯 GESTIONNAIRE DE NAVIGATION CENTRALISÉ
+ *  GESTIONNAIRE DE NAVIGATION CENTRALISÉ
  */
 public class NavigationManager {
 
@@ -36,7 +36,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 🚀 MÉTHODES DE NAVIGATION PRINCIPALES
+    //  MÉTHODES DE NAVIGATION PRINCIPALES
     // ========================================
 
     public void navigateTo(String fxmlPath) {
@@ -136,7 +136,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 🏠 RACCOURCIS DE NAVIGATION
+    //  RACCOURCIS DE NAVIGATION
     // ========================================
 
     public void goToDashboard() {
@@ -144,11 +144,11 @@ public class NavigationManager {
     }
 
     public void goToClients() {
-        navigateTo("/view/vendeur/ClientList.fxml");
+        navigateTo("/view/vendeur/VentesList.fxml");
     }
 
     public void goToVehicles() {
-        navigateTo("/view/vendeur/VendeurVehicle.fxml");
+        navigateTo("/view/client/vehicles-view.fxml");
     }
 
     public void goToMagasins() {
@@ -168,7 +168,7 @@ public class NavigationManager {
     }
 
     /**
-     * ⬅️ Retour à la page précédente
+     * ⬅ Retour à la page précédente
      */
     public void goBack() {
         if (navigationHistory.size() > 1) {
@@ -183,7 +183,7 @@ public class NavigationManager {
     }
 
     /**
-     * 🔄 Rafraîchir la page actuelle
+     *  Rafraîchir la page actuelle
      */
     public void refresh() {
         if (!navigationHistory.isEmpty()) {
@@ -194,7 +194,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 🎨 GESTION DES ERREURS
+    //  GESTION DES ERREURS
     // ========================================
 
     private void showErrorContent(String message) {
@@ -219,7 +219,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 📊 INFORMATIONS
+    //  INFORMATIONS
     // ========================================
 
     public String getCurrentPage() {

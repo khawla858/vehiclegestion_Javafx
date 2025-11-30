@@ -3,18 +3,25 @@ package com.example.vehiclegestion.vendeur.controller.layout;
 import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
 import com.example.vehiclegestion.utils.NavigationManager;
+
+// ✅ NOUVEAUX IMPORTS POUR LE CHAT
+import com.example.vehiclegestion.common.dao.ChatDAO;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 /**
- * 🎯 NavbarController - Version Simplifiée
- *
- * Utilise NavigationManager pour toute la navigation
- * Plus besoin de loadContent() ici !
+ * 🎯 NavbarController - Version avec Chat Intégré
  */
 public class NavbarController {
 
@@ -24,9 +31,18 @@ public class NavbarController {
     @FXML private Label userRoleLabel;
     @FXML private Button dashboardBtn;
 
+    // ✅ NOUVEAU : Badge notification messages (à lier avec l'icône dans le FXML)
+    @FXML private Label messageBadge;  // Le label "5" sur l'icône message
+
     private StackPane contentPane;
     private SessionManager session = SessionManager.getInstance();
     private NavigationManager nav = NavigationManager.getInstance();
+
+    // ✅ NOUVEAU : DAO pour le chat
+    private ChatDAO chatDAO = new ChatDAO();
+
+    // ✅ NOUVEAU : Timeline pour rafraîchir le badge
+    private Timeline badgeRefreshTimeline;
 
     /**
      * Injection du contentPane (pour compatibilité)
@@ -44,6 +60,10 @@ public class NavbarController {
         setupSearchField();
         playWelcomeAnimation();
         setupHoverEffects();
+
+        // ✅ NOUVEAU : Initialiser le badge et démarrer le refresh
+        updateMessageBadge();
+        startBadgeRefresh();
     }
 
     private void loadUserInfo() {
@@ -90,6 +110,58 @@ public class NavbarController {
 
             fade.play();
             scale.play();
+        }
+    }
+
+    // ========================================
+    // 💬 GESTION DU BADGE MESSAGES
+    // ========================================
+
+    /**
+     * Met à jour le badge avec le nombre de messages non lus
+     */
+    private void updateMessageBadge() {
+        if (!session.estConnecte()) return;
+
+        try {
+            int unreadCount = chatDAO.countUnreadMessages(
+                    session.getUserId(),
+                    session.getUserRole()
+            );
+
+            if (messageBadge != null) {
+                if (unreadCount > 0) {
+                    messageBadge.setText(String.valueOf(unreadCount));
+                    messageBadge.setVisible(true);
+                    System.out.println("📬 " + unreadCount + " messages non lus");
+                } else {
+                    messageBadge.setVisible(false);
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur mise à jour badge: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Démarre le rafraîchissement automatique du badge toutes les 10 secondes
+     */
+    private void startBadgeRefresh() {
+        badgeRefreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(10), e -> updateMessageBadge())
+        );
+        badgeRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        badgeRefreshTimeline.play();
+        System.out.println("🔄 Auto-refresh badge messages démarré");
+    }
+
+    /**
+     * Arrête le rafraîchissement (à appeler lors de la fermeture)
+     */
+    public void stopBadgeRefresh() {
+        if (badgeRefreshTimeline != null) {
+            badgeRefreshTimeline.stop();
         }
     }
 
@@ -235,21 +307,54 @@ public class NavbarController {
         alert.show();
     }
 
+    // ========================================
+    // 💬 NOUVEAU : OUVRIR LA FENÊTRE DE CHAT
+    // ========================================
+
+    /**
+     * Ouvre la fenêtre de chat dans une nouvelle fenêtre
+     */
     @FXML
     private void showMessages() {
-        System.out.println("💬 Messages");
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Messages");
-        alert.setHeaderText("Vous avez 5 nouveaux messages");
-        alert.setContentText(
-                "💬 Question sur le financement - BMW Série 3\n" +
-                        "🚗 Demande de test drive - Mercedes Classe C\n" +
-                        "✅ Confirmation RDV - M. Dubois\n" +
-                        "❓ Renseignement sur garantie - Audi Q5\n" +
-                        "📋 Suivi dossier - Mme. Petit"
-        );
-        styleAlert(alert);
-        alert.show();
+        System.out.println("💬 Ouverture de la fenêtre de chat...");
+
+        if (!session.estConnecte()) {
+            showAlert("Erreur", "Vous devez être connecté pour accéder au chat", Alert.AlertType.ERROR);
+            return;
+        }
+
+        try {
+            // Charger le FXML du chat
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/view/common/ChatWindow.fxml")
+            );
+            Parent root = loader.load();
+
+            // Créer une nouvelle fenêtre
+            Stage chatStage = new Stage();
+            chatStage.setTitle("💬 Messages - AutoSales Pro");
+            chatStage.setScene(new Scene(root, 900, 600));
+
+            // Définir comme fenêtre modale (optionnel)
+            // chatStage.initModality(Modality.APPLICATION_MODAL);
+
+            // Afficher la fenêtre
+            chatStage.show();
+
+            System.out.println("✅ Fenêtre de chat ouverte");
+
+            // Rafraîchir le badge après ouverture
+            updateMessageBadge();
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur ouverture chat: " + e.getMessage());
+            e.printStackTrace();
+
+            showAlert("Erreur",
+                    "Impossible d'ouvrir la fenêtre de chat.\n" +
+                            "Erreur: " + e.getMessage(),
+                    Alert.AlertType.ERROR);
+        }
     }
 
     // ========================================
@@ -295,6 +400,9 @@ public class NavbarController {
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
+                // Arrêter le refresh du badge
+                stopBadgeRefresh();
+
                 session.fermerSession();
                 System.out.println("✅ Session fermée");
 

@@ -209,7 +209,7 @@ private void showDashboard() {
 
     @FXML
     private void showCustomerList() {
-        loadContent("/view/vendeur/ClientList.fxml");
+        loadContent("/view/vendeur/VentesList.fxml");
     }
 
     @FXML
@@ -236,8 +236,8 @@ private void showDashboard() {
     }
 
     @FXML
-    private void showVehicleManagement() {
-        loadContent("/view/vendeur/VendeurVehicle.fxml");
+    private void showVehiclesManagement() {
+        loadContent("/view/client/vehicles-view.fxml");
     }
 
     // ================= MÉTHODES COMMANDES =================
@@ -252,10 +252,8 @@ private void showDashboard() {
         showAlert("Commandes", "Commandes terminées");
     }
 
-    @FXML
-    private void showPendingReservations() {
-        loadContent("/view/vendeur/reservations_vendeur.fxml");
-    }
+    //@FXML
+    //private void showPendingReservations() {loadContent("/view/vendeur/reservations_vendeur.fxml");}
 
     @FXML
     private void showPurchaseRequests() {
