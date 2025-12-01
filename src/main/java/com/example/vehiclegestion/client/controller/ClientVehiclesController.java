@@ -855,7 +855,13 @@ public class ClientVehiclesController {
     }
 
     private Article convertVehicleToArticle(Vehicle vehicle) {
+        System.out.println("🔄 === CONVERSION VEHICLE → ARTICLE ===");
+        System.out.println("   Vehicle ID: " + vehicle.getId());
+
         Article article = new Article();
+
+        // ✅ CORRECTION CRITIQUE: Définir l'ID de l'article
+        article.setId(vehicle.getId()); // ⭐⭐ CETTE LIGNE MANQUE !
 
         article.setTitre(vehicle.getTitle());
         article.setPrix(vehicle.getPrice());
@@ -871,6 +877,8 @@ public class ClientVehiclesController {
         article.setModele(vehicle.getTitle());
         article.setPuissance(120);
         article.setEtat("Excellent");
+
+        System.out.println("✅ Article converti - ID: " + article.getId() + ", Titre: " + article.getTitre());
 
         return article;
     }

@@ -1,4 +1,4 @@
-package com.example.vehiclegestion.vendeur.controller;
+package com.example.vehiclegestion.client.controller;
 
 import javafx.scene.control.Alert;
 import com.example.vehiclegestion.vendeur.model.Article;
@@ -34,7 +34,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import java.io.IOException;
 
-public class VehicleDetailController implements DataReceiver {
+public class VehicleDetaiController implements DataReceiver {
 
     @FXML private ScrollPane scrollPane;
     @FXML private HBox mainContainer;

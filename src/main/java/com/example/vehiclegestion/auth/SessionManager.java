@@ -13,6 +13,9 @@ public class SessionManager {
         System.out.println("✅ SessionManager initialisé: " + this.hashCode());
     }
 
+    public String getUserRole() {
+        return utilisateurConnecte != null ? utilisateurConnecte.getRole() : null;
+    }
     public static SessionManager getInstance() {
         return INSTANCE;
     }
