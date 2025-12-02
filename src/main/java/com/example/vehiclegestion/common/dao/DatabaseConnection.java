@@ -9,7 +9,38 @@ public class DatabaseConnection {
     private static final String USER = "postgres";
     private static final String PASSWORD = "postgre";
 
+    /**
+     * Crée une NOUVELLE connexion à chaque appel
+     * (Meilleure pratique pour les applications desktop)
+     */
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        try {
+            Class.forName("org.postgresql.Driver");
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("✅ Nouvelle connexion à la base de données créée");
+            return connection;
+        } catch (ClassNotFoundException e) {
+            System.err.println("❌ Driver PostgreSQL introuvable");
+            throw new SQLException("Driver PostgreSQL introuvable", e);
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur de connexion à la base de données: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Teste la connexion sans la garder ouverte
+     */
+    public static boolean testConnection() {
+        System.out.println("🧪 Test de connexion à la base de données...");
+        try (Connection testConn = getConnection()) {
+            if (testConn != null && !testConn.isClosed()) {
+                System.out.println("✅ Test de connexion réussi !");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Test de connexion échoué: " + e.getMessage());
+        }
+        return false;
     }
 }

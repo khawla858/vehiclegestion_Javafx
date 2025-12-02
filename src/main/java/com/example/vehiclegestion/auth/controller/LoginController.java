@@ -1,6 +1,6 @@
 package com.example.vehiclegestion.auth.controller;
-import com.example.vehiclegestion.auth.SessionManager; // ⚠️ AJOUT IMPORT MANQUANT
 
+import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.dao.UtilisateurDAO;
 import com.example.vehiclegestion.auth.model.Utilisateur;
 import javafx.fxml.FXML;
@@ -27,8 +27,7 @@ public class LoginController {
     private Label errorLabel;
 
     private UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
-    private SessionManager sessionManager = SessionManager.getInstance(); // ⚠️ AJOUT
-
+    private SessionManager sessionManager = SessionManager.getInstance();
 
     /**
      * Gérer la connexion
@@ -55,12 +54,12 @@ public class LoginController {
         if (user != null) {
             hideError();
 
-            // ⚠️⚠️⚠️ CORRECTION : DÉMARRER LA SESSION !!!
+            // ✅ DÉMARRER LA SESSION
             System.out.println("✅ Connexion réussie pour: " + user.getEmail());
             System.out.println("🎭 Rôle: " + user.getRole());
             System.out.println("🆔 ID: " + user.getIdUtilisateur());
 
-            sessionManager.demarrerSession(user); // ⚠️ LIGNE CRITIQUE MANQUANTE
+            sessionManager.demarrerSession(user);
 
             // Debug après démarrage session
             sessionManager.debugSession();
@@ -116,19 +115,16 @@ public class LoginController {
      * Redirection vers le dashboard client
      */
     private void redirectToClientDashboard(Utilisateur user) throws IOException {
-
         // ⚠️ VÉRIFICATION AVANT REDIRECTION
         if (!sessionManager.estConnecte()) {
             System.out.println("🚨 ERREUR: Session non démarrée avant redirection!");
             showError("Erreur de session");
             return;
         }
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/client/client-dashboard.fxml"));
-        Parent root = loader.load();
 
-        // Passer les données utilisateur au contrôleur
-        // ClientDashboardController controller = loader.getController();
-        // controller.setUser(user);
+        // ✅ CORRECTION : CHEMIN CORRECT
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/client/main-layout.fxml"));
+        Parent root = loader.load();
 
         Stage stage = (Stage) emailField.getScene().getWindow();
         stage.setScene(new Scene(root));
@@ -163,6 +159,7 @@ public class LoginController {
 
         System.out.println("✅ Redirection vendeur réussie");
     }
+
     /**
      * Redirection vers le dashboard admin
      */
@@ -174,10 +171,6 @@ public class LoginController {
     /**
      * Aller vers la page d'inscription
      */
-
-
-
-
     @FXML
     private void handleGoToRegister() {
         try {
@@ -221,6 +214,7 @@ public class LoginController {
     private void hideError() {
         errorLabel.setVisible(false);
     }
+
     private void debugRegisterPath() {
         System.out.println("=== DÉBOGAGE CHEMIN REGISTER ===");
 
@@ -256,7 +250,4 @@ public class LoginController {
             System.out.println("   ❌ Erreur: " + e.getMessage());
         }
     }
-
-
-
 }

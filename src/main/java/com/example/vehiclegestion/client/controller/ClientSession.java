@@ -4,7 +4,6 @@ import com.example.vehiclegestion.client.model.Client;
 
 /**
  * Gestionnaire de session pour les clients authentifiés
- * Stocke les informations du client connecté
  */
 public class ClientSession {
     private static ClientSession instance;
@@ -23,7 +22,7 @@ public class ClientSession {
     public void login(Client client) {
         this.currentClient = client;
         this.isLoggedIn = true;
-        System.out.println("✅ Client connecté: " + client.getFullName());
+        System.out.println("✅ Client connecté: " + client.getFullName() + " (ID: " + client.getId() + ")");
     }
 
     public void logout() {
@@ -46,5 +45,9 @@ public class ClientSession {
 
     public String getClientName() {
         return currentClient != null ? currentClient.getFullName() : "Invité";
+    }
+
+    public String getClientEmail() {
+        return currentClient != null ? currentClient.getEmail() : "";
     }
 }

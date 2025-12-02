@@ -195,6 +195,105 @@
     -fx-font-size: 14px;
 }
 
+
+
+/* ========================================== */
+/* STYLES NAVBAR MODERNE - AUTOSALES PRO */
+/* ========================================== */
+
+/* Style général */
+.root {
+    -fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* Boutons de navigation avec effet hover */
+.nav-menu-item:hover {
+    -fx-border-color: #FF6B35 !important;
+    -fx-text-fill: #FF6B35 !important;
+}
+
+.nav-menu-item:pressed {
+    -fx-background-color: #f5f5f5;
+}
+
+/* Item actif */
+.nav-menu-item.active {
+    -fx-border-color: #FF6B35 !important;
+    -fx-text-fill: #FF6B35 !important;
+    -fx-font-weight: 600;
+}
+
+/* Effet hover sur les boutons d'icône */
+.icon-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.icon-button:hover {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 50%;
+}
+
+/* TextField de recherche */
+.text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-field:focused {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:vertical,
+.scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar:vertical .thumb,
+.scroll-pane .scroll-bar:horizontal .thumb {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 5px;
+}
+
+.scroll-pane .scroll-bar:vertical .thumb:hover,
+.scroll-pane .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #999999;
+}
+
+/* Animation des badges */
+@keyframes pulse {
+    0%, 100% { -fx-scale-x: 1; -fx-scale-y: 1; }
+    50% { -fx-scale-x: 1.1; -fx-scale-y: 1.1; }
+}
+
+/* Séparateurs */
+.separator {
+    -fx-background-color: #e8e8e8;
+}
+
+/* Liens footer */
+.footer-link {
+    -fx-text-fill: #666666;
+    -fx-cursor: hand;
+}
+
+.footer-link:hover {
+    -fx-text-fill: #FF6B35;
+    -fx-underline: true;
+}
 .text-field:focused, .combo-box:focused, .date-picker:focused {
     -fx-border-color: #3498db;
     -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 5, 0, 0, 1);

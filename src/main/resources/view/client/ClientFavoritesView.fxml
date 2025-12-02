@@ -1,14 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.ClientFavoritesController"
+            style="-fx-background-color: #FAFAFA;">
+    <Label text="Mes Favoris" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
 
-</AnchorPane>
+
+
+    <!-- Contenu principal -->
+    <center>
+        <StackPane>
+            <!-- Grille de véhicules favoris -->
+            <ScrollPane fx:id="scrollPane" fitToWidth="true"
+                        style="-fx-background-color: transparent; -fx-border-width: 0;">
+                <VBox spacing="20">
+                    <padding>
+                        <Insets top="20" right="40" bottom="40" left="40"/>
+                    </padding>
+
+                    <GridPane fx:id="favoritesGrid" hgap="20" vgap="20">
+                        <!-- Les cartes de véhicules seront ajoutées ici dynamiquement -->
+                    </GridPane>
+                </VBox>
+            </ScrollPane>
+
+            <!-- État vide (affiché quand aucun favori) -->
+            <VBox fx:id="emptyState" alignment="CENTER" spacing="20"
+                  visible="false" managed="false"
+                  style="-fx-background-color: transparent; -fx-padding: 60;">
+                <Label text="❤️" style="-fx-font-size: 80px;"/>
+                <Label text="Aucun favori pour le moment"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+                <Label text="Ajoutez des véhicules à vos favoris pour les retrouver facilement ici"
+                       wrapText="true" textAlignment="CENTER" maxWidth="400"
+                       style="-fx-font-size: 14px; -fx-text-fill: #999999;"/>
+                <Button text="🔍 Parcourir les véhicules"
+                        onAction="#goToVehicles"
+                        style="-fx-background-color: #0066FF; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 25; -fx-cursor: hand;"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+</BorderPane>

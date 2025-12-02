@@ -1,7 +1,10 @@
 package com.example.vehiclegestion.client.controller;
 
 import com.example.vehiclegestion.client.doa.VehicleDAO;
+import com.example.vehiclegestion.client.doa.FavoriteDAO;
+import com.example.vehiclegestion.client.doa.ReservationDAO;
 import com.example.vehiclegestion.client.model.Vehicle;
+import com.example.vehiclegestion.auth.SessionManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -13,13 +16,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.File;
+
+import java.net.URL;
+
+import com.example.vehiclegestion.vendeur.controller.VehicleDetailController;
+import com.example.vehiclegestion.vendeur.model.Article;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import java.io.IOException;
+
 public class ClientVehiclesController {
 
     @FXML private TextField minPriceField;
     @FXML private TextField maxPriceField;
-    @FXML private RadioButton particulierRadio;
-    @FXML private RadioButton professionnelRadio;
     @FXML private ComboBox<String> brandFilter;
     @FXML private ComboBox<String> typeFilter;
     @FXML private ComboBox<String> priceFilter;
@@ -27,29 +41,43 @@ public class ClientVehiclesController {
     @FXML private Label resultsCount;
     @FXML private GridPane vehiclesGrid;
     @FXML private VBox emptyState;
+    @FXML private VBox filterSidebar;
+    @FXML private Button filterToggleBtn;
 
     private List<Vehicle> vehicles = new ArrayList<>();
     private ObservableList<Vehicle> filteredVehicles = FXCollections.observableArrayList();
     private VehicleDAO vehicleDAO = new VehicleDAO();
+    private FavoriteDAO favoriteDAO = new FavoriteDAO();
+    private ReservationDAO reservationDAO = new ReservationDAO();
+
+    private SessionManager sessionManager = SessionManager.getInstance();
+    private int currentClientId;
+
+    private Map<Integer, Button> favoriteButtons = new HashMap<>();
+    private boolean filtersVisible = false;
+    private static final int FILTERS_WIDTH = 280;
+    private static final int COLUMNS_WITH_FILTERS = 3;
+    private static final int COLUMNS_WITHOUT_FILTERS = 4;
 
     @FXML
     public void initialize() {
-        System.out.println("✅ ClientVehiclesController initialisé");
+        if (!sessionManager.estConnecte()) {
+            showAlert("Erreur", "Session invalide");
+            return;
+        }
+
+        currentClientId = sessionManager.getUtilisateurConnecte().getIdUtilisateur();
+        reservationDAO.updateExpiredReservations();
+
         initializeFilters();
+        setupFilterAnimations();
         loadVehiclesFromDatabase();
 
-        // Grouper les radio buttons
-        ToggleGroup sellerTypeGroup = new ToggleGroup();
-        particulierRadio.setToggleGroup(sellerTypeGroup);
-        professionnelRadio.setToggleGroup(sellerTypeGroup);
-
-        // Écouteurs pour les filtres
         brandFilter.setOnAction(e -> applyAllFilters());
         typeFilter.setOnAction(e -> applyAllFilters());
         priceFilter.setOnAction(e -> applyAllFilters());
         sortFilter.setOnAction(e -> sortVehicles());
 
-        // Écouteurs pour les champs de prix
         minPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 minPriceField.setText(newValue.replaceAll("[^\\d]", ""));
@@ -65,8 +93,62 @@ public class ClientVehiclesController {
         });
     }
 
+    private void setupFilterAnimations() {
+        filterToggleBtn.setOnMouseEntered(e -> showFilters());
+        filterToggleBtn.setOnMouseClicked(e -> toggleFilters());
+
+        filterSidebar.setOnMouseEntered(e -> keepFiltersVisible());
+        filterSidebar.setOnMouseExited(e -> hideFiltersAfterDelay());
+    }
+
+    private void toggleFilters() {
+        if (filtersVisible) {
+            hideFilters();
+        } else {
+            showFilters();
+        }
+    }
+
+    private void showFilters() {
+        if (!filtersVisible) {
+            filtersVisible = true;
+            filterSidebar.setMinWidth(FILTERS_WIDTH);
+            filterSidebar.setMaxWidth(FILTERS_WIDTH);
+            filterToggleBtn.setStyle("-fx-background-color: #e3f2fd; -fx-border-width: 0; -fx-font-size: 14; -fx-padding: 15 5; -fx-cursor: hand; -fx-text-fill: #0066FF; -fx-alignment: center; -fx-content-display: top; -fx-wrap-text: true;");
+            displayVehicles();
+        }
+    }
+
+    private void hideFilters() {
+        if (filtersVisible) {
+            filtersVisible = false;
+            filterSidebar.setMinWidth(0);
+            filterSidebar.setMaxWidth(0);
+            filterToggleBtn.setStyle("-fx-background-color: transparent; -fx-border-width: 0; -fx-font-size: 14; -fx-padding: 15 5; -fx-cursor: hand; -fx-text-fill: #666; -fx-alignment: center; -fx-content-display: top; -fx-wrap-text: true;");
+            displayVehicles();
+        }
+    }
+
+    private void hideFiltersAfterDelay() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+                javafx.application.Platform.runLater(() -> {
+                    if (filtersVisible && !filterSidebar.isHover() && !filterToggleBtn.isHover()) {
+                        hideFilters();
+                    }
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void keepFiltersVisible() {
+        // Les filtres restent visibles tant que la souris est dessus
+    }
+
     private void initializeFilters() {
-        // Initialisation des filtres avec valeurs par défaut
         brandFilter.setItems(FXCollections.observableArrayList(
                 "Toutes les marques", "Toyota", "Renault", "Peugeot", "BMW", "Mercedes",
                 "Audi", "Volkswagen", "Ford", "Nissan", "Hyundai", "Dacia", "Kia", "Chevrolet", "Suzuki"
@@ -91,7 +173,6 @@ public class ClientVehiclesController {
         ));
         sortFilter.setValue("Plus récentes");
 
-        // Valeurs par défaut pour les prix
         minPriceField.setText("2000");
         maxPriceField.setText("15000");
     }
@@ -123,13 +204,11 @@ public class ClientVehiclesController {
         ObservableList<String> types = FXCollections.observableArrayList("Tous les types");
 
         for (Vehicle vehicle : vehicles) {
-            // Extraire la marque du titre
             String brand = extractBrandFromTitle(vehicle.getTitle());
             if (brand != null && !brands.contains(brand)) {
                 brands.add(brand);
             }
 
-            // Extraire le type de la catégorie
             if (vehicle.getCategory() != null && !types.contains(vehicle.getCategory())) {
                 types.add(vehicle.getCategory());
             }
@@ -154,43 +233,34 @@ public class ClientVehiclesController {
             }
         }
 
-        // Si aucune marque connue, prendre le premier mot
         String[] words = title.split(" ");
         return words.length > 0 ? words[0] : "Autre";
     }
 
-    // REMPLACE uniquement la méthode displayVehicles() dans ton Controller
-
     private void displayVehicles() {
         vehiclesGrid.getChildren().clear();
+        favoriteButtons.clear();
 
         if (filteredVehicles.isEmpty()) {
-            // Afficher le message "aucun véhicule"
             emptyState.setVisible(true);
             emptyState.setManaged(true);
             vehiclesGrid.setVisible(false);
             updateResultsCount();
-            System.out.println("⚠️ Aucun véhicule à afficher");
             return;
         }
 
-        // Masquer le message vide
         emptyState.setVisible(false);
         emptyState.setManaged(false);
         vehiclesGrid.setVisible(true);
 
-        System.out.println("📦 Affichage de " + filteredVehicles.size() + " véhicules");
-
         int column = 0;
         int row = 0;
-        int columns = 3; // 3 colonnes
+        int columns = filtersVisible ? COLUMNS_WITH_FILTERS : COLUMNS_WITHOUT_FILTERS;
 
         for (Vehicle vehicle : filteredVehicles) {
             try {
                 VBox vehicleCard = createModernVehicleCard(vehicle);
                 vehiclesGrid.add(vehicleCard, column, row);
-
-                System.out.println("✅ Carte ajoutée: " + vehicle.getTitle() + " à position [" + column + "," + row + "]");
 
                 column++;
                 if (column >= columns) {
@@ -204,29 +274,36 @@ public class ClientVehiclesController {
         }
 
         updateResultsCount();
-        System.out.println("✅ Grille mise à jour avec " + vehiclesGrid.getChildren().size() + " cartes");
     }
-
-
-
 
     private VBox createModernVehicleCard(Vehicle vehicle) {
         VBox card = new VBox(0);
-        card.setStyle("-fx-background-color: white; -fx-border-color: #e8e8e8; -fx-border-radius: 8; " +
-                "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
-        card.setPrefWidth(280);
-        card.setMaxWidth(280);
+        int cardWidth = filtersVisible ? 280 : 300;
+        card.setStyle("-fx-background-color: white; " +
+                "-fx-border-color: #e8e8e8; " +
+                "-fx-border-radius: 8; " +
+                "-fx-background-radius: 8; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
+        card.setPrefWidth(cardWidth);
+        card.setMaxWidth(cardWidth);
         card.setCursor(javafx.scene.Cursor.HAND);
 
         // Header avec info vendeur
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-padding: 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;");
+        header.setStyle("-fx-padding: 12 15; " +
+                "-fx-border-color: #f0f0f0; " +
+                "-fx-border-width: 0 0 1 0; " +
+                "-fx-background-color: white; " +
+                "-fx-background-radius: 8 8 0 0;");
 
-        // Avatar vendeur
         StackPane avatar = new StackPane();
-        avatar.setStyle("-fx-background-color: " + getRandomColor() + "; -fx-background-radius: 20; -fx-min-width: 35; " +
-                "-fx-min-height: 35; -fx-max-width: 35; -fx-max-height: 35;");
+        avatar.setStyle("-fx-background-color: " + getRandomColor() + "; " +
+                "-fx-background-radius: 20; " +
+                "-fx-min-width: 35; " +
+                "-fx-min-height: 35; " +
+                "-fx-max-width: 35; " +
+                "-fx-max-height: 35;");
 
         String sellerInitials = getInitials(vehicle.getSellerName());
         Label avatarText = new Label(sellerInitials);
@@ -246,33 +323,38 @@ public class ClientVehiclesController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Label premiumBadge = new Label("⭐ Premium");
-        premiumBadge.setStyle("-fx-background-color: #FFF3E0; -fx-text-fill: #FF9800; -fx-padding: 4 8; " +
-                "-fx-background-radius: 4; -fx-font-size: 11; -fx-font-weight: bold;");
+        premiumBadge.setStyle("-fx-background-color: #FFF3E0; " +
+                "-fx-text-fill: #FF9800; " +
+                "-fx-padding: 4 8; " +
+                "-fx-background-radius: 4; " +
+                "-fx-font-size: 11; " +
+                "-fx-font-weight: bold;");
 
         header.getChildren().addAll(avatar, vendorInfo, spacer, premiumBadge);
 
         // Image du véhicule
         StackPane imageContainer = new StackPane();
-        imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 8;");
+        imageContainer.setStyle("-fx-background-color: #f5f5f5; " +
+                "-fx-background-radius: 0;");
         imageContainer.setPrefHeight(180);
         imageContainer.setMaxHeight(180);
 
-        // Charger l'image depuis la base de données
         loadVehicleImage(vehicle, imageContainer);
 
-        // Badge nombre de photos
         Label photoCount = new Label("📷 " + getRandomPhotoCount());
-        photoCount.setStyle("-fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 10; " +
-                "-fx-background-radius: 15; -fx-font-size: 11;");
+        photoCount.setStyle("-fx-background-color: rgba(0,0,0,0.6); " +
+                "-fx-text-fill: white; " +
+                "-fx-padding: 5 10; " +
+                "-fx-background-radius: 15; " +
+                "-fx-font-size: 11;");
         StackPane.setAlignment(photoCount, Pos.BOTTOM_LEFT);
         StackPane.setMargin(photoCount, new Insets(10));
         imageContainer.getChildren().add(photoCount);
 
         // Contenu de la carte
         VBox content = new VBox(10);
-        content.setStyle("-fx-padding: 15;");
+        content.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 0;");
 
-        // Localisation
         HBox locationBox = new HBox(5);
         locationBox.setAlignment(Pos.CENTER_LEFT);
         Label locationIcon = new Label("📍");
@@ -280,21 +362,18 @@ public class ClientVehiclesController {
         location.setStyle("-fx-text-fill: #666; -fx-font-size: 11;");
         locationBox.getChildren().addAll(locationIcon, location);
 
-        // Titre du véhicule
         Label title = new Label(vehicle.getTitle());
         title.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #333;");
         title.setWrapText(true);
-        title.setMaxWidth(250);
+        title.setMaxWidth(cardWidth - 30);
 
-        // Description
         String descriptionText = vehicle.getDescription() != null ?
                 truncateDescription(vehicle.getDescription()) : "Aucune description disponible";
         Label description = new Label(descriptionText);
         description.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
         description.setWrapText(true);
-        description.setMaxWidth(250);
+        description.setMaxWidth(cardWidth - 30);
 
-        // Caractéristiques
         HBox specs = new HBox(15);
         specs.setAlignment(Pos.CENTER_LEFT);
 
@@ -309,10 +388,14 @@ public class ClientVehiclesController {
 
         specs.getChildren().addAll(year, transmission, fuel);
 
-        // Footer avec prix
+        // Footer avec prix, indicateur disponibilité et bouton favori
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER_LEFT);
-        footer.setStyle("-fx-padding: 15 15 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;");
+        footer.setStyle("-fx-padding: 15 15 12 15; " +
+                "-fx-border-color: #f0f0f0; " +
+                "-fx-border-width: 1 0 0 0; " +
+                "-fx-background-color: white; " +
+                "-fx-background-radius: 0 0 8 8;");
 
         VBox priceBox = new VBox(2);
         Label price = new Label(String.format("%,.0f DH", vehicle.getPrice()));
@@ -327,72 +410,213 @@ public class ClientVehiclesController {
         Region priceSpacer = new Region();
         HBox.setHgrow(priceSpacer, Priority.ALWAYS);
 
-        Button favoriteBtn = new Button("♡");
-        favoriteBtn.setStyle("-fx-background-color: #f5f5f5; -fx-text-fill: #FF6B35; -fx-font-size: 18; " +
-                "-fx-padding: 8 12; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-width: 0;");
-        favoriteBtn.setOnAction(e -> addToFavorites(vehicle));
+        // INDICATEUR DE DISPONIBILITÉ
+        Button availabilityBtn = createAvailabilityButton(vehicle);
 
-        footer.getChildren().addAll(priceBox, priceSpacer, favoriteBtn);
+        // Bouton favori avec état dynamique
+        Button favoriteBtn = createFavoriteButton(vehicle);
+        favoriteButtons.put(vehicle.getId(), favoriteBtn);
 
-        // Assembler la carte
+        HBox buttonsContainer = new HBox(5);
+        buttonsContainer.setAlignment(Pos.CENTER_RIGHT);
+        buttonsContainer.getChildren().addAll(availabilityBtn, favoriteBtn);
+
+        footer.getChildren().addAll(priceBox, priceSpacer, buttonsContainer);
+
         content.getChildren().addAll(locationBox, title, description, specs);
         card.getChildren().addAll(header, imageContainer, content, footer);
 
-        // Interactions
-        card.setOnMouseClicked(e -> viewVehicleDetails(vehicle));
+        card.setOnMouseClicked(e -> {
+            if (e.getTarget() != favoriteBtn && e.getTarget() != availabilityBtn &&
+                    !favoriteBtn.getParent().equals(e.getTarget()) && !availabilityBtn.getParent().equals(e.getTarget())) {
+                viewVehicleDetails(vehicle);
+            }
+        });
+
         setupCardHoverEffects(card);
 
         return card;
     }
 
-    private void loadVehicleImage(Vehicle vehicle, StackPane container) {
-        System.out.println("🖼️ Tentative de chargement image pour: " + vehicle.getTitle());
+    // NOUVELLE MÉTHODE : Indicateur de disponibilité (remplace réservation)
+    private Button createAvailabilityButton(Vehicle vehicle) {
+        Button availabilityBtn = new Button();
 
+        // Récupérer le statut réel depuis la base de données
+        String statut = vehicle.getStatutVehicule() != null ? vehicle.getStatutVehicule().toLowerCase() : "disponible";
+        boolean estReserve = reservationDAO.isVehiculeReserved(vehicle.getId());
+        boolean estReserveParMoi = reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId());
+
+        // Logique d'affichage basée sur le statut réel
+        switch (statut) {
+            case "vendu":
+                availabilityBtn.setText("⛔ VENDU");
+                availabilityBtn.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #D32F2F, #B71C1C); " +
+                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(211,47,47,0.3), 4, 0, 0, 2); " +
+                                "-fx-cursor: default; -fx-border-color: #C62828; -fx-border-width: 1;"
+                );
+                break;
+
+            case "reserve":
+            case "réservé":
+                if (estReserveParMoi) {
+                    availabilityBtn.setText("⭐ VOTRE RÉSERVATION");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #FFD54F, #FFB300); " +
+                                    "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                    "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(255,183,0,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #FFA000; -fx-border-width: 1;"
+                    );
+                } else {
+                    availabilityBtn.setText("🔒 RÉSERVÉ");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #FFB74D, #FF9800); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(255,152,0,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #F57C00; -fx-border-width: 1;"
+                    );
+                }
+                break;
+
+            case "en attente":
+                availabilityBtn.setText("⏳ EN ATTENTE");
+                availabilityBtn.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #FFCC80, #FFA726); " +
+                                "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(255,167,38,0.3), 4, 0, 0, 2); " +
+                                "-fx-cursor: default; -fx-border-color: #FF9800; -fx-border-width: 1;"
+                );
+                break;
+
+            case "indisponible":
+                availabilityBtn.setText("🚫 INDISPONIBLE");
+                availabilityBtn.setStyle(
+                        "-fx-background-color: linear-gradient(to bottom, #90A4AE, #78909C); " +
+                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(120,144,156,0.3), 4, 0, 0, 2); " +
+                                "-fx-cursor: default; -fx-border-color: #607D8B; -fx-border-width: 1;"
+                );
+                break;
+
+            case "disponible":
+            case "en stock":
+            default:
+                if (estReserve) {
+                    availabilityBtn.setText("📝 EN COURS");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #81C784, #4CAF50); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                    "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(76,175,80,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #388E3C; -fx-border-width: 1;"
+                    );
+                } else {
+                    availabilityBtn.setText("✅ DISPONIBLE");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #66BB6A, #43A047); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(67,160,71,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #2E7D32; -fx-border-width: 1;"
+                    );
+                }
+                break;
+        }
+
+        availabilityBtn.setDisable(true);
+        return availabilityBtn;
+    }
+
+    private String getButtonStyle(String backgroundColor, String textColor) {
+        return "-fx-background-color: " + backgroundColor + "; " +
+                "-fx-text-fill: " + textColor + "; " +
+                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
+                "-fx-background-radius: 12; -fx-cursor: default;";
+    }
+
+    private Button createFavoriteButton(Vehicle vehicle) {
+        boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
+
+        Button favoriteBtn = new Button("🛒");
+        favoriteBtn.setStyle(
+                "-fx-background-color: " + (isFav ? "#4CAF50" : "#f5f5f5") + "; " +
+                        "-fx-text-fill: " + (isFav ? "white" : "#666") + "; " +
+                        "-fx-font-size: 16; -fx-padding: 6 8; " +
+                        "-fx-background-radius: 20; -fx-cursor: hand; -fx-border-width: 0;"
+        );
+
+        favoriteBtn.setOnAction(e -> toggleFavorite(vehicle, favoriteBtn));
+
+        return favoriteBtn;
+    }
+
+    private void toggleFavorite(Vehicle vehicle, Button button) {
+        boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
+
+        if (isFav) {
+            boolean success = favoriteDAO.removeFavorite(currentClientId, vehicle.getId());
+            if (success) {
+                button.setText("🛒");
+                button.setStyle(
+                        "-fx-background-color: #f5f5f5; -fx-text-fill: #666; " +
+                                "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
+                                "-fx-cursor: hand; -fx-border-width: 0;"
+                );
+            }
+        } else {
+            boolean success = favoriteDAO.addFavorite(currentClientId, vehicle.getId());
+            if (success) {
+                button.setText("🛒");
+                button.setStyle(
+                        "-fx-background-color: #4CAF50; -fx-text-fill: white; " +
+                                "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
+                                "-fx-cursor: hand; -fx-border-width: 0;"
+                );
+            }
+        }
+    }
+    private void loadVehicleImage(Vehicle vehicle, StackPane container) {
         if (vehicle.getImage() != null && !vehicle.getImage().trim().isEmpty()) {
             try {
                 String imagePath = vehicle.getImage();
-                System.out.println("📁 Chemin image: " + imagePath);
-
                 File imageFile = new File(imagePath);
 
                 if (imageFile.exists()) {
-                    // Charger depuis le système de fichiers
                     Image image = new Image(imageFile.toURI().toString(), true);
                     ImageView imageView = new ImageView(image);
-                    imageView.setFitWidth(280);
+                    imageView.setFitWidth(filtersVisible ? 280 : 240);
                     imageView.setFitHeight(180);
                     imageView.setPreserveRatio(true);
                     imageView.setSmooth(true);
 
-                    // Ajouter un écouteur pour les erreurs de chargement
                     image.errorProperty().addListener((obs, oldVal, newVal) -> {
                         if (newVal) {
-                            System.err.println("❌ Erreur de chargement de l'image: " + imagePath);
                             showDefaultImage(container);
                         }
                     });
 
-                    // Ajouter un écouteur pour quand l'image est chargée
-                    image.progressProperty().addListener((obs, oldVal, newVal) -> {
-                        if (newVal.doubleValue() == 1.0) {
-                            System.out.println("✅ Image chargée avec succès: " + imagePath);
-                        }
-                    });
-
                     container.getChildren().add(0, imageView);
-
                 } else {
-                    System.err.println("❌ Fichier image non trouvé: " + imagePath);
                     showDefaultImage(container);
                 }
-
             } catch (Exception e) {
-                System.err.println("❌ Erreur chargement image pour: " + vehicle.getTitle());
-                e.printStackTrace();
                 showDefaultImage(container);
             }
         } else {
-            System.out.println("ℹ️ Aucune image définie pour: " + vehicle.getTitle());
             showDefaultImage(container);
         }
     }
@@ -406,28 +630,22 @@ public class ClientVehiclesController {
                         "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"));
     }
 
-    // === FILTRES ===
-
     @FXML
     private void applyAllFilters() {
         filteredVehicles.setAll(vehicles);
 
-        // Filtre par marque
         if (brandFilter.getValue() != null && !brandFilter.getValue().equals("Toutes les marques")) {
             filteredVehicles.removeIf(v -> !extractBrandFromTitle(v.getTitle()).equals(brandFilter.getValue()));
         }
 
-        // Filtre par type
         if (typeFilter.getValue() != null && !typeFilter.getValue().equals("Tous les types")) {
             filteredVehicles.removeIf(v -> v.getCategory() == null || !v.getCategory().equals(typeFilter.getValue()));
         }
 
-        // Filtre par prix prédéfini
         if (priceFilter.getValue() != null && !priceFilter.getValue().equals("Tous les prix")) {
             filteredVehicles.removeIf(v -> !matchesPriceRange(v.getPrice(), priceFilter.getValue()));
         }
 
-        // Filtre par prix personnalisé
         try {
             double minPrice = minPriceField.getText().isEmpty() ? 0 : Double.parseDouble(minPriceField.getText());
             double maxPrice = maxPriceField.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxPriceField.getText());
@@ -449,7 +667,6 @@ public class ClientVehiclesController {
         priceFilter.setValue("Tous les prix");
         minPriceField.setText("2000");
         maxPriceField.setText("15000");
-        particulierRadio.setSelected(true);
 
         filteredVehicles.setAll(vehicles);
         displayVehicles();
@@ -492,7 +709,6 @@ public class ClientVehiclesController {
         }
     }
 
-    // Méthodes utilitaires
     private void showDefaultImage(StackPane container) {
         container.getChildren().clear();
         container.setStyle("-fx-background-color: " + getRandomLightColor() + "; -fx-background-radius: 8;");
@@ -522,19 +738,12 @@ public class ClientVehiclesController {
 
     private String getTimeAgo(java.time.LocalDateTime date) {
         if (date == null) return "quelques jours";
-
         java.time.Duration duration = java.time.Duration.between(date, java.time.LocalDateTime.now());
         long hours = duration.toHours();
-
         if (hours < 1) return "moins d'1 heure";
         if (hours < 24) return hours + " heure" + (hours > 1 ? "s" : "");
         if (hours < 168) return (hours / 24) + " jour" + (hours / 24 > 1 ? "s" : "");
         return (hours / 168) + " semaine" + (hours / 168 > 1 ? "s" : "");
-    }
-
-    private String getRandomTime() {
-        String[] times = {"2 heures", "5 heures", "1 jour", "2 jours", "3 jours", "4 heures", "22 heures"};
-        return times[(int)(Math.random() * times.length)];
     }
 
     private int getRandomPhotoCount() {
@@ -583,16 +792,87 @@ public class ClientVehiclesController {
     }
 
     private void viewVehicleDetails(Vehicle vehicle) {
-        showAlert("Détails du véhicule",
-                vehicle.getTitle() + "\n\n" +
-                        "Prix: " + String.format("%,.0f DH", vehicle.getPrice()) + "\n" +
-                        "Catégorie: " + vehicle.getCategory() + "\n" +
-                        "Vendeur: " + vehicle.getSellerName() + "\n" +
-                        "Description: " + vehicle.getDescription());
+        System.out.println("🎯 DEBUT viewVehicleDetails pour: " + vehicle.getTitle());
+
+        try {
+            String fxmlPath = "/view/vendeur/VehicleDetail.fxml";
+            System.out.println("🔍 Chemin FXML testé: " + fxmlPath);
+
+            URL url = getClass().getResource(fxmlPath);
+            System.out.println("📁 URL trouvée: " + (url != null ? "✅ OUI" : "❌ NON"));
+
+            if (url == null) {
+                String[] testPaths = {
+                        "/com/example/vehiclegestion/view/vendeur/VehicleDetail.fxml",
+                        "/view/vendeur/VehicleDetail.fxml",
+                        "/vendeur/VehicleDetail.fxml",
+                        "VehicleDetail.fxml"
+                };
+
+                for (String path : testPaths) {
+                    url = getClass().getResource(path);
+                    System.out.println("Test '" + path + "' → " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
+                    if (url != null) {
+                        fxmlPath = path;
+                        break;
+                    }
+                }
+            }
+
+            if (url == null) {
+                throw new IOException("Fichier FXML introuvable: Vehicle-detail.fxml");
+            }
+
+            System.out.println("✅ Chargement FXML depuis: " + fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent root = loader.load();
+            System.out.println("✅ FXML chargé avec succès");
+
+            VehicleDetailController controller = loader.getController();
+            System.out.println("✅ Contrôleur récupéré: " + controller.getClass().getSimpleName());
+
+            Article article = convertVehicleToArticle(vehicle);
+            System.out.println("✅ Article converti: " + article.getTitre());
+
+            controller.receiveData(article);
+            System.out.println("✅ Données transmises au contrôleur");
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.setTitle("Détails du véhicule - " + vehicle.getTitle());
+
+            System.out.println("✅ Nouvelle fenêtre créée");
+
+            stage.show();
+            System.out.println("🎉 Fenêtre de détails affichée avec succès!");
+
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR CRITIQUE dans viewVehicleDetails: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible d'ouvrir les détails du véhicule: " + e.getMessage());
+        }
     }
 
-    private void addToFavorites(Vehicle vehicle) {
-        showAlert("Favoris", vehicle.getTitle() + " ajouté à vos favoris !");
+    private Article convertVehicleToArticle(Vehicle vehicle) {
+        Article article = new Article();
+
+        article.setTitre(vehicle.getTitle());
+        article.setPrix(vehicle.getPrice());
+        article.setDescription(vehicle.getDescription());
+        article.setImage(vehicle.getImage());
+        article.setCategorie(vehicle.getCategory());
+
+        article.setAnnee(2023);
+        article.setKilometrage(50000);
+        article.setTransmission("Manuelle");
+        article.setCarburant("Essence");
+        article.setMarque(extractBrandFromTitle(vehicle.getTitle()));
+        article.setModele(vehicle.getTitle());
+        article.setPuissance(120);
+        article.setEtat("Excellent");
+
+        return article;
     }
 
     private void showAlert(String title, String message) {

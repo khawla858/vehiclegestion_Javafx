@@ -1,6 +1,9 @@
 package com.example.vehiclegestion.client.controller;
 
+import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.auth.model.Utilisateur;
 import com.example.vehiclegestion.client.doa.FavoriteDAO;
+import com.example.vehiclegestion.client.doa.ReservationDAO;
 import com.example.vehiclegestion.client.doa.VehicleDAO;
 import com.example.vehiclegestion.client.model.Vehicle;
 import javafx.fxml.FXML;
@@ -19,8 +22,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.io.File;
-import javafx.scene.Node;
-import javafx.event.ActionEvent;
 
 public class ClientFavoritesController implements Initializable {
 
@@ -28,39 +29,70 @@ public class ClientFavoritesController implements Initializable {
     @FXML private VBox emptyState;
     @FXML private Label favoriteCountLabel;
     @FXML private ScrollPane scrollPane;
-    @FXML private Button backButton;
     @FXML private Button clearAllButton;
 
     private FavoriteDAO favoriteDAO = new FavoriteDAO();
     private VehicleDAO vehicleDAO = new VehicleDAO();
-    private int currentClientId = 20; // Même ID que dans ClientVehiclesController
+    private ReservationDAO reservationDAO = new ReservationDAO();
+    private SessionManager sessionManager = SessionManager.getInstance();
+    private int currentClientId;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("✅ ClientFavoritesController initialisé");
+        System.out.println("✅ Initialisation de ClientFavoritesController...");
+
+        // Vérifier la session avec votre SessionManager
+        if (!sessionManager.estConnecte()) {
+            showAlert("Erreur", "Veuillez vous connecter pour accéder aux favoris");
+            redirectToLogin();
+            return;
+        }
+
+        // Récupérer l'ID de l'utilisateur connecté
+        Utilisateur currentUser = sessionManager.getUtilisateurConnecte();
+        currentClientId = currentUser.getIdUtilisateur();
+
+        System.out.println("✅ ClientFavoritesController initialisé pour: " +
+                currentUser.getPrenom() + " " + currentUser.getNom() +
+                " (ID: " + currentClientId + ")");
+
         loadFavorites();
         setupEventHandlers();
     }
 
     private void setupEventHandlers() {
-        backButton.setOnAction(e -> goBackToVehicles());
-        clearAllButton.setOnAction(e -> clearAllFavorites());
+        // Vérifier que le bouton existe avant d'ajouter l'event handler
+        if (clearAllButton != null) {
+            clearAllButton.setOnAction(e -> clearAllFavorites());
+        } else {
+            System.err.println("❌ clearAllButton est null dans setupEventHandlers");
+        }
     }
 
     private void loadFavorites() {
         try {
+            // Mettre à jour les réservations expirées
+            reservationDAO.updateExpiredReservations();
+
             List<Vehicle> favoriteVehicles = favoriteDAO.getFavoriteVehicles(currentClientId);
             displayFavorites(favoriteVehicles);
             updateFavoriteCount(favoriteVehicles.size());
 
-            System.out.println("✅ " + favoriteVehicles.size() + " favoris chargés");
+            System.out.println("✅ " + favoriteVehicles.size() + " favoris chargés pour l'utilisateur ID: " + currentClientId);
         } catch (Exception e) {
             System.err.println("❌ Erreur chargement favoris: " + e.getMessage());
+            e.printStackTrace();
             showAlert("Erreur", "Impossible de charger vos favoris");
         }
     }
 
     private void displayFavorites(List<Vehicle> favorites) {
+        // Vérifier que favoritesGrid n'est pas null
+        if (favoritesGrid == null) {
+            System.err.println("❌ ERREUR: favoritesGrid est null dans displayFavorites");
+            return;
+        }
+
         favoritesGrid.getChildren().clear();
 
         if (favorites.isEmpty()) {
@@ -76,7 +108,7 @@ public class ClientFavoritesController implements Initializable {
 
         int column = 0;
         int row = 0;
-        int columns = 3;
+        int columns = 4;
 
         for (Vehicle vehicle : favorites) {
             try {
@@ -94,20 +126,6 @@ public class ClientFavoritesController implements Initializable {
             }
         }
     }
-
-
-
-
-    /**
-     * Ouvrir la vue des favoris
-     */
-
-
-
-
-
-
-
 
     private VBox createFavoriteVehicleCard(Vehicle vehicle) {
         VBox card = new VBox(0);
@@ -202,7 +220,7 @@ public class ClientFavoritesController implements Initializable {
 
         specs.getChildren().addAll(year, transmission, fuel);
 
-        // Footer avec prix et bouton de suppression
+        // Footer avec prix, bouton réservation et bouton suppression
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER_LEFT);
         footer.setStyle("-fx-padding: 15 15 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;");
@@ -220,6 +238,9 @@ public class ClientFavoritesController implements Initializable {
         Region priceSpacer = new Region();
         HBox.setHgrow(priceSpacer, Priority.ALWAYS);
 
+        // Bouton de réservation
+        Button reserveButton = createReservationButton(vehicle);
+
         // Bouton pour retirer des favoris
         Button removeFavoriteBtn = new Button("❌");
         removeFavoriteBtn.setStyle(
@@ -231,13 +252,14 @@ public class ClientFavoritesController implements Initializable {
 
         removeFavoriteBtn.setOnAction(e -> removeFromFavorites(vehicle, card));
 
-        footer.getChildren().addAll(priceBox, priceSpacer, removeFavoriteBtn);
+        footer.getChildren().addAll(priceBox, priceSpacer, reserveButton, removeFavoriteBtn);
+        footer.setSpacing(10);
 
         content.getChildren().addAll(locationBox, title, description, specs);
         card.getChildren().addAll(header, imageContainer, content, footer);
 
         card.setOnMouseClicked(e -> {
-            if (e.getTarget() != removeFavoriteBtn) {
+            if (e.getTarget() != removeFavoriteBtn && e.getTarget() != reserveButton) {
                 viewVehicleDetails(vehicle);
             }
         });
@@ -245,6 +267,105 @@ public class ClientFavoritesController implements Initializable {
         setupCardHoverEffects(card);
 
         return card;
+    }
+
+    private Button createReservationButton(Vehicle vehicle) {
+        Button reserveButton = new Button();
+
+        // Vérifier si le véhicule est déjà réservé
+        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
+            // Vérifier si c'est le client actuel qui a réservé
+            if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
+                reserveButton.setText("✅ Déjà réservé");
+                reserveButton.setStyle(
+                        "-fx-background-color: #E8F5E8; " +
+                                "-fx-text-fill: #2E7D32; " +
+                                "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 12; " +
+                                "-fx-background-radius: 15; -fx-cursor: default;"
+                );
+                reserveButton.setDisable(true);
+            } else {
+                reserveButton.setText("⛔ Déjà réservé");
+                reserveButton.setStyle(
+                        "-fx-background-color: #FFEBEE; " +
+                                "-fx-text-fill: #C62828; " +
+                                "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 12; " +
+                                "-fx-background-radius: 15; -fx-cursor: default;"
+                );
+                reserveButton.setDisable(true);
+            }
+        } else {
+            reserveButton.setText("📅 Réserver");
+            reserveButton.setStyle(
+                    "-fx-background-color: #4CAF50; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 16; " +
+                            "-fx-background-radius: 15; -fx-cursor: hand;"
+            );
+            reserveButton.setOnAction(e -> handleReservation(vehicle, reserveButton));
+        }
+
+        return reserveButton;
+    }
+
+    private void handleReservation(Vehicle vehicle, Button reserveButton) {
+        // Vérifier à nouveau si le véhicule est disponible
+        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
+            showAlert("Réservation impossible", "❌ Ce véhicule a déjà été réservé par un autre client.");
+            updateReservationButton(reserveButton, vehicle);
+            return;
+        }
+
+        // Vérifier si l'utilisateur a déjà réservé ce véhicule
+        if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
+            showAlert("Réservation existante", "ℹ️ Vous avez déjà réservé ce véhicule.");
+            updateReservationButton(reserveButton, vehicle);
+            return;
+        }
+
+        // Demander confirmation
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirmation de réservation");
+        confirmation.setHeaderText("Confirmer la réservation");
+        confirmation.setContentText("Voulez-vous réserver le véhicule : " + vehicle.getTitle() + " ?\n\n" +
+                "Prix: " + String.format("%,.0f DH", vehicle.getPrice()) + "\n" +
+                "La réservation sera valable pendant 24 heures.");
+
+        if (confirmation.showAndWait().get() == ButtonType.OK) {
+            boolean success = reservationDAO.createReservation(currentClientId, vehicle.getId());
+            if (success) {
+                showAlert("Réservation confirmée", "✅ Véhicule réservé avec succès!\n\n" +
+                        "Vous avez 24 heures pour finaliser votre achat.\n" +
+                        "Véhicule: " + vehicle.getTitle());
+                updateReservationButton(reserveButton, vehicle);
+            } else {
+                showAlert("Erreur", "❌ Impossible de réserver le véhicule. Veuillez réessayer.");
+            }
+        }
+    }
+
+    private void updateReservationButton(Button reserveButton, Vehicle vehicle) {
+        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
+            if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
+                reserveButton.setText("✅ Déjà réservé");
+                reserveButton.setStyle(
+                        "-fx-background-color: #E8F5E8; " +
+                                "-fx-text-fill: #2E7D32; " +
+                                "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 12; " +
+                                "-fx-background-radius: 15; -fx-cursor: default;"
+                );
+                reserveButton.setDisable(true);
+            } else {
+                reserveButton.setText("⛔ Déjà réservé");
+                reserveButton.setStyle(
+                        "-fx-background-color: #FFEBEE; " +
+                                "-fx-text-fill: #C62828; " +
+                                "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 12; " +
+                                "-fx-background-radius: 15; -fx-cursor: default;"
+                );
+                reserveButton.setDisable(true);
+            }
+        }
     }
 
     private void removeFromFavorites(Vehicle vehicle, VBox card) {
@@ -279,25 +400,36 @@ public class ClientFavoritesController implements Initializable {
     }
 
     @FXML
-    private void goBackToVehicles() {
+    private void goToVehicles() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/client/view/ClientVehiclesView.fxml"));
-            Stage stage = (Stage) backButton.getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/client/ClientVehiclesView.fxml"));
+            Stage stage = (Stage) favoritesGrid.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            System.err.println("❌ Erreur retour aux véhicules: " + e.getMessage());
+            System.err.println("❌ Erreur navigation vers véhicules: " + e.getMessage());
             e.printStackTrace();
+            showAlert("Erreur", "Impossible de naviguer vers la page des véhicules");
         }
-    }
-
-    @FXML
-    private void goToVehicles() {
-        goBackToVehicles();
     }
 
     private void updateFavoriteCount(int count) {
         favoriteCountLabel.setText(count + " véhicule(s) favori(s)");
+    }
+
+    private void redirectToLogin() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/login.fxml"));
+            Stage stage = (Stage) favoritesGrid.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Connexion - Gestion Véhicules");
+            stage.setMaximized(false);
+            stage.setWidth(1000);
+            stage.setHeight(700);
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            System.err.println("❌ Erreur redirection login: " + e.getMessage());
+        }
     }
 
     // Méthodes utilitaires (reprises de ClientVehiclesController)
