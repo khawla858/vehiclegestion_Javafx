@@ -2,26 +2,31 @@ package com.example.vehiclegestion.vendeur.controller.layout;
 
 import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
-import com.example.vehiclegestion.common.controller.ChatWindowController;
 import com.example.vehiclegestion.utils.NavigationManager;
-import javafx.animation.FadeTransition;
-import javafx.animation.ScaleTransition;
-import javafx.fxml.FXML;
+import com.example.vehiclegestion.common.dao.ChatDAO;
+import com.example.vehiclegestion.common.model.Notification;
+import com.example.vehiclegestion.common.utils.NotificationService;
+import com.example.vehiclegestion.common.utils.NotificationManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.util.Duration;
+import java.io.IOException;
+import java.util.List;
 
 /**
- * 🎯 NavbarController - Version Simplifiée
- *
- * Utilise NavigationManager pour toute la navigation
- * Plus besoin de loadContent() ici !
+ * 🎯 NavbarController - Version avec Notifications
  */
-public class NavbarController {
+public class NavbarController implements NotificationManager.NotificationListener {
 
     @FXML private TextField searchField;
     @FXML private MenuButton profileMenu;
@@ -29,9 +34,31 @@ public class NavbarController {
     @FXML private Label userRoleLabel;
     @FXML private Button dashboardBtn;
 
+    // ✅ Badge messages
+    @FXML private Label messageBadge;
+
+    // ✅ Nouveaux éléments pour les notifications
+    @FXML private Button notificationBtn;
+    @FXML private Label notificationBadge;
+    @FXML private BorderPane notificationDropdown;
+    @FXML private VBox notificationItemsContainer;
+    @FXML private Label lblNotificationStatus;
+    @FXML private ScrollPane notificationScrollPane;
+    @FXML private Button btnMarkAllRead;
+    @FXML private Button btnSeeAll;
+
     private StackPane contentPane;
     private SessionManager session = SessionManager.getInstance();
     private NavigationManager nav = NavigationManager.getInstance();
+    private ChatDAO chatDAO = new ChatDAO();
+
+    // ✅ Service de notifications
+    private NotificationService notificationService;
+    private Timeline notificationCheckTimeline;
+    private Timeline notificationRefreshTimeline;
+    private Timeline badgeRefreshTimeline;
+    private int lastNotificationCount = 0;
+    private boolean notificationDropdownVisible = false;
 
     /**
      * Injection du contentPane (pour compatibilité)
@@ -43,12 +70,462 @@ public class NavbarController {
 
     @FXML
     public void initialize() {
-        System.out.println("📋 NavbarController initialisé");
+        System.out.println("📋 NavbarController vendeur initialisé");
 
         loadUserInfo();
         setupSearchField();
         playWelcomeAnimation();
         setupHoverEffects();
+
+        // ✅ Initialiser les notifications
+        setupNotifications();
+
+        // ✅ Initialiser le badge messages
+        updateMessageBadge();
+        startBadgeRefresh();
+    }
+
+    // ✅ IMPLÉMENTATION DE L'INTERFACE NotificationListener
+    @Override
+    public void onNewNotification(int userId) {
+        System.out.println("🔔 NotificationManager: Nouvelle notification pour user " + userId);
+
+        if (session.estConnecte()) {
+            Utilisateur currentUser = session.getUtilisateurConnecte();
+            if (currentUser != null && currentUser.getIdUtilisateur() == userId) {
+                Platform.runLater(() -> {
+                    System.out.println("🔄 Mise à jour UI pour nouvelle notification");
+                    updateNotificationBadge();
+                    if (notificationDropdownVisible) {
+                        loadNotificationDropdown();
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public void onNotificationRead(int notificationId) {
+        Platform.runLater(() -> {
+            System.out.println("📖 Notification lue: " + notificationId);
+            if (notificationDropdownVisible) {
+                loadNotificationDropdown();
+            }
+        });
+    }
+
+    private void setupNotifications() {
+        notificationService = NotificationService.getInstance();
+
+        // S'abonner aux notifications
+        NotificationManager.getInstance().addListener(this);
+
+        // Mettre à jour le badge
+        updateNotificationBadge();
+
+        // Vérifier les nouvelles notifications périodiquement
+        startNotificationChecker();
+
+        // Rafraîchir la liste toutes les 30 secondes
+        startNotificationRefresh();
+
+        // Initialiser les boutons du dropdown
+        setupDropdownButtons();
+
+        // Cacher le dropdown au démarrage
+        notificationDropdown.setVisible(false);
+        notificationDropdown.setManaged(false);
+
+        // Fermer le dropdown en cliquant ailleurs
+        setupClickOutsideListener();
+    }
+
+    private void setupDropdownButtons() {
+        // Bouton "Tout marquer comme lu"
+        if (btnMarkAllRead != null) {
+            btnMarkAllRead.setOnAction(e -> markAllNotificationsAsRead());
+        }
+
+        // Bouton "Voir tout"
+        if (btnSeeAll != null) {
+            btnSeeAll.setOnAction(e -> showAllNotificationsPage());
+        }
+    }
+
+    @FXML
+    private void toggleNotificationDropdown() {
+        System.out.println("🔔 Toggle dropdown notifications vendeur");
+
+        if (!notificationDropdownVisible) {
+            showNotificationDropdown();
+        } else {
+            hideNotificationDropdown();
+        }
+    }
+
+    private void showNotificationDropdown() {
+        System.out.println("📱 Affichage dropdown notifications vendeur");
+
+        notificationDropdownVisible = true;
+        notificationDropdown.setVisible(true);
+        notificationDropdown.setManaged(true);
+
+        // Ajuster la taille
+        notificationDropdown.setPrefWidth(400);
+        notificationDropdown.setPrefHeight(500);
+
+        // Positionner le dropdown
+        positionNotificationDropdown();
+
+        // Charger les notifications
+        loadNotificationDropdown();
+
+        // Rafraîchir le badge
+        updateNotificationBadge();
+
+        // Empêcher la propagation du clic
+        notificationDropdown.setOnMouseClicked(e -> e.consume());
+    }
+
+    private void hideNotificationDropdown() {
+        System.out.println("📱 Masquage dropdown notifications vendeur");
+
+        notificationDropdownVisible = false;
+        notificationDropdown.setVisible(false);
+        notificationDropdown.setManaged(false);
+    }
+
+    private void positionNotificationDropdown() {
+        if (notificationBtn != null && notificationDropdown != null) {
+            double dropdownX = notificationBtn.localToScene(0, 0).getX() - 150;
+            double dropdownY = notificationBtn.localToScene(0, 0).getY() + 65;
+
+            notificationDropdown.setTranslateX(dropdownX);
+            notificationDropdown.setTranslateY(dropdownY);
+        }
+    }
+
+    private void loadNotificationDropdown() {
+        if (!session.estConnecte() || notificationService == null) return;
+
+        int userId = session.getUtilisateurConnecte().getIdUtilisateur();
+        System.out.println("📋 Chargement notifications vendeur pour user: " + userId);
+
+        List<Notification> notifications = notificationService.getNotificationsUtilisateur(userId, false);
+
+        Platform.runLater(() -> {
+            notificationItemsContainer.getChildren().clear();
+
+            if (notifications.isEmpty()) {
+                System.out.println("📭 Aucune notification trouvée pour vendeur");
+                showEmptyNotificationState();
+                lblNotificationStatus.setText("0 notification(s)");
+                return;
+            }
+
+            System.out.println("✅ " + notifications.size() + " notifications chargées");
+
+            int nonLuesCount = 0;
+
+            for (Notification notif : notifications) {
+                System.out.println("   - " + notif.getTitre() + " (lue: " + notif.isEstLue() + ")");
+                if (!notif.isEstLue()) {
+                    nonLuesCount++;
+                }
+                addNotificationItemToDropdown(notif);
+            }
+
+            lblNotificationStatus.setText(notifications.size() + " notification(s) • " +
+                    nonLuesCount + " non lue(s)");
+        });
+    }
+
+    private void addNotificationItemToDropdown(Notification notification) {
+        try {
+            HBox notificationItem = new HBox(10);
+            notificationItem.setStyle("-fx-padding: 12 15; " +
+                    "-fx-border-width: 0 0 1 0; " +
+                    "-fx-border-color: #f0f0f0; " +
+                    "-fx-background-color: " +
+                    (notification.isEstLue() ? "white" : "#f8fbff") + ";");
+
+            // Icône
+            Label iconLabel = new Label(notification.getIcon());
+            iconLabel.setStyle("-fx-font-size: 18px; -fx-padding: 0 10 0 0;");
+
+            // Contenu
+            VBox contentBox = new VBox(3);
+            contentBox.setMaxWidth(250);
+
+            // Titre et temps
+            HBox headerBox = new HBox(5);
+            Label titleLabel = new Label(notification.getTitre());
+            titleLabel.setStyle("-fx-font-weight: bold; " +
+                    "-fx-text-fill: #1a1a1a; " +
+                    "-fx-font-size: 13px;");
+            titleLabel.setWrapText(true);
+
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            Label timeLabel = new Label(notification.getTimeAgo());
+            timeLabel.setStyle("-fx-text-fill: #999; -fx-font-size: 11px;");
+
+            headerBox.getChildren().addAll(titleLabel, spacer, timeLabel);
+
+            // Message
+            Label messageLabel = new Label(notification.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+            messageLabel.setWrapText(true);
+
+            // Catégorie
+            HBox footerBox = new HBox(5);
+            Label categoryLabel = new Label(notification.getCategorie());
+            categoryLabel.setStyle("-fx-background-color: #e8f4fd; " +
+                    "-fx-text-fill: #3498db; " +
+                    "-fx-padding: 2 8; " +
+                    "-fx-font-size: 10px; " +
+                    "-fx-background-radius: 10;");
+
+            Region footerSpacer = new Region();
+            HBox.setHgrow(footerSpacer, Priority.ALWAYS);
+
+            // Indicateur "non lu"
+            if (!notification.isEstLue()) {
+                Label unreadDot = new Label("●");
+                unreadDot.setStyle("-fx-text-fill: #3498db; -fx-font-size: 8px;");
+                footerBox.getChildren().add(unreadDot);
+            }
+
+            footerBox.getChildren().addAll(categoryLabel, footerSpacer);
+
+            contentBox.getChildren().addAll(headerBox, messageLabel, footerBox);
+
+            notificationItem.getChildren().addAll(iconLabel, contentBox);
+
+            // Style pour les priorités
+            if ("urgente".equals(notification.getPriorite())) {
+                notificationItem.setStyle(notificationItem.getStyle() +
+                        "-fx-border-left-color: #dc3545; -fx-border-left-width: 3;");
+            } else if ("haute".equals(notification.getPriorite())) {
+                notificationItem.setStyle(notificationItem.getStyle() +
+                        "-fx-border-left-color: #ffc107; -fx-border-left-width: 3;");
+            }
+
+            // Gestion du clic
+            notificationItem.setOnMouseClicked(e -> {
+                System.out.println("📱 Notification cliquée: " + notification.getTitre());
+
+                // Marquer comme lue
+                if (!notification.isEstLue()) {
+                    notificationService.marquerCommeLue(notification.getIdNotification());
+
+                    // Mettre à jour l'UI
+                    notificationItem.setStyle(notificationItem.getStyle().replace("#f8fbff", "white"));
+                    loadNotificationDropdown();
+                    updateNotificationBadge();
+                }
+
+                // Fermer le dropdown
+                hideNotificationDropdown();
+
+                // Naviguer selon le type
+                handleNotificationNavigation(notification);
+
+                e.consume();
+            });
+
+            // Effet hover
+            notificationItem.setOnMouseEntered(e -> {
+                notificationItem.setStyle(notificationItem.getStyle() +
+                        "-fx-background-color: #f5f9ff; -fx-cursor: hand;");
+            });
+
+            notificationItem.setOnMouseExited(e -> {
+                String baseStyle = "-fx-padding: 12 15; -fx-border-width: 0 0 1 0; " +
+                        "-fx-border-color: #f0f0f0; " +
+                        "-fx-background-color: " +
+                        (notification.isEstLue() ? "white" : "#f8fbff") + ";";
+
+                if ("urgente".equals(notification.getPriorite())) {
+                    baseStyle += "-fx-border-left-color: #dc3545; -fx-border-left-width: 3;";
+                } else if ("haute".equals(notification.getPriorite())) {
+                    baseStyle += "-fx-border-left-color: #ffc107; -fx-border-left-width: 3;";
+                }
+
+                notificationItem.setStyle(baseStyle);
+            });
+
+            notificationItemsContainer.getChildren().add(notificationItem);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur création item notification vendeur: " + e.getMessage());
+        }
+    }
+
+    private void showEmptyNotificationState() {
+        VBox emptyState = new VBox(15);
+        emptyState.setStyle("-fx-alignment: center; -fx-padding: 40 20;");
+
+        Label icon = new Label("🔔");
+        icon.setStyle("-fx-font-size: 40px;");
+
+        Label message = new Label("Aucune notification");
+        message.setStyle("-fx-font-size: 16px; -fx-text-fill: #666;");
+
+        Label subMessage = new Label("Vous serez notifié ici des nouvelles activités");
+        subMessage.setStyle("-fx-font-size: 12px; -fx-text-fill: #999; -fx-alignment: center;");
+        subMessage.setWrapText(true);
+
+        emptyState.getChildren().addAll(icon, message, subMessage);
+        notificationItemsContainer.getChildren().add(emptyState);
+    }
+
+    private void handleNotificationNavigation(Notification notification) {
+        String lien = notification.getLienAction();
+        String type = notification.getTypeNotification();
+
+        System.out.println("🎯 Navigation depuis notification vendeur: " + type);
+
+        if (lien != null) {
+            if (lien.contains("message") || lien.startsWith("/messages")) {
+                showMessages();
+            } else if (lien.contains("vehicule") || lien.startsWith("/vehicules")) {
+                showVehicleManagement();
+            } else if (lien.contains("client") || lien.startsWith("/clients")) {
+                showCustomerList();
+            } else if (lien.contains("reservation") || lien.startsWith("/reservations")) {
+                showPendingReservations();
+            } else if (lien.contains("rendezvous")) {
+                showRendezVous();
+            }
+        }
+    }
+
+    private void setupClickOutsideListener() {
+        // Au lieu d'utiliser getScene() immédiatement, attendre que la scène soit disponible
+        if (notificationBtn != null && notificationBtn.getScene() != null) {
+            notificationBtn.getScene().setOnMouseClicked(e -> {
+                if (notificationDropdownVisible) {
+                    if (!notificationDropdown.getBoundsInParent().contains(e.getX(), e.getY()) &&
+                            !notificationBtn.getBoundsInParent().contains(e.getX(), e.getY())) {
+                        hideNotificationDropdown();
+                    }
+                }
+            });
+        } else {
+            // Si la scène n'est pas encore disponible, on écoute l'événement plus tard
+            notificationBtn.sceneProperty().addListener((observable, oldScene, newScene) -> {
+                if (newScene != null) {
+                    newScene.setOnMouseClicked(e -> {
+                        if (notificationDropdownVisible) {
+                            if (!notificationDropdown.getBoundsInParent().contains(e.getX(), e.getY()) &&
+                                    !notificationBtn.getBoundsInParent().contains(e.getX(), e.getY())) {
+                                hideNotificationDropdown();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    private void markAllNotificationsAsRead() {
+        if (!session.estConnecte() || notificationService == null) return;
+
+        int userId = session.getUtilisateurConnecte().getIdUtilisateur();
+        notificationService.marquerToutesCommeLues(userId);
+
+        // Rafraîchir l'UI
+        loadNotificationDropdown();
+        updateNotificationBadge();
+
+        System.out.println("✅ Toutes les notifications marquées comme lues");
+    }
+
+    private void showAllNotificationsPage() {
+        System.out.println("📋 Navigation vers page notifications complète");
+
+        hideNotificationDropdown();
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Notifications complètes");
+        alert.setHeaderText("Page des notifications");
+        alert.setContentText("Cette fonctionnalité sera implémentée prochainement.");
+        alert.showAndWait();
+    }
+
+    private void startNotificationChecker() {
+        notificationCheckTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(30), e -> updateNotificationBadge())
+        );
+        notificationCheckTimeline.setCycleCount(Timeline.INDEFINITE);
+        notificationCheckTimeline.play();
+    }
+
+    private void startNotificationRefresh() {
+        notificationRefreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(30), e -> {
+                    if (notificationDropdownVisible) {
+                        loadNotificationDropdown();
+                    }
+                })
+        );
+        notificationRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        notificationRefreshTimeline.play();
+    }
+
+    private void updateNotificationBadge() {
+        if (!session.estConnecte() || notificationService == null) return;
+
+        Platform.runLater(() -> {
+            try {
+                int userId = session.getUtilisateurConnecte().getIdUtilisateur();
+                int count = notificationService.getNombreNotificationsNonLues(userId);
+
+                System.out.println("📊 Mise à jour badge vendeur: " + count + " notifications non lues");
+
+                if (notificationBadge != null) {
+                    if (count > 0) {
+                        notificationBadge.setText(String.valueOf(count > 99 ? "99+" : count));
+                        notificationBadge.setVisible(true);
+
+                        // Animation pour nouvelles notifications
+                        if (count > lastNotificationCount && lastNotificationCount > 0) {
+                            animateNotificationBadge();
+                        }
+                    } else {
+                        notificationBadge.setVisible(false);
+                    }
+                }
+
+                lastNotificationCount = count;
+
+            } catch (Exception e) {
+                System.err.println("❌ Erreur mise à jour badge vendeur: " + e.getMessage());
+            }
+        });
+    }
+
+    private void animateNotificationBadge() {
+        if (notificationBadge == null) return;
+
+        Timeline pulse = new Timeline(
+                new KeyFrame(Duration.millis(0), e -> {
+                    notificationBadge.setScaleX(1.0);
+                    notificationBadge.setScaleY(1.0);
+                }),
+                new KeyFrame(Duration.millis(150), e -> {
+                    notificationBadge.setScaleX(1.3);
+                    notificationBadge.setScaleY(1.3);
+                }),
+                new KeyFrame(Duration.millis(300), e -> {
+                    notificationBadge.setScaleX(1.0);
+                    notificationBadge.setScaleY(1.0);
+                })
+        );
+        pulse.setCycleCount(2);
+        pulse.play();
     }
 
     private void loadUserInfo() {
@@ -99,7 +576,44 @@ public class NavbarController {
     }
 
     // ========================================
-    // 🚀 NAVIGATION - Utilise NavigationManager
+    // 💬 GESTION DU BADGE MESSAGES
+    // ========================================
+
+    private void updateMessageBadge() {
+        if (!session.estConnecte()) return;
+
+        try {
+            int unreadCount = chatDAO.countUnreadMessages(
+                    session.getUserId(),
+                    session.getUserRole()
+            );
+
+            if (messageBadge != null) {
+                if (unreadCount > 0) {
+                    messageBadge.setText(String.valueOf(unreadCount));
+                    messageBadge.setVisible(true);
+                    System.out.println("📬 " + unreadCount + " messages non lus");
+                } else {
+                    messageBadge.setVisible(false);
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur mise à jour badge messages: " + e.getMessage());
+        }
+    }
+
+    private void startBadgeRefresh() {
+        badgeRefreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(10), e -> updateMessageBadge())
+        );
+        badgeRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        badgeRefreshTimeline.play();
+        System.out.println("🔄 Auto-refresh badge messages démarré");
+    }
+
+    // ========================================
+    // 🚀 NAVIGATION
     // ========================================
 
     @FXML
@@ -115,57 +629,15 @@ public class NavbarController {
     }
 
     @FXML
-    private void showCustomerHistory() {
-        System.out.println("📊 Navigation: Historique clients");
-        showAlert("Clients", "Historique des interactions\n(Fonctionnalité à implémenter)", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
     private void showVehicleManagement() {
         System.out.println("🚗 Navigation: Gestion véhicules");
         nav.goToVehicles();
     }
 
     @FXML
-    private void showStockManagement() {
-        System.out.println("📦 Navigation: Gestion stock");
-        nav.goToMagasinDetails();
-    }
-
-    @FXML
     private void showPendingReservations() {
         System.out.println("🛒 Navigation: Réservations");
         nav.goToReservations();
-    }
-
-    @FXML
-    private void showSalesHistory() {
-        System.out.println("💰 Navigation: Historique ventes");
-        showAlert("Ventes", "Historique des ventes\n(Fonctionnalité à implémenter)", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void showMonthlySales() {
-        System.out.println("📊 Navigation: Ventes mensuelles");
-        showAlert("Statistiques", "Ventes mensuelles\n(Fonctionnalité à implémenter)", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void showRevenueStats() {
-        System.out.println("💰 Navigation: Stats revenus");
-        showAlert("Statistiques", "Statistiques de revenus\n(Fonctionnalité à implémenter)", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void showClientPerformance() {
-        System.out.println("🎯 Navigation: Performances clients");
-        showAlert("Statistiques", "Performances clients\n(Fonctionnalité à implémenter)", Alert.AlertType.INFORMATION);
-    }
-
-    @FXML
-    private void showSalesAnalytics() {
-        System.out.println("📈 Navigation: Analytics");
-        showAlert("Analytics", "Analytics ventes\n(Fonctionnalité à implémenter)", Alert.AlertType.INFORMATION);
     }
 
     @FXML
@@ -212,17 +684,8 @@ public class NavbarController {
 
     @FXML
     private void showNotifications() {
-        System.out.println("🔔 Notifications");
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Notifications");
-        alert.setHeaderText("Vous avez 3 nouvelles notifications");
-        alert.setContentText(
-                "📋 Nouvelle réservation pour BMW X5\n" +
-                        "📅 Rappel: RDV demain 10h avec M. Dupont\n" +
-                        "💬 Message de Mme. Martin concernant l'Audi A4"
-        );
-        styleAlert(alert);
-        alert.show();
+        // Cette méthode est maintenant gérée par toggleNotificationDropdown
+        toggleNotificationDropdown();
     }
 
     @FXML
@@ -240,88 +703,36 @@ public class NavbarController {
         alert.show();
     }
 
-    /**
-     * Ouvre la fenêtre de chat pour le vendeur
-     */
     @FXML
     private void showMessages() {
-        System.out.println("\n💬 === OUVERTURE CHAT VENDEUR ===");
+        System.out.println("💬 Ouverture de la fenêtre de chat...");
+
+        if (!session.estConnecte()) {
+            showAlert("Erreur", "Vous devez être connecté pour accéder au chat", Alert.AlertType.ERROR);
+            return;
+        }
 
         try {
-            // Essayer différents chemins
-            String[] possiblePaths = {
-                    "/view/common/ChatWindow.fxml",
-                    "/com/example/vehiclegestion/view/common/ChatWindow.fxml",
-                    "view/common/ChatWindow.fxml",
-                    "/ChatWindow.fxml",
-                    "ChatWindow.fxml"
-            };
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/view/common/ChatWindow.fxml")
+            );
+            Parent root = loader.load();
 
-            FXMLLoader loader = null;
-            Parent chatRoot = null;
-            String foundPath = null;
+            Stage chatStage = new Stage();
+            chatStage.setTitle("💬 Messages - AutoSales Pro");
+            chatStage.setScene(new Scene(root, 900, 600));
+            chatStage.show();
 
-            for (String path : possiblePaths) {
-                try {
-                    System.out.println("🔍 Essai du chemin: " + path);
-                    java.net.URL url = getClass().getResource(path);
-                    if (url != null) {
-                        System.out.println("✅ URL trouvée: " + url);
-                        loader = new FXMLLoader(url);
-                        chatRoot = loader.load();
-                        foundPath = path;
-                        System.out.println("✅ FXML chargé avec succès: " + path);
-                        break;
-                    }
-                } catch (Exception e) {
-                    System.out.println("❌ Échec pour: " + path + " - " + e.getMessage());
-                }
-            }
-
-            if (chatRoot == null || loader == null) {
-                System.err.println("❌ Fichier ChatWindow.fxml introuvable dans tous les chemins testés");
-                showAlert("Erreur", "Impossible de charger l'interface de chat", Alert.AlertType.ERROR);
-                return;
-            }
-
-            System.out.println("✅ FXML chargé depuis: " + foundPath);
-
-            // Récupérer le contrôleur
-            ChatWindowController chatController = loader.getController();
-
-            if (chatController == null) {
-                System.err.println("❌ Contrôleur ChatWindowController non trouvé");
-                showAlert("Erreur", "Contrôleur non chargé", Alert.AlertType.ERROR);
-                return;
-            }
-
-            System.out.println("✅ Contrôleur chargé - Mode: VENDEUR");
-            System.out.println("   Utilisateur ID: " + session.getUserId());
-            System.out.println("   Rôle: " + session.getUserRole());
-
-            // Créer et afficher la fenêtre
-            Stage stage = new Stage();
-            stage.setTitle("Messages - Conversations avec les clients");
-            stage.setScene(new Scene(chatRoot, 1000, 700));
-            stage.setMinWidth(800);
-            stage.setMinHeight(600);
-
-            // Fermer proprement
-            stage.setOnCloseRequest(e -> {
-                if (chatController != null) {
-                    chatController.cleanup();
-                }
-                System.out.println("📭 Fenêtre de chat fermée");
-            });
-
-            stage.show();
-
-            System.out.println("✅ Fenêtre de chat vendeur ouverte avec succès");
+            System.out.println("✅ Fenêtre de chat ouverte");
+            updateMessageBadge();
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur inattendue lors de l'ouverture du chat: " + e.getMessage());
+            System.err.println("❌ Erreur ouverture chat: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Erreur", "Erreur lors de l'ouverture du chat:\n" + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Erreur",
+                    "Impossible d'ouvrir la fenêtre de chat.\n" +
+                            "Erreur: " + e.getMessage(),
+                    Alert.AlertType.ERROR);
         }
     }
 
@@ -363,11 +774,11 @@ public class NavbarController {
         confirmation.setTitle("Déconnexion");
         confirmation.setHeaderText("Êtes-vous sûr de vouloir vous déconnecter ?");
         confirmation.setContentText("Vous serez redirigé vers la page de connexion.");
-
         styleAlert(confirmation);
 
         confirmation.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
+                cleanup();
                 session.fermerSession();
                 System.out.println("✅ Session fermée");
 
@@ -377,20 +788,29 @@ public class NavbarController {
                 success.setContentText("À bientôt sur AutoSales Pro 👋");
                 styleAlert(success);
                 success.show();
-
-                // Redirection vers login
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
-                    Parent loginPage = loader.load();
-                    Stage currentStage = (Stage) userNameLabel.getScene().getWindow();
-                    currentStage.setScene(new Scene(loginPage));
-                    currentStage.setTitle("Connexion - AutoSales Pro");
-                    currentStage.centerOnScreen();
-                } catch (Exception e) {
-                    System.err.println("❌ Erreur redirection login: " + e.getMessage());
-                }
             }
         });
+    }
+
+    public void cleanup() {
+        // Se désabonner des notifications
+        NotificationManager.getInstance().removeListener(this);
+
+        // Arrêter les timelines
+        stopBadgeRefresh();
+
+        if (notificationCheckTimeline != null) {
+            notificationCheckTimeline.stop();
+        }
+        if (notificationRefreshTimeline != null) {
+            notificationRefreshTimeline.stop();
+        }
+    }
+
+    public void stopBadgeRefresh() {
+        if (badgeRefreshTimeline != null) {
+            badgeRefreshTimeline.stop();
+        }
     }
 
     // ========================================

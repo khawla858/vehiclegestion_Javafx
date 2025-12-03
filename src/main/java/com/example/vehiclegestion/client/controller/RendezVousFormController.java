@@ -3,9 +3,8 @@ package com.example.vehiclegestion.client.controller;
 import javafx.scene.control.Alert;
 import com.example.vehiclegestion.client.model.RendezVs;
 import com.example.vehiclegestion.client.doa.RendezVsDAO;
-import com.example.vehiclegestion.client.model.Vehicle; // Utilise Vehicle
+import com.example.vehiclegestion.client.model.Vehicle;
 import com.example.vehiclegestion.auth.SessionManager;
-// AJOUTER CET IMPORT
 import com.example.vehiclegestion.common.utils.NotificationService;
 
 import javafx.fxml.FXML;
@@ -36,21 +35,18 @@ public class RendezVousFormController {
     @FXML private Button cancelBtn;
     @FXML private VBox successMessage;
 
-    private Vehicle vehicle; // Utilise Vehicle au lieu de Article
+    private Vehicle vehicle;
     private RendezVsDAO rendezVsDAO = new RendezVsDAO();
     private Runnable onRendezVousCreated;
-
-    // AJOUTER CET ATTRIBUT
     private NotificationService notificationService;
 
     public void initialize() {
-        // AJOUTER CETTE LIGNE - Initialiser NotificationService
         notificationService = NotificationService.getInstance();
         setupForm();
         setupStyling();
     }
 
-    public void setVehicle(Vehicle vehicle) { // Change setArticle en setVehicle
+    public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
         updateVehicleInfo();
     }
@@ -151,7 +147,6 @@ public class RendezVousFormController {
 
     private void updateVehicleInfo() {
         if (vehicle != null) {
-            // Extraire les informations du titre si nécessaire
             String[] titleParts = vehicle.getTitle().split(" ");
             String marque = titleParts.length > 0 ? titleParts[0] : "Marque";
             String modele = titleParts.length > 1 ? titleParts[1] : "Modèle";
@@ -168,95 +163,43 @@ public class RendezVousFormController {
 
     @FXML
     private void handleSubmit() {
-        System.out.println("🔄 Début de la soumission du formulaire...");
+        System.out.println("📅 CRÉATION RENDEZ-VOUS SIMPLE");
 
-        if (!validateForm()) {
-            System.out.println("❌ Validation échouée");
+        // Validation simple
+        if (datePicker.getValue() == null || timeComboBox.getValue() == null || vehicle == null) {
+            System.out.println("❌ Données manquantes");
+            showError("Erreur", "Veuillez remplir tous les champs");
             return;
         }
 
         try {
+            // Créer l'objet rendez-vous
             RendezVs rendezVs = createRendezVsFromForm();
-            System.out.println("📋 Rendez-vous créé, envoi à la DAO...");
 
-            // Debug des données
-            rendezVsDAO.debugRendezVs(rendezVs);
+            System.out.println("🎯 Détails RDV:");
+            System.out.println("   Client: " + rendezVs.getIdClient());
+            System.out.println("   Vendeur: " + rendezVs.getIdVendeur());
+            System.out.println("   Date: " + rendezVs.getDateRdv());
+            System.out.println("   Heure: " + rendezVs.getHeureRdv());
 
-            boolean success = rendezVsDAO.creerRendezVous(rendezVs);
+            // Utiliser la méthode qui crée RDV + notifications
+            boolean success = rendezVsDAO.creerRendezVousAvecNotification(rendezVs);
 
             if (success) {
-                System.out.println("✅ Rendez-vous créé avec succès en base");
-
-                // ================================================
-                // AJOUTER CE CODE POUR LA NOTIFICATION
-                // ================================================
-                try {
-                    // Formater la date et l'heure
-                    String dateStr = rendezVs.getDateRdv().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    String heureStr = rendezVs.getHeureRdv().format(DateTimeFormatter.ofPattern("HH:mm"));
-
-                    // Obtenir le nom du client
-
-                    String nomClient = SessionManager.getInstance().getUserFullName();
-                    if (nomClient == null || nomClient.isEmpty()) {
-                        nomClient = "Un client";
-                    }
-
-                    System.out.println("📅 Envoi des notifications pour le RDV:");
-                    System.out.println("   Client: " + rendezVs.getIdClient());
-                    System.out.println("   Vendeur: " + rendezVs.getIdVendeur());
-                    System.out.println("   Date: " + dateStr + " " + heureStr);
-
-                    // 1. Notifier le CLIENT (notification immédiate)
-                    notificationService.notifierRappelRendezVous(
-                            rendezVs.getIdClient(),
-                            999, // ID temporaire (remplacez par l'ID réel si disponible)
-                            dateStr,
-                            heureStr
-                    );
-                    System.out.println("   ✅ Notification envoyée au client");
-
-                    // 2. Notifier le VENDEUR
-                    notificationService.notifierDemandeEssai(
-                            rendezVs.getIdVendeur(),
-                            999, // ID temporaire
-                            nomClient,
-                            dateStr + " à " + heureStr
-                    );
-                    System.out.println("   ✅ Notification envoyée au vendeur");
-
-                } catch (Exception e) {
-                    System.err.println("⚠️ Erreur lors de l'envoi des notifications: " + e.getMessage());
-                    e.printStackTrace();
-                }
-                // ================================================
-
+                System.out.println("✅ RENDEZ-VOUS CRÉÉ AVEC NOTIFICATIONS");
                 showSuccessMessage();
                 if (onRendezVousCreated != null) {
                     onRendezVousCreated.run();
                 }
             } else {
-                System.out.println("❌ Échec de création en base");
-                showError("Erreur", "Impossible de créer le rendez-vous. Veuillez réessayer.");
+                System.out.println("❌ Échec création RDV");
+                showError("Erreur", "Impossible de créer le rendez-vous");
             }
+
         } catch (Exception e) {
-            System.err.println("💥 Erreur lors de la création: " + e.getMessage());
+            System.err.println("💥 Erreur: " + e.getMessage());
             e.printStackTrace();
-            showError("Erreur", "Une erreur est survenue: " + e.getMessage());
-        }
-
-        System.out.println("=== DEBUG HANDLESUBMIT ===");
-        System.out.println("Date: " + datePicker.getValue());
-        System.out.println("Heure: " + timeComboBox.getValue());
-        System.out.println("Durée: " + durationComboBox.getValue());
-        System.out.println("Type: " + typeRdvComboBox.getValue());
-        System.out.println("Véhicule: " + (vehicle != null ? vehicle.getTitle() : "NULL"));
-        System.out.println("Utilisateur connecté: " + SessionManager.getInstance().estConnecte());
-        System.out.println("ID User: " + SessionManager.getInstance().getUserId());
-
-        if (!validateForm()) {
-            System.out.println("❌ Validation échouée");
-            return;
+            showError("Erreur", "Problème technique");
         }
     }
 
@@ -294,21 +237,17 @@ public class RendezVousFormController {
     }
 
     private RendezVs createRendezVsFromForm() {
-
         System.out.println("=== DEBUG VEHICLE INFO ===");
         System.out.println("Vehicle ID: " + vehicle.getId());
         System.out.println("Seller ID: " + vehicle.getSellerId());
         System.out.println("Vehicle Title: " + vehicle.getTitle());
 
         RendezVs rdv = new RendezVs();
-        rdv.setIdClient(SessionManager.getInstance().getUserId());
-        rdv.setIdVendeur(vehicle.getSellerId());
-        rdv.setIdArticle(vehicle.getId());
 
         // Informations de base
         rdv.setIdClient(SessionManager.getInstance().getUserId());
-        rdv.setIdVendeur(vehicle.getSellerId()); // Utilise getSellerId()
-        rdv.setIdArticle(vehicle.getId()); // Utilise getId()
+        rdv.setIdVendeur(vehicle.getSellerId());
+        rdv.setIdArticle(vehicle.getId());
 
         // Date et heure
         rdv.setDateRdv(datePicker.getValue());

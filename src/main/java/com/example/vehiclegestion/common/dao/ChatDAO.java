@@ -582,4 +582,186 @@ public class ChatDAO {
             System.err.println("❌ Erreur connexion DB: " + e.getMessage());
         }
     }
+    /**
+     * Envoie un message dans une conversation ET crée une notification
+     */
+    public boolean sendMessageWithNotification(int idConversation, int idExpediteur, String roleExpediteur, String contenu) {
+        System.out.println("📤 ENVOI MESSAGE AVEC NOTIFICATION");
+
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Démarrer une transaction
+
+            // 1. Insérer le message
+            String messageQuery = """
+            INSERT INTO Message (id_conversation, id_expediteur, role_expediteur, contenu, type_message)
+            VALUES (?, ?, ?, ?, 'texte')
+        """;
+
+            PreparedStatement messageStmt = conn.prepareStatement(messageQuery, Statement.RETURN_GENERATED_KEYS);
+            messageStmt.setInt(1, idConversation);
+            messageStmt.setInt(2, idExpediteur);
+            messageStmt.setString(3, roleExpediteur);
+            messageStmt.setString(4, contenu);
+
+            int messageRows = messageStmt.executeUpdate();
+
+            if (messageRows > 0) {
+                System.out.println("✅ Message inséré");
+
+                // 2. Récupérer l'ID du destinataire
+                int destinataireId = -1;
+                String roleDestinataire = "";
+
+                String destinataireQuery = """
+                SELECT 
+                    CASE 
+                        WHEN ? = 'client' THEN id_vendeur
+                        WHEN ? = 'vendeur' THEN id_client
+                    END as id_destinataire,
+                    CASE 
+                        WHEN ? = 'client' THEN 'vendeur'
+                        WHEN ? = 'vendeur' THEN 'client'
+                    END as role_destinataire
+                FROM Conversation 
+                WHERE id_conversation = ?
+            """;
+
+                PreparedStatement destinataireStmt = conn.prepareStatement(destinataireQuery);
+                destinataireStmt.setString(1, roleExpediteur);
+                destinataireStmt.setString(2, roleExpediteur);
+                destinataireStmt.setString(3, roleExpediteur);
+                destinataireStmt.setString(4, roleExpediteur);
+                destinataireStmt.setInt(5, idConversation);
+
+                ResultSet rs = destinataireStmt.executeQuery();
+
+                if (rs.next()) {
+                    destinataireId = rs.getInt("id_destinataire");
+                    roleDestinataire = rs.getString("role_destinataire");
+                    System.out.println("🎯 Destinataire trouvé: ID=" + destinataireId + ", Role=" + roleDestinataire);
+                }
+
+                // 3. Si destinataire existe, créer la notification
+                if (destinataireId > 0) {
+                    // Récupérer le nom de l'expéditeur
+                    String nomExpediteur = getNomUtilisateur(idExpediteur, conn);
+                    if (nomExpediteur == null || nomExpediteur.isEmpty()) {
+                        nomExpediteur = "Un " + (roleExpediteur.equals("client") ? "client" : "vendeur");
+                    }
+
+                    // Insérer la notification
+                    String notificationQuery = """
+                    INSERT INTO Notification (
+                        id_utilisateur, 
+                        role_destinataire, 
+                        id_source, 
+                        type_source, 
+                        titre, 
+                        message, 
+                        type_notification, 
+                        categorie, 
+                        est_lue, 
+                        date_creation, 
+                        priorite, 
+                        lien_action
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
+                """;
+
+                    PreparedStatement notifStmt = conn.prepareStatement(notificationQuery);
+                    notifStmt.setInt(1, destinataireId);
+                    notifStmt.setString(2, roleDestinataire);
+                    notifStmt.setInt(3, idConversation);
+                    notifStmt.setString(4, "conversation");
+                    notifStmt.setString(5, "💬 Nouveau message");
+                    notifStmt.setString(6, nomExpediteur + " vous a envoyé un message");
+                    notifStmt.setString(7, "nouveau_message");
+                    notifStmt.setString(8, "message");
+                    notifStmt.setBoolean(9, false);
+                    notifStmt.setString(10, "haute");
+                    notifStmt.setString(11, "/messages");
+
+                    int notifRows = notifStmt.executeUpdate();
+
+                    if (notifRows > 0) {
+                        System.out.println("🔔 NOTIFICATION CRÉÉE pour user " + destinataireId);
+                    } else {
+                        System.out.println("⚠️ Notification non créée");
+                    }
+
+                    notifStmt.close();
+                } else {
+                    System.out.println("⚠️ Aucun destinataire trouvé pour la conversation");
+                }
+
+                // 4. Mettre à jour la date du dernier message
+                updateLastMessageDateInTransaction(idConversation, conn);
+
+                // 5. Valider la transaction
+                conn.commit();
+                System.out.println("✅ Transaction validée - Message + Notification créés");
+
+                messageStmt.close();
+                if (destinataireStmt != null) destinataireStmt.close();
+
+                return true;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ ERREUR transaction: " + e.getMessage());
+            e.printStackTrace();
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                    System.out.println("↩️ Transaction annulée");
+                }
+            } catch (SQLException ex) {
+                System.err.println("❌ Erreur rollback: " + ex.getMessage());
+            }
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("❌ Erreur fermeture connexion: " + e.getMessage());
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Récupère le nom d'un utilisateur
+     */
+    private String getNomUtilisateur(int idUtilisateur, Connection conn) throws SQLException {
+        String query = "SELECT prenom, nom FROM Utilisateur WHERE id_utilisateur = ?";
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, idUtilisateur);
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            String prenom = rs.getString("prenom");
+            String nom = rs.getString("nom");
+            stmt.close();
+            return (prenom != null ? prenom + " " : "") + (nom != null ? nom : "");
+        }
+
+        stmt.close();
+        return null;
+    }
+
+    /**
+     * Mettre à jour la date du dernier message dans une transaction
+     */
+    private void updateLastMessageDateInTransaction(int idConversation, Connection conn) throws SQLException {
+        String query = "UPDATE Conversation SET dernier_message_date = NOW() WHERE id_conversation = ?";
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, idConversation);
+        stmt.executeUpdate();
+        stmt.close();
+        System.out.println("📅 Date dernier message mise à jour");
+    }
 }

@@ -5,26 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="21d4a189-069c-43e7-8dd4-f952c2e27263" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/NotificationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/NotificationDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/model/Notification.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/utils/NotificationManager.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/utils/NotificationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/vehiclegestion/css/notification-dropdown.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/view/common/NotificationPopup.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/auth/SessionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/auth/SessionManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientFavoritesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientFavoritesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientVehiclesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientVehiclesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/MainController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/RendezVousFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/RendezVousFormController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/VehicleDetaiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/VehiDetaiCo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/VehicleDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/VehicleDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/AddVehicleFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/AddVehicleFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/RendezVsDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/doa/RendezVsDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/ChatDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/ChatDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/NotificationDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/NotificationDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/utils/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/utils/NotificationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/layout/NavbarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/layout/NavbarController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/view/client/main-layout.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/client/main-layout.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/view/vendeur/AddVehicleForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/vendeur/AddVehicleForm.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/common/ChatWindow.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/common/ChatWindow.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/view/vendeur/layout/Navbar.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/vendeur/layout/Navbar.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

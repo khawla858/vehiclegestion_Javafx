@@ -86,13 +86,13 @@ public class NotificationService {
                 idClient,
                 "client",
                 "📅 Rappel de rendez-vous",
-                "Vous avez un rendez-vous demain à " + heureRdv + " pour un essai routier",
+                "Vous avez un rendez-vous le " + dateRdv + " à " + heureRdv + " pour un essai routier",
                 "rappel_rendezvous",
                 "transaction"
         );
         notif.setIdSource(idRdv);
         notif.setTypeSource("rendezvous");
-        notif.setPriorite("urgente");
+        notif.setPriorite("haute");
         notif.setLienAction("/rendezvous/" + idRdv);
 
         creerEtNotifier(notif);
@@ -117,7 +117,7 @@ public class NotificationService {
         creerEtNotifier(notif);
     }
 
-    // 👔 NOTIFICATIONS POUR VENDEURS (gardées pour référence)
+    // 👔 NOTIFICATIONS POUR VENDEURS
     public void notifierNouvelleReservationVendeur(int idVendeur, int idReservation, String nomClient, String titreVehicule) {
         System.out.println("🛒 Notification vendeur: Nouvelle réservation");
 
@@ -137,46 +137,6 @@ public class NotificationService {
         creerEtNotifier(notif);
     }
 
-    // 📱 MÉTHODES UTILITAIRES
-    public List<Notification> getNotificationsUtilisateur(int idUtilisateur, boolean nonLuesSeulement) {
-        return notificationDAO.getNotificationsUtilisateur(idUtilisateur, nonLuesSeulement);
-    }
-
-    public int getNombreNotificationsNonLues(int idUtilisateur) {
-        return notificationDAO.getNombreNotificationsNonLues(idUtilisateur);
-    }
-
-    public void marquerCommeLue(int idNotification) {
-        notificationDAO.marquerCommeLue(idNotification);
-
-        // Notifier que la notification a été lue
-        NotificationManager.getInstance().notifyNotificationRead(idNotification);
-    }
-
-    public void marquerToutesCommeLues(int idUtilisateur) {
-        notificationDAO.marquerToutesCommeLues(idUtilisateur);
-
-        // Notifier que toutes les notifications ont été lues
-        NotificationManager.getInstance().notifyNewNotification(idUtilisateur);
-    }
-
-    public void supprimerNotification(int idNotification) {
-        notificationDAO.supprimerNotification(idNotification);
-    }
-
-    // 🔄 MÉTHODE PRIVÉE POUR CRÉER ET NOTIFIER
-    private void creerEtNotifier(Notification notification) {
-        // 1. Créer la notification en base
-        notificationDAO.creerNotification(notification);
-
-        // 2. Notifier tous les écouteurs
-        NotificationManager.getInstance().notifyNewNotification(notification.getIdUtilisateur());
-
-        System.out.println("📢 Notification créée et notifiée: ID=" + notification.getIdNotification() +
-                ", User=" + notification.getIdUtilisateur());
-    }
-    // Dans NotificationService.java, ajoutez cette méthode :
-
     public void notifierDemandeEssai(int idVendeur, int idRdv, String nomClient, String dateEssai) {
         System.out.println("🚗 Notification: Demande d'essai pour vendeur " + idVendeur);
 
@@ -195,4 +155,191 @@ public class NotificationService {
 
         creerEtNotifier(notif);
     }
-}
+
+    // 📱 MÉTHODES UTILITAIRES
+    public List<Notification> getNotificationsUtilisateur(int idUtilisateur, boolean nonLuesSeulement) {
+        System.out.println("📋 Récupération notifications pour user " + idUtilisateur);
+        List<Notification> notifs = notificationDAO.getNotificationsUtilisateur(idUtilisateur, nonLuesSeulement);
+        System.out.println("✅ " + notifs.size() + " notifications trouvées");
+        return notifs;
+    }
+
+    public int getNombreNotificationsNonLues(int idUtilisateur) {
+        int count = notificationDAO.getNombreNotificationsNonLues(idUtilisateur);
+        System.out.println("🔢 Notifications non lues pour user " + idUtilisateur + ": " + count);
+        return count;
+    }
+
+    public void marquerCommeLue(int idNotification) {
+        System.out.println("📖 Marquer notification " + idNotification + " comme lue");
+        notificationDAO.marquerCommeLue(idNotification);
+
+        NotificationManager.getInstance().notifyNotificationRead(idNotification);
+    }
+
+    public void marquerToutesCommeLues(int idUtilisateur) {
+        System.out.println("📖 Marquer toutes les notifications comme lues pour user " + idUtilisateur);
+        notificationDAO.marquerToutesCommeLues(idUtilisateur);
+
+        NotificationManager.getInstance().notifyNewNotification(idUtilisateur);
+    }
+
+    public void supprimerNotification(int idNotification) {
+        System.out.println("🗑️ Supprimer notification " + idNotification);
+        notificationDAO.supprimerNotification(idNotification);
+    }
+
+    // 🔄 MÉTHODE PRIVÉE POUR CRÉER ET NOTIFIER
+    public void creerEtNotifier(Notification notification) {
+        try {
+            System.out.println("🔔 Création notification:");
+            System.out.println("   User ID: " + notification.getIdUtilisateur());
+            System.out.println("   Rôle: " + notification.getRoleDestinataire());
+            System.out.println("   Titre: " + notification.getTitre());
+            System.out.println("   Message: " + notification.getMessage());
+
+            // 1. Créer la notification en base
+            notificationDAO.creerNotification(notification);
+
+            System.out.println("✅ Notification créée avec ID: " + notification.getIdNotification());
+
+            // 2. Notifier tous les écouteurs
+            NotificationManager.getInstance().notifyNewNotification(notification.getIdUtilisateur());
+
+            System.out.println("📢 Notification envoyée au NotificationManager");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur création notification: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
+        // 📩 NOTIFICATION POUR VENDEUR : Nouvelle demande de RDV
+        public void notifierNouvelleDemandeRendezVous(int idVendeur, int idRdv,
+                                                      String nomClient, String titreVehicule,
+                                                      String date, String heure) {
+            System.out.println("📨 Notification vendeur: Nouvelle demande RDV");
+
+            Notification notif = new Notification(
+                    idVendeur,
+                    "vendeur",
+                    "📅 Nouvelle demande de rendez-vous",
+                    nomClient + " demande un rendez-vous pour le véhicule \"" + titreVehicule +
+                            "\" le " + date + " à " + heure,
+                    "nouvelle_demande_rdv",
+                    "transaction"
+            );
+            notif.setIdSource(idRdv);
+            notif.setTypeSource("rendezvous");
+            notif.setPriorite("haute");
+            notif.setLienAction("/vendeur/rendezvous/" + idRdv + "/traiter");
+
+            creerEtNotifier(notif);
+        }
+
+        // ✅ NOTIFICATION POUR CLIENT : Demande envoyée
+        public void notifierConfirmationDemandeClient(int idClient, int idRdv, String message) {
+            System.out.println("📨 Notification client: Demande envoyée");
+
+            Notification notif = new Notification(
+                    idClient,
+                    "client",
+                    "📩 Demande de rendez-vous envoyée",
+                    message,
+                    "demande_rdv_envoyee",
+                    "transaction"
+            );
+            notif.setIdSource(idRdv);
+            notif.setTypeSource("rendezvous");
+            notif.setPriorite("normale");
+            notif.setLienAction("/client/rendezvous/" + idRdv);
+
+            creerEtNotifier(notif);
+        }
+
+        // ✅ NOTIFICATION POUR CLIENT : RDV accepté par vendeur
+        public void notifierRendezVousAccepteClient(int idClient, int idRdv,
+                                                    String message, String date, String heure) {
+            System.out.println("✅ Notification client: RDV accepté");
+
+            Notification notif = new Notification(
+                    idClient,
+                    "client",
+                    "✅ Rendez-vous accepté",
+                    message + "\nDate: " + date + " à " + heure,
+                    "rdv_accepte",
+                    "transaction"
+            );
+            notif.setIdSource(idRdv);
+            notif.setTypeSource("rendezvous");
+            notif.setPriorite("haute");
+            notif.setLienAction("/client/rendezvous/" + idRdv + "/confirmer");
+
+            creerEtNotifier(notif);
+        }
+
+        // ❌ NOTIFICATION POUR CLIENT : RDV refusé par vendeur
+        public void notifierRendezVousRefuseClient(int idClient, int idRdv,
+                                                   String message, String date, String heure) {
+            System.out.println("❌ Notification client: RDV refusé");
+
+            Notification notif = new Notification(
+                    idClient,
+                    "client",
+                    "❌ Rendez-vous refusé",
+                    message + "\nDate demandée: " + date + " à " + heure,
+                    "rdv_refuse",
+                    "transaction"
+            );
+            notif.setIdSource(idRdv);
+            notif.setTypeSource("rendezvous");
+            notif.setPriorite("normale");
+            notif.setLienAction("/client/rendezvous/" + idRdv);
+
+            creerEtNotifier(notif);
+        }
+
+        // 👍 NOTIFICATION POUR VENDEUR : Client confirme RDV
+        public void notifierClientConfirmeRendezVous(int idVendeur, int idRdv,
+                                                     String nomClient, String message) {
+            System.out.println("👍 Notification vendeur: Client confirme RDV");
+
+            Notification notif = new Notification(
+                    idVendeur,
+                    "vendeur",
+                    "👍 Rendez-vous confirmé",
+                    nomClient + " a confirmé le rendez-vous. " + message,
+                    "rdv_confirme_par_client",
+                    "transaction"
+            );
+            notif.setIdSource(idRdv);
+            notif.setTypeSource("rendezvous");
+            notif.setPriorite("normale");
+            notif.setLienAction("/vendeur/rendezvous/" + idRdv);
+
+            creerEtNotifier(notif);
+        }
+
+        // 🚫 NOTIFICATION POUR VENDEUR : Client annule RDV
+        public void notifierClientAnnuleRendezVous(int idVendeur, int idRdv,
+                                                   String nomClient, String message) {
+            System.out.println("🚫 Notification vendeur: Client annule RDV");
+
+            Notification notif = new Notification(
+                    idVendeur,
+                    "vendeur",
+                    "🚫 Rendez-vous annulé",
+                    nomClient + " a annulé le rendez-vous. " + message,
+                    "rdv_annule_par_client",
+                    "transaction"
+            );
+            notif.setIdSource(idRdv);
+            notif.setTypeSource("rendezvous");
+            notif.setPriorite("urgente");
+            notif.setLienAction("/vendeur/rendezvous/" + idRdv);
+
+            creerEtNotifier(notif);
+        }
+    }

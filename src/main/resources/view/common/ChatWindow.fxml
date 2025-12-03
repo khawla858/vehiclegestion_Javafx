@@ -205,15 +205,15 @@
                             onAction="#attachFile"/>
 
                     <!-- Champ de texte -->
+                    <!-- REMPLACEZ lignes 152-158 : -->
                     <TextField fx:id="messageInputField"
                                promptText="Écrivez votre message..."
-                               onAction="#sendMessage"
                                style="-fx-padding: 12 15;
-                                      -fx-background-radius: 20;
-                                      -fx-border-radius: 20;
-                                      -fx-background-color: #f0f2f5;
-                                      -fx-border-color: transparent;
-                                      -fx-font-size: 14px;"
+                  -fx-background-radius: 20;
+                  -fx-border-radius: 20;
+                  -fx-background-color: #f0f2f5;
+                  -fx-border-color: transparent;
+                  -fx-font-size: 14px;"
                                HBox.hgrow="ALWAYS"/>
 
                     <!-- Bouton emoji -->
@@ -224,18 +224,7 @@
                             onAction="#showEmojiPicker"/>
 
                     <!-- Bouton envoyer -->
-                    <Button fx:id="sendButton"
-                            text="➤"
-                            onAction="#sendMessage"
-                            style="-fx-background-color: #0084ff;
-                                   -fx-text-fill: white;
-                                   -fx-background-radius: 25;
-                                   -fx-pref-width: 50;
-                                   -fx-pref-height: 50;
-                                   -fx-font-size: 18px;
-                                   -fx-font-weight: bold;
-                                   -fx-cursor: hand;
-                                   -fx-effect: dropshadow(gaussian, rgba(0,132,255,0.3), 10, 0, 0, 2);"/>
+
                 </HBox>
 
             </VBox>
