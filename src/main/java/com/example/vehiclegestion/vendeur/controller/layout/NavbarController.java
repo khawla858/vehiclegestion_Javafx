@@ -2,12 +2,17 @@ package com.example.vehiclegestion.vendeur.controller.layout;
 
 import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
+import com.example.vehiclegestion.common.controller.ChatWindowController;
 import com.example.vehiclegestion.utils.NavigationManager;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
@@ -235,21 +240,89 @@ public class NavbarController {
         alert.show();
     }
 
+    /**
+     * Ouvre la fenêtre de chat pour le vendeur
+     */
     @FXML
     private void showMessages() {
-        System.out.println("💬 Messages");
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Messages");
-        alert.setHeaderText("Vous avez 5 nouveaux messages");
-        alert.setContentText(
-                "💬 Question sur le financement - BMW Série 3\n" +
-                        "🚗 Demande de test drive - Mercedes Classe C\n" +
-                        "✅ Confirmation RDV - M. Dubois\n" +
-                        "❓ Renseignement sur garantie - Audi Q5\n" +
-                        "📋 Suivi dossier - Mme. Petit"
-        );
-        styleAlert(alert);
-        alert.show();
+        System.out.println("\n💬 === OUVERTURE CHAT VENDEUR ===");
+
+        try {
+            // Essayer différents chemins
+            String[] possiblePaths = {
+                    "/view/common/ChatWindow.fxml",
+                    "/com/example/vehiclegestion/view/common/ChatWindow.fxml",
+                    "view/common/ChatWindow.fxml",
+                    "/ChatWindow.fxml",
+                    "ChatWindow.fxml"
+            };
+
+            FXMLLoader loader = null;
+            Parent chatRoot = null;
+            String foundPath = null;
+
+            for (String path : possiblePaths) {
+                try {
+                    System.out.println("🔍 Essai du chemin: " + path);
+                    java.net.URL url = getClass().getResource(path);
+                    if (url != null) {
+                        System.out.println("✅ URL trouvée: " + url);
+                        loader = new FXMLLoader(url);
+                        chatRoot = loader.load();
+                        foundPath = path;
+                        System.out.println("✅ FXML chargé avec succès: " + path);
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Échec pour: " + path + " - " + e.getMessage());
+                }
+            }
+
+            if (chatRoot == null || loader == null) {
+                System.err.println("❌ Fichier ChatWindow.fxml introuvable dans tous les chemins testés");
+                showAlert("Erreur", "Impossible de charger l'interface de chat", Alert.AlertType.ERROR);
+                return;
+            }
+
+            System.out.println("✅ FXML chargé depuis: " + foundPath);
+
+            // Récupérer le contrôleur
+            ChatWindowController chatController = loader.getController();
+
+            if (chatController == null) {
+                System.err.println("❌ Contrôleur ChatWindowController non trouvé");
+                showAlert("Erreur", "Contrôleur non chargé", Alert.AlertType.ERROR);
+                return;
+            }
+
+            System.out.println("✅ Contrôleur chargé - Mode: VENDEUR");
+            System.out.println("   Utilisateur ID: " + session.getUserId());
+            System.out.println("   Rôle: " + session.getUserRole());
+
+            // Créer et afficher la fenêtre
+            Stage stage = new Stage();
+            stage.setTitle("Messages - Conversations avec les clients");
+            stage.setScene(new Scene(chatRoot, 1000, 700));
+            stage.setMinWidth(800);
+            stage.setMinHeight(600);
+
+            // Fermer proprement
+            stage.setOnCloseRequest(e -> {
+                if (chatController != null) {
+                    chatController.cleanup();
+                }
+                System.out.println("📭 Fenêtre de chat fermée");
+            });
+
+            stage.show();
+
+            System.out.println("✅ Fenêtre de chat vendeur ouverte avec succès");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur inattendue lors de l'ouverture du chat: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de l'ouverture du chat:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     // ========================================
@@ -305,7 +378,17 @@ public class NavbarController {
                 styleAlert(success);
                 success.show();
 
-                // TODO: Rediriger vers page de login
+                // Redirection vers login
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
+                    Parent loginPage = loader.load();
+                    Stage currentStage = (Stage) userNameLabel.getScene().getWindow();
+                    currentStage.setScene(new Scene(loginPage));
+                    currentStage.setTitle("Connexion - AutoSales Pro");
+                    currentStage.centerOnScreen();
+                } catch (Exception e) {
+                    System.err.println("❌ Erreur redirection login: " + e.getMessage());
+                }
             }
         });
     }

@@ -69,4 +69,26 @@ public class SessionManager {
                 utilisateurConnecte.getEmail() + " (" + utilisateurConnecte.getRole() + ")" : "null"));
         System.out.println("=====================");
     }
+
+    public String getUserFullName() {
+        if (utilisateurConnecte == null) {
+            return null;
+        }
+
+        Utilisateur user = utilisateurConnecte;
+        if (user.getPrenom() != null && user.getNom() != null) {
+            return user.getPrenom() + " " + user.getNom();
+        } else if (user.getNom() != null) {
+            return user.getNom();
+        } else if (user.getPrenom() != null) {
+            return user.getPrenom();
+        } else {
+            // Extraire de l'email
+            String email = user.getEmail();
+            if (email != null && email.contains("@")) {
+                return email.substring(0, email.indexOf("@"));
+            }
+            return "Utilisateur";
+        }
+    }
 }

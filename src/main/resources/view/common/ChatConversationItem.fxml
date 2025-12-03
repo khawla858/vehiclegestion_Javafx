@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<HBox xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="conversationItemRoot"
+      alignment="CENTER_LEFT"
+      spacing="12"
+      style="-fx-background-color: white; -fx-cursor: hand; -fx-padding: 12 15;">
+
+    <!-- Avatar -->
+    <StackPane fx:id="avatarPane"
+               style="-fx-background-color: #0084ff; -fx-background-radius: 25;"
+               prefWidth="50" prefHeight="50">
+        <Label fx:id="avatarLabel"
+               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+    </StackPane>
+
+    <!-- Infos conversation -->
+    <VBox spacing="4" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+        <Label fx:id="nomLabel"
+               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1c1e21;"/>
+        <Label fx:id="messageLabel"
+               maxWidth="200"
+               style="-fx-font-size: 13px; -fx-text-fill: #65676b;"/>
+    </VBox>
+
+    <!-- Infos droite -->
+    <VBox spacing="5" alignment="TOP_RIGHT">
+        <Label fx:id="dateLabel"
+               style="-fx-font-size: 11px; -fx-text-fill: #8a8d91;"/>
+        <Label fx:id="badgeLabel"
+               visible="false"
+               style="-fx-background-color: #0084ff; -fx-text-fill: white;
+                      -fx-background-radius: 10; -fx-padding: 2 6;
+                      -fx-font-size: 11px; -fx-font-weight: bold;"/>
+    </VBox>
+
+</HBox>

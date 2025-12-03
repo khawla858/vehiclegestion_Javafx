@@ -71,7 +71,7 @@
         <!-- ACTIONS DROITE -->
         <HBox spacing="15" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
             <!-- PANIER -->
-            <StackPane fx:id="cartIcon" styleClass="top-icon-btn" onMouseClicked="#showCart"
+            <StackPane fx:id="cartIcon" onMouseClicked="#showCart"
                        style="-fx-cursor: hand;">
                 <StackPane style="-fx-background-color: transparent;
                                   -fx-pref-width: 42;
@@ -83,18 +83,19 @@
                               -fx-font-size: 9px;
                               -fx-translate-x: 12;
                               -fx-translate-y: -12;
+                              -fx-background-color: #e74c3c;
+                              -fx-background-radius: 10;
                               -fx-padding: 2 6;
                               -fx-min-width: 18;
                               -fx-alignment: center;"/>
             </StackPane>
 
             <!-- NOTIFICATIONS -->
-            <StackPane styleClass="top-icon-btn" onMouseClicked="#showNotifications">
-                <StackPane style="
-                                  -fx-background-radius: 50;
+            <StackPane onMouseClicked="#showNotifications"
+                       style="-fx-cursor: hand;">
+                <StackPane style="-fx-background-radius: 50;
                                   -fx-pref-width: 42;
-                                  -fx-pref-height: 42;
-                                  -fx-cursor: hand;">
+                                  -fx-pref-height: 42;">
                     <FontIcon iconLiteral="far-bell" iconSize="18" iconColor="#7f8c8d"/>
                 </StackPane>
                 <Label text="3"
@@ -111,12 +112,11 @@
             </StackPane>
 
             <!-- MESSAGES -->
-            <StackPane styleClass="top-icon-btn" onMouseClicked="#showMessages">
-                <StackPane style="
-                                  -fx-background-radius: 50;
+            <StackPane onMouseClicked="#showMessages"
+                       style="-fx-cursor: hand;">
+                <StackPane style="-fx-background-radius: 50;
                                   -fx-pref-width: 42;
-                                  -fx-pref-height: 42;
-                                  -fx-cursor: hand;">
+                                  -fx-pref-height: 42;">
                     <FontIcon iconLiteral="far-envelope" iconSize="18" iconColor="#7f8c8d"/>
                 </StackPane>
                 <Label text="5"
@@ -202,7 +202,6 @@
         <!-- Dashboard -->
         <Button fx:id="dashboardBtn"
                 onAction="#showDashboard"
-                styleClass="nav-item-btn"
                 style="-fx-background-color: transparent;
                        -fx-border-width: 0;
                        -fx-padding: 16 20;
@@ -218,7 +217,6 @@
 
         <!-- Clients (MenuButton) -->
         <MenuButton text="Clients"
-                    styleClass="nav-menu-btn"
                     style="-fx-background-color: transparent;
                            -fx-border-width: 0;
                            -fx-padding: 16 20;
@@ -226,7 +224,7 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <FontIcon iconLiteral="fas-users" iconSize="16" iconColor="#9b59b6"/>
-                    <Label
+                    <Label text="Clients"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                     <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
                 </HBox>
@@ -243,7 +241,6 @@
 
         <!-- Véhicules (MenuButton) -->
         <MenuButton text="Véhicules"
-                    styleClass="nav-menu-btn"
                     style="-fx-background-color: transparent;
                            -fx-border-width: 0;
                            -fx-padding: 16 20;
@@ -268,7 +265,6 @@
 
         <!-- Commandes (MenuButton) -->
         <MenuButton text="Reservations"
-                    styleClass="nav-menu-btn"
                     style="-fx-background-color: transparent;
                            -fx-border-width: 0;
                            -fx-padding: 16 20;
@@ -276,7 +272,7 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <FontIcon iconLiteral="fas-shopping-cart" iconSize="16" iconColor="#27ae60"/>
-                    <Label text="Commandes"
+                    <Label text="Réservations"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                     <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
                 </HBox>
@@ -293,7 +289,6 @@
 
         <!-- Statistiques (MenuButton) -->
         <MenuButton text="Mes achats"
-                    styleClass="nav-menu-btn"
                     style="-fx-background-color: transparent;
                            -fx-border-width: 0;
                            -fx-padding: 16 20;
@@ -301,13 +296,13 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <FontIcon iconLiteral="fas-chart-bar" iconSize="16" iconColor="#e74c3c"/>
-                    <Label text="Statistiques"
+                    <Label text="Mes achats"
                            style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                     <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
                 </HBox>
             </graphic>
             <items>
-                <MenuItem text="mes achats" onAction="#showMonthlySales">
+                <MenuItem text="Mes achats" onAction="#showMonthlySales">
                     <graphic><FontIcon iconLiteral="fas-chart-line" iconSize="14" iconColor="#e74c3c"/></graphic>
                 </MenuItem>
                 <MenuItem text="Revenus" onAction="#showRevenueStats">
@@ -324,7 +319,6 @@
 
         <!-- Rendez-vous -->
         <Button onAction="#showRendezVous"
-                styleClass="nav-item-btn"
                 style="-fx-background-color: transparent;
                        -fx-border-width: 0;
                        -fx-padding: 16 20;
@@ -340,7 +334,6 @@
 
         <!-- Magasins -->
         <Button onAction="#showMagasins"
-                styleClass="nav-item-btn"
                 style="-fx-background-color: transparent;
                        -fx-border-width: 0;
                        -fx-padding: 16 20;

@@ -6,7 +6,7 @@ import com.example.vehiclegestion.client.doa.FavoriteDAO;
 import com.example.vehiclegestion.client.doa.ReservationDAO;
 import com.example.vehiclegestion.client.doa.VehicleDAO;
 import com.example.vehiclegestion.client.model.Vehicle;
-import com.example.vehiclegestion.client.controller.VehicleDetaiController;
+import com.example.vehiclegestion.client.controller.VehiDetaiCo;
 import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -562,7 +562,7 @@ public class ClientFavoritesController implements Initializable {
         System.out.println("🎯 DEBUT viewVehicleDetails pour: " + vehicle.getTitle());
 
         try {
-            String fxmlPath = "/view/vendeur/VehicleDetail.fxml";
+            String fxmlPath = "/view/client/Vehicle-Detail.fxml";
             System.out.println("🔍 Chemin FXML testé: " + fxmlPath);
 
             URL url = getClass().getResource(fxmlPath);
@@ -570,10 +570,10 @@ public class ClientFavoritesController implements Initializable {
 
             if (url == null) {
                 String[] testPaths = {
-                        "/com/example/vehiclegestion/view/vendeur/VehicleDetail.fxml",
-                        "/view/vendeur/VehicleDetail.fxml",
-                        "/vendeur/VehicleDetail.fxml",
-                        "VehicleDetail.fxml"
+                        "/com/example/vehiclegestion/view/client/Vehicle-Detail.fxml",
+                        "/view/client/Vehicle-Detail.fxml",
+                        "/client/Vehicle-Detail.fxml",
+                        "Vehicle-Detail.fxml"
                 };
 
                 for (String path : testPaths) {
@@ -596,7 +596,7 @@ public class ClientFavoritesController implements Initializable {
             Parent root = loader.load();
             System.out.println("✅ FXML chargé avec succès");
 
-            VehicleDetaiController controller = loader.getController();
+            VehiDetaiCo controller = loader.getController();
             System.out.println("✅ Contrôleur récupéré: " + controller.getClass().getSimpleName());
 
             Article article = convertVehicleToArticle(vehicle);

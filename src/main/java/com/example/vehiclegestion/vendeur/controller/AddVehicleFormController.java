@@ -55,6 +55,8 @@ public class AddVehicleFormController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         articleDAO = new ArticleDAO();
+        checkImageStructure(); // Ajoutez cette ligne
+
         setupForm();
     }
 
@@ -100,36 +102,46 @@ public class AddVehicleFormController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(dialogStage);
         if (selectedFile != null) {
             try {
-                // dossier de stockage (externe, à côté du jar ou dans le répertoire de travail)
-                Path imagesDir = Path.of(System.getProperty("user.dir"), "images", "articles");
-                if (!Files.exists(imagesDir)) Files.createDirectories(imagesDir);
+                // CHANGEMENT: Utiliser LE MÊME DOSSIER que pour les clients
+                Path targetDir = Path.of(System.getProperty("user.dir"), "src", "main", "resources", "uploads", "vehicles");
+                if (!Files.exists(targetDir)) {
+                    Files.createDirectories(targetDir);
+                    System.out.println("📁 Dossier créé: " + targetDir);
+                }
 
-                // extension d'origine
+                // Générer un nom unique
                 String originalName = selectedFile.getName();
-                String ext = "";
-                int i = originalName.lastIndexOf('.');
-                if (i > 0) ext = originalName.substring(i);
+                String extension = "";
+                int dotIndex = originalName.lastIndexOf('.');
+                if (dotIndex > 0) {
+                    extension = originalName.substring(dotIndex);
+                }
 
-                // nom unique
-                String newName = "article_" + System.currentTimeMillis() + ext;
+                // Nom basé sur le timestamp + nom original
+                String timestamp = String.valueOf(System.currentTimeMillis());
+                String cleanName = originalName.substring(0, dotIndex > 0 ? dotIndex : originalName.length())
+                        .replaceAll("[^a-zA-Z0-9]", "_");
+                String newName = timestamp + "_" + cleanName + extension;
 
-                Path dest = imagesDir.resolve(newName);
+                Path destination = targetDir.resolve(newName);
 
-                // copier le fichier sélectionné vers le dossier de l'application
-                Files.copy(selectedFile.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
+                // Copier le fichier
+                Files.copy(selectedFile.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
 
-                // stocker le chemin RELATIF (par rapport au dossier de l'application)
-                // tu peux stocker "images/articles/..." ou absolute file: URI selon ton choix.
-                selectedImagePath = "images/articles/" + newName;
+                // Stocker le chemin RELATIF (comme pour les clients)
+                selectedImagePath = "uploads/vehicles/" + newName;
 
-                // afficher le nom dans le champ
+                // Afficher dans le champ
                 imageField.setText(newName);
 
-                // afficher un aperçu (utiliser file: URI)
-                Image image = new Image(dest.toUri().toString(), true);
+                // Aperçu
+                Image image = new Image(destination.toUri().toString(), true);
                 imagePreview.setImage(image);
                 imagePreviewContainer.setManaged(true);
                 imagePreviewContainer.setVisible(true);
+
+                System.out.println("✅ Image copiée vers: " + destination);
+                System.out.println("📋 Chemin stocké en DB: " + selectedImagePath);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -158,44 +170,12 @@ public class AddVehicleFormController implements Initializable {
             article.setTransmission(transmissionComboBox.getValue());
             article.setCarburant(carburantComboBox.getValue());
             article.setPuissance(!puissanceField.getText().isEmpty() ? Integer.parseInt(puissanceField.getText()) : 0);
-            //article.setCouleur(couleurField.getText().trim());
-            //article.setReduction(!reductionField.getText().isEmpty() ? Integer.parseInt(reductionField.getText()) : 0);
-            //article.setPrixPromo(!prixPromoField.getText().isEmpty() ? Double.parseDouble(prixPromoField.getText()) : article.getPrix());
 
+            // SIMPLIFICATION: Utiliser directement le chemin déjà copié
+            article.setImage(selectedImagePath); // "uploads/vehicles/nom_fichier.jpg"
 
-            // ================================================
-            // 1. SAUVEGARDE DE L’IMAGE DANS LE PROJET
-            // ================================================
-            String imageRelativePath = null;
+            System.out.println("📋 Article à insérer - Image: " + article.getImage());
 
-            if (selectedImagePath != null && !selectedImagePath.isEmpty()) {
-
-                // dossier où tu veux stocker les images dans ton projet
-                File destDir = new File("images/articles");
-                if (!destDir.exists()) destDir.mkdirs();
-
-                // nom unique pour éviter les conflits
-                String fileName = "article_" + System.currentTimeMillis() + ".png";
-
-                File source = new File(selectedImagePath);
-                File destination = new File(destDir, fileName);
-
-                // copier l'image dans le projet
-                java.nio.file.Files.copy(
-                        source.toPath(),
-                        destination.toPath(),
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                );
-
-                // chemin RELATIF que tu stockes dans la base
-                imageRelativePath = "images/articles/" + fileName;
-            }
-
-            article.setImage(imageRelativePath);
-
-            // ================================================
-            // 2. INSERTION DANS LA BASE
-            // ================================================
             boolean success = articleDAO.addArticle(article, vendeurId);
 
             if (success) {
@@ -227,7 +207,6 @@ public class AddVehicleFormController implements Initializable {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void cancel() {
@@ -286,4 +265,34 @@ public class AddVehicleFormController implements Initializable {
         selectedImagePath = null;
         messageLabel.setText("");
     }
+
+
+    private void checkImageStructure() {
+        // Vérifier la structure des dossiers
+        String[] pathsToCheck = {
+                "src/main/resources/uploads/vehicles",
+                "uploads/vehicles",
+                "images/articles"
+        };
+
+        System.out.println("📁 === VÉRIFICATION STRUCTURE IMAGES ===");
+        for (String path : pathsToCheck) {
+            File dir = new File(path);
+            if (dir.exists()) {
+                System.out.println("✅ " + path + " - Existe (" +
+                        dir.listFiles().length + " fichiers)");
+
+                // Lister les fichiers
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        System.out.println("   📄 " + f.getName());
+                    }
+                }
+            } else {
+                System.out.println("❌ " + path + " - N'existe pas");
+            }
+        }
+    }
+
 }

@@ -1,0 +1,7 @@
+<configuration>
+    <appender name="ELASTIC" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+</configuration>

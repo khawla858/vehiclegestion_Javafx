@@ -5,6 +5,9 @@ import com.example.vehiclegestion.client.model.RendezVs;
 import com.example.vehiclegestion.client.doa.RendezVsDAO;
 import com.example.vehiclegestion.client.model.Vehicle; // Utilise Vehicle
 import com.example.vehiclegestion.auth.SessionManager;
+// AJOUTER CET IMPORT
+import com.example.vehiclegestion.common.utils.NotificationService;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -18,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+
 public class RendezVousFormController {
 
     @FXML private VBox mainContainer;
@@ -36,7 +40,12 @@ public class RendezVousFormController {
     private RendezVsDAO rendezVsDAO = new RendezVsDAO();
     private Runnable onRendezVousCreated;
 
+    // AJOUTER CET ATTRIBUT
+    private NotificationService notificationService;
+
     public void initialize() {
+        // AJOUTER CETTE LIGNE - Initialiser NotificationService
+        notificationService = NotificationService.getInstance();
         setupForm();
         setupStyling();
     }
@@ -177,6 +186,51 @@ public class RendezVousFormController {
 
             if (success) {
                 System.out.println("✅ Rendez-vous créé avec succès en base");
+
+                // ================================================
+                // AJOUTER CE CODE POUR LA NOTIFICATION
+                // ================================================
+                try {
+                    // Formater la date et l'heure
+                    String dateStr = rendezVs.getDateRdv().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    String heureStr = rendezVs.getHeureRdv().format(DateTimeFormatter.ofPattern("HH:mm"));
+
+                    // Obtenir le nom du client
+
+                    String nomClient = SessionManager.getInstance().getUserFullName();
+                    if (nomClient == null || nomClient.isEmpty()) {
+                        nomClient = "Un client";
+                    }
+
+                    System.out.println("📅 Envoi des notifications pour le RDV:");
+                    System.out.println("   Client: " + rendezVs.getIdClient());
+                    System.out.println("   Vendeur: " + rendezVs.getIdVendeur());
+                    System.out.println("   Date: " + dateStr + " " + heureStr);
+
+                    // 1. Notifier le CLIENT (notification immédiate)
+                    notificationService.notifierRappelRendezVous(
+                            rendezVs.getIdClient(),
+                            999, // ID temporaire (remplacez par l'ID réel si disponible)
+                            dateStr,
+                            heureStr
+                    );
+                    System.out.println("   ✅ Notification envoyée au client");
+
+                    // 2. Notifier le VENDEUR
+                    notificationService.notifierDemandeEssai(
+                            rendezVs.getIdVendeur(),
+                            999, // ID temporaire
+                            nomClient,
+                            dateStr + " à " + heureStr
+                    );
+                    System.out.println("   ✅ Notification envoyée au vendeur");
+
+                } catch (Exception e) {
+                    System.err.println("⚠️ Erreur lors de l'envoi des notifications: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                // ================================================
+
                 showSuccessMessage();
                 if (onRendezVousCreated != null) {
                     onRendezVousCreated.run();
@@ -190,7 +244,6 @@ public class RendezVousFormController {
             e.printStackTrace();
             showError("Erreur", "Une erreur est survenue: " + e.getMessage());
         }
-
 
         System.out.println("=== DEBUG HANDLESUBMIT ===");
         System.out.println("Date: " + datePicker.getValue());
@@ -251,8 +304,6 @@ public class RendezVousFormController {
         rdv.setIdClient(SessionManager.getInstance().getUserId());
         rdv.setIdVendeur(vehicle.getSellerId());
         rdv.setIdArticle(vehicle.getId());
-
-
 
         // Informations de base
         rdv.setIdClient(SessionManager.getInstance().getUserId());
@@ -329,6 +380,7 @@ public class RendezVousFormController {
             showError("Erreur", "Problème d'affichage du message de succès.");
         }
     }
+
     @FXML
     private void closeForm() {
         Stage stage = (Stage) mainContainer.getScene().getWindow();
