@@ -1,0 +1,120 @@
+/* historique.css - Partie tableaux */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .table-row-cell {
+    -fx-border-color: #f0f0f0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 0;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #fafafa;
+}
+
+.table-view .table-row-cell:even {
+    -fx-background-color: white;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #e3f2fd;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #3498db20;
+    -fx-background-insets: 0;
+}
+
+.table-cell {
+    -fx-padding: 8 15;
+    -fx-border-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* ScrollBar pour TableView */
+.table-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #c1c1c1;
+    -fx-background-radius: 5em;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a8a8a8;
+}
+
+/* Style pour les badges dans les cellules */
+.status-badge-confirme {
+    -fx-background-color: #2ecc7120;
+    -fx-text-fill: #2ecc71;
+    -fx-padding: 4 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.status-badge-attente {
+    -fx-background-color: #f39c1220;
+    -fx-text-fill: #f39c12;
+    -fx-padding: 4 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.status-badge-annule {
+    -fx-background-color: #e74c3c20;
+    -fx-text-fill: #e74c3c;
+    -fx-padding: 4 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.note-cell-5 {
+    -fx-text-fill: #2ecc71;
+    -fx-font-weight: bold;
+}
+
+.note-cell-4 {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+.note-cell-3 {
+    -fx-text-fill: #f39c12;
+    -fx-font-weight: bold;
+}
+
+.note-cell-2 {
+    -fx-text-fill: #e67e22;
+    -fx-font-weight: bold;
+}
+
+.note-cell-1 {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+}

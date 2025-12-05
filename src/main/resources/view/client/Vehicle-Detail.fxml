@@ -90,10 +90,13 @@
                             <Label text="👁" style="-fx-font-size: 16px;"/>
                             <Label text="1 234 vues" style="-fx-text-fill: #666; -fx-font-size: 13px;"/>
                         </HBox>
-                        <HBox spacing="10">
-                            <Label text="♡" style="-fx-font-size: 16px;"/>
-                            <Label text="67 favoris" style="-fx-text-fill: #666; -fx-font-size: 13px;"/>
-                        </HBox>
+                        <!-- Bouton Visiter Magasin -->
+                        <Button fx:id="visiterMagasinBtn" text="🏪 Visiter Magasin"
+                                style="-fx-background-color: #FF9800; -fx-text-fill: white;
+               -fx-padding: 10 20; -fx-background-radius: 8;
+               -fx-font-weight: bold; -fx-cursor: hand;
+               -fx-font-size: 14px; -fx-max-width: Infinity;"
+                                onAction="#handleVisiterMagasin"/>
                     </VBox>
 
                 </VBox>

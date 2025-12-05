@@ -2,7 +2,8 @@ package com.example.vehiclegestion.vendeur.dao;
 
 import com.example.vehiclegestion.vendeur.model.Magasin;
 import com.example.vehiclegestion.common.dao.DatabaseConnection;
-
+import java.util.Map;
+import java.util.HashMap;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -293,5 +294,45 @@ public class MagasinDAO {
             e.printStackTrace();
             return false;
         }
+    }
+    public Magasin getMagasinByVendeurId(int vendeurId) {
+        String sql = "SELECT * FROM Magasin WHERE id_vendeur = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, vendeurId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Magasin magasin = new Magasin();
+                magasin.setIdMagasin(rs.getInt("id_magasin"));
+                magasin.setNomMagasin(rs.getString("nom_magasin"));
+                magasin.setCategorie(rs.getString("categorie"));
+                magasin.setAdresse(rs.getString("adresse"));
+                magasin.setLocalisation(rs.getString("localisation"));
+                magasin.setTelephone(rs.getString("telephone"));
+                magasin.setEmailContact(rs.getString("email_contact"));
+                magasin.setSiteWeb(rs.getString("site_web"));
+                magasin.setDescription(rs.getString("description"));
+                magasin.setLogoMagasin(rs.getString("logo_magasin"));
+                magasin.setFacebook(rs.getString("facebook"));
+                magasin.setInstagram(rs.getString("instagram"));
+                magasin.setIdVendeur(rs.getInt("id_vendeur"));
+
+                // Pour les horaires, créez un Map simple
+                Map<String, String> horaires = new HashMap<>();
+                // Ici, vous pouvez parser les horaires selon votre structure de base
+                // Par exemple, si c'est une colonne texte avec format: "Lundi=9h-18h;Mardi=9h-18h"
+
+                return magasin;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur récupération magasin: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

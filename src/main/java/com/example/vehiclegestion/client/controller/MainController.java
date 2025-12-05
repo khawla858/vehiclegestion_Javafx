@@ -591,7 +591,7 @@ public class MainController {
     private void showHistory() {
         System.out.println("📊 Navigation vers Historique");
         setActiveMenu(historyBtn);
-        loadContent("/view/client/ClientFavoritesView.fxml");
+        loadContent("/view/client/historique-client.fxml");
     }
 
     @FXML
@@ -701,4 +701,8 @@ public class MainController {
             notificationRefreshTimeline.stop();
         }
     }
+
+
+
+
 }

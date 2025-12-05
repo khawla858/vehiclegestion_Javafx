@@ -1,43 +1,44 @@
 package com.example.vehiclegestion.client.controller;
 
-import javafx.scene.control.Alert;
 import com.example.vehiclegestion.vendeur.model.Article;
 import com.example.vehiclegestion.vendeur.model.Commentaire;
 import com.example.vehiclegestion.vendeur.dao.CommentaireDAO;
 import com.example.vehiclegestion.utils.DataReceiver;
-import com.example.vehiclegestion.utils.NavigationManager;
 import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.client.model.Vehicle;
+import com.example.vehiclegestion.vendeur.controller.MagasinDetailsController;
+import com.example.vehiclegestion.vendeur.model.Magasin;
+import com.example.vehiclegestion.vendeur.dao.MagasinDAO;
 import javafx.fxml.FXML;
+
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import java.net.URL;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.scene.Node;
 import javafx.geometry.Pos;
-import java.io.IOException;
 import javafx.application.Platform;
 import com.example.vehiclegestion.common.dao.ChatDAO;
 import com.example.vehiclegestion.common.model.Conversation;
 import com.example.vehiclegestion.common.controller.ChatWindowController;
 
-
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import com.example.vehiclegestion.utils.DatabaseConnection;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 
 public class VehiDetaiCo implements DataReceiver {
 
@@ -55,9 +56,9 @@ public class VehiDetaiCo implements DataReceiver {
     @FXML private VBox sellerSection;
     @FXML private Button contactBtn;
     @FXML private Button backBtn;
+    @FXML private Button visiterMagasinBtn;
 
     private Article article;
-    private NavigationManager nav = NavigationManager.getInstance();
     private CommentaireDAO commentaireDAO = new CommentaireDAO();
     private boolean articleCharge = false;
 
@@ -91,7 +92,7 @@ public class VehiDetaiCo implements DataReceiver {
         scrollPane.setStyle("-fx-background-color: #f5f5f5;");
 
         if (backBtn != null) {
-            backBtn.setOnAction(e -> nav.goBack());
+            backBtn.setOnAction(e -> goBack());
             backBtn.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; " +
                     "-fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
         }
@@ -101,6 +102,19 @@ public class VehiDetaiCo implements DataReceiver {
             contactBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; " +
                     "-fx-padding: 12 30; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;");
         }
+
+        if (visiterMagasinBtn != null) {
+            visiterMagasinBtn.setOnAction(e -> handleVisiterMagasin());
+            visiterMagasinBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; " +
+                    "-fx-padding: 10 20; -fx-background-radius: 8; " +
+                    "-fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;");
+        }
+    }
+
+    private void goBack() {
+        // Fermer la fenêtre actuelle
+        Stage stage = (Stage) backBtn.getScene().getWindow();
+        stage.close();
     }
 
     private void displayArticleDetails() {
@@ -202,8 +216,6 @@ public class VehiDetaiCo implements DataReceiver {
         descriptionLabel.setWrapText(true);
     }
 
-    // ==================== SECTION COMMENTAIRES ====================
-
     private void loadCommentaires() {
         System.out.println("🔄 === DÉBUT CHARGEMENT COMMENTAIRES ===");
 
@@ -230,7 +242,6 @@ public class VehiDetaiCo implements DataReceiver {
             System.out.println("📝 Déjà commenté: " + dejaCommente);
 
             if (dejaCommente) {
-                // ✅ AFFICHER LE COMMENTAIRE DE L'UTILISATEUR AU LIEU DU MESSAGE
                 Commentaire monCommentaire = commentaireDAO.getCommentaireUtilisateur(userId, article.getId());
                 if (monCommentaire != null) {
                     VBox myCommentCard = createMyCommentCard(monCommentaire);
@@ -265,15 +276,11 @@ public class VehiDetaiCo implements DataReceiver {
         }
     }
 
-    /**
-     * Crée une carte spéciale pour le commentaire de l'utilisateur connecté
-     */
     private VBox createMyCommentCard(Commentaire commentaire) {
         VBox card = new VBox(15);
         card.setStyle("-fx-background-color: #E8F5E9; -fx-padding: 20; -fx-background-radius: 8; " +
                 "-fx-border-color: #4CAF50; -fx-border-width: 2; -fx-border-radius: 8;");
 
-        // Header
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
 
@@ -285,7 +292,6 @@ public class VehiDetaiCo implements DataReceiver {
 
         header.getChildren().addAll(icon, title);
 
-        // Note
         HBox ratingBox = new HBox(5);
         ratingBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -303,12 +309,10 @@ public class VehiDetaiCo implements DataReceiver {
         noteContainer.setAlignment(Pos.CENTER_LEFT);
         noteContainer.getChildren().addAll(ratingBox, noteText);
 
-        // Commentaire
         Label commentText = new Label(commentaire.getTexteCommentaire());
         commentText.setWrapText(true);
         commentText.setStyle("-fx-text-fill: #333; -fx-font-size: 14px; -fx-line-spacing: 1.3;");
 
-        // Date
         Label dateLabel = new Label("Publié " + formatDate(commentaire.getDateCommentaire()));
         dateLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 12px; -fx-font-style: italic;");
 
@@ -438,7 +442,19 @@ public class VehiDetaiCo implements DataReceiver {
         Button loginBtn = new Button("Se connecter");
         loginBtn.setStyle("-fx-background-color: #0066FF; -fx-text-fill: white; " +
                 "-fx-padding: 8 20; -fx-background-radius: 6; -fx-cursor: hand;");
-        loginBtn.setOnAction(e -> nav.navigateTo("/view/auth/login.fxml"));
+        loginBtn.setOnAction(e -> {
+            // Ouvrir la fenêtre de login
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
+                Parent root = loader.load();
+                Stage loginStage = new Stage();
+                loginStage.setTitle("Connexion");
+                loginStage.setScene(new Scene(root, 400, 500));
+                loginStage.show();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         prompt.getChildren().addAll(icon, message, loginBtn);
         return prompt;
@@ -499,8 +515,6 @@ public class VehiDetaiCo implements DataReceiver {
         if (nomClient.contains("⭐")) return "#F44336";
         return "#2196F3";
     }
-
-    // ==================== GESTION DES COMMENTAIRES ====================
 
     private void saveCommentaire(int note, String texte) {
         System.out.println("\n💾 === DÉBUT SAVE COMMENTAIRE ===");
@@ -576,19 +590,14 @@ public class VehiDetaiCo implements DataReceiver {
         warningText.setStyle("-fx-text-fill: #666;");
         warningBox.getChildren().addAll(warningIcon, warningText);
 
-        // SECTION BOUTONS D'ACTION
         VBox actionButtons = createActionButtons();
         sellerSection.getChildren().addAll(sellerHeader, warningBox, actionButtons);
     }
 
-    /**
-     * Crée la section des boutons d'action (remplace la section avec les checkboxes)
-     */
     private VBox createActionButtons() {
         VBox buttonsContainer = new VBox(10);
         buttonsContainer.setStyle("-fx-padding: 15 0 0 0;");
 
-        // Bouton Prendre rendez-vous
         Button rendezvousBtn = new Button("📅 Prendre rendez-vous");
         rendezvousBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; " +
                 "-fx-padding: 12 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; " +
@@ -596,7 +605,6 @@ public class VehiDetaiCo implements DataReceiver {
         rendezvousBtn.setMaxWidth(Double.MAX_VALUE);
         rendezvousBtn.setOnAction(e -> handleRendezvous());
 
-        // ✅ BOUTON CHAT AVEC LE VENDEUR
         Button chatBtn = new Button("💬 Contacter le Vendeur");
         chatBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; " +
                 "-fx-padding: 12 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; " +
@@ -604,7 +612,6 @@ public class VehiDetaiCo implements DataReceiver {
         chatBtn.setMaxWidth(Double.MAX_VALUE);
         chatBtn.setOnAction(e -> handleContact());
 
-        // Bouton Appel téléphonique
         Button callBtn = new Button("📞 Appeler le Vendeur");
         callBtn.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; " +
                 "-fx-padding: 12 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; " +
@@ -614,54 +621,253 @@ public class VehiDetaiCo implements DataReceiver {
             showInfo("Appel", "Numéro: +212 6XX XXX XXX\n(Fonctionnalité en développement)");
         });
 
-        // Bouton Ajouter aux favoris
-        Button favoriteBtn = new Button("❤️ Ajouter aux favoris");
-        favoriteBtn.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; " +
+        Button magasinBtn = new Button("🏪 Visiter Magasin");
+        magasinBtn.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; " +
                 "-fx-padding: 12 20; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; " +
                 "-fx-font-size: 14px;");
-        favoriteBtn.setMaxWidth(Double.MAX_VALUE);
-        favoriteBtn.setOnAction(e -> handleAddToFavorites());
+        magasinBtn.setMaxWidth(Double.MAX_VALUE);
+        magasinBtn.setOnAction(e -> handleVisiterMagasin());
 
-        buttonsContainer.getChildren().addAll(rendezvousBtn, chatBtn, callBtn, favoriteBtn);
-
+        buttonsContainer.getChildren().addAll(rendezvousBtn, chatBtn, callBtn, magasinBtn);
         return buttonsContainer;
     }
 
-    // ==================== GESTION DES ACTIONS ====================
-
     @FXML
-    private void handleRendezvous() {
-        System.out.println("📅 === DÉBUT handleRendezvous ===");
+    private void handleVisiterMagasin() {
+        System.out.println("🏪 === DÉBUT handleVisiterMagasin ===");
 
         if (article == null) {
             showError("Erreur", "Aucun véhicule sélectionné");
             return;
         }
 
-        // ✅ SOLUTION URGENTE - TOUJOURS récupérer l'ID vendeur depuis la base
-        int idVendeur = getVendeurIdFromDatabase(article.getId());
-        System.out.println("🔍 Récupération BD - Article ID: " + article.getId() + ", Vendeur ID: " + idVendeur);
+        int vendeurId = getVendeurIdFromDatabase(article.getId());
 
-        if (idVendeur <= 0) {
-            showError("Erreur", "Impossible de trouver le vendeur de ce véhicule");
+        if (vendeurId <= 0) {
+            showError("Erreur", "Informations du magasin non disponibles");
             return;
         }
 
-        // Mettre à jour l'article avec l'ID vendeur correct
-        article.setIdVendeur(idVendeur);
+        Magasin magasin = getMagasinDetails(vendeurId);
 
-        // Convertir avec l'ID correct
-        Vehicle vehicle = convertArticleToVehicle(article);
-        System.out.println("✅ Données finales - Vehicle Seller ID: " + vehicle.getSellerId());
+        if (magasin == null) {
+            showInfo("Magasin", "Ce vendeur n'a pas encore configuré son magasin.\n\n" +
+                    "Souhaitez-vous le contacter directement ?", vendeurId);
+            return;
+        }
 
-        // Ouvrir le formulaire
-        boolean formulaireOuvert = openRendezVousForm();
-        if (!formulaireOuvert) {
-            openRendezVousFormIntegre();
+        // ✅ CORRECTION : Ouvrir dans une nouvelle fenêtre
+        ouvrirFenetreMagasin(magasin);
+    }
+
+    /**
+     * ✅ CORRECTION : Ouvrir une fenêtre dédiée pour le magasin
+     */
+    private void ouvrirFenetreMagasin(Magasin magasin) {
+        try {
+            System.out.println("🏪 Ouverture fenêtre magasin pour: " + magasin.getNomMagasin());
+
+            String[] cheminsFXML = {
+                    "/com/example/vehiclegestion/view/vendeur/magasinDetails.fxml",
+                    "/view/vendeur/magasinDetails.fxml",
+                    "/magasinDetails.fxml"
+            };
+
+            FXMLLoader loader = null;
+            Parent root = null;
+            String cheminTrouve = null;
+
+            for (String chemin : cheminsFXML) {
+                try {
+                    System.out.println("🔍 Essai du chemin: " + chemin);
+                    URL url = getClass().getResource(chemin);
+                    if (url != null) {
+                        loader = new FXMLLoader(url);
+                        root = loader.load();
+                        cheminTrouve = chemin;
+                        System.out.println("✅ FXML chargé: " + chemin);
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Échec pour: " + chemin);
+                }
+            }
+
+            if (root == null) {
+                System.out.println("⚠️ FXML non trouvé, création d'une fenêtre simple...");
+                creerFenetreMagasinSimple(magasin);
+                return;
+            }
+
+            MagasinDetailsController controller = loader.getController();
+            controller.setMagasin(magasin);
+
+            Stage magasinStage = new Stage();
+            magasinStage.setTitle("Magasin - " + magasin.getNomMagasin());
+            magasinStage.setScene(new Scene(root, 1200, 800));
+
+            magasinStage.initModality(Modality.WINDOW_MODAL);
+            if (visiterMagasinBtn != null) {
+                magasinStage.initOwner(visiterMagasinBtn.getScene().getWindow());
+            }
+
+            magasinStage.setMinWidth(900);
+            magasinStage.setMinHeight(600);
+
+            magasinStage.show();
+
+            System.out.println("✅ Fenêtre magasin ouverte avec succès: " + cheminTrouve);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur ouverture fenêtre magasin: " + e.getMessage());
+            creerFenetreMagasinSimple(magasin);
         }
     }
 
-    // ✅ MÉTHODE GARANTIE pour récupérer l'ID vendeur
+    /**
+     * ✅ CORRECTION : Créer une fenêtre simple si le FXML n'est pas trouvé
+     */
+    private void creerFenetreMagasinSimple(Magasin magasin) {
+        try {
+            Stage stage = new Stage();
+            stage.setTitle("Magasin - " + magasin.getNomMagasin());
+
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setFitToWidth(true);
+            scrollPane.setStyle("-fx-background-color: #f5f7fa;");
+
+            VBox content = new VBox(20);
+            content.setStyle("-fx-padding: 30;");
+
+            // Header
+            HBox header = new HBox(20);
+            header.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12;");
+
+            StackPane logoPlaceholder = new StackPane();
+            logoPlaceholder.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 8; -fx-min-width: 100; -fx-min-height: 100;");
+            Label logoLabel = new Label("🏪");
+            logoLabel.setStyle("-fx-font-size: 40px;");
+            logoPlaceholder.getChildren().add(logoLabel);
+
+            VBox infos = new VBox(10);
+            Label nomLabel = new Label(magasin.getNomMagasin());
+            nomLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+            Label categorieLabel = new Label(magasin.getCategorie());
+            categorieLabel.setStyle("-fx-text-fill: #666;");
+
+            infos.getChildren().addAll(nomLabel, categorieLabel);
+            header.getChildren().addAll(logoPlaceholder, infos);
+
+            // Détails
+            VBox details = new VBox(15);
+            details.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12;");
+
+            if (magasin.getAdresse() != null && !magasin.getAdresse().isEmpty()) {
+                HBox adresseBox = new HBox(10);
+                adresseBox.getChildren().addAll(new Label("📍"), new Label(magasin.getAdresse()));
+                details.getChildren().add(adresseBox);
+            }
+
+            if (magasin.getTelephone() != null && !magasin.getTelephone().isEmpty()) {
+                HBox telBox = new HBox(10);
+                telBox.getChildren().addAll(new Label("📞"), new Label(magasin.getTelephone()));
+                details.getChildren().add(telBox);
+            }
+
+            if (magasin.getEmailContact() != null && !magasin.getEmailContact().isEmpty()) {
+                HBox emailBox = new HBox(10);
+                emailBox.getChildren().addAll(new Label("📧"), new Label(magasin.getEmailContact()));
+                details.getChildren().add(emailBox);
+            }
+
+            if (magasin.getDescription() != null && !magasin.getDescription().isEmpty()) {
+                Label descLabel = new Label("Description:");
+                descLabel.setStyle("-fx-font-weight: bold;");
+                TextArea descArea = new TextArea(magasin.getDescription());
+                descArea.setEditable(false);
+                descArea.setWrapText(true);
+                descArea.setPrefRowCount(4);
+                details.getChildren().addAll(descLabel, descArea);
+            }
+
+            // Boutons
+            HBox boutons = new HBox(15);
+            boutons.setStyle("-fx-padding: 20 0 0 0;");
+
+            Button btnContact = new Button("📞 Contacter");
+            btnContact.setOnAction(e -> {
+                showInfo("Contact", "Contacter " + magasin.getNomMagasin());
+            });
+
+            Button btnFermer = new Button("Fermer");
+            btnFermer.setOnAction(e -> stage.close());
+
+            boutons.getChildren().addAll(btnContact, btnFermer);
+
+            content.getChildren().addAll(header, details, boutons);
+            scrollPane.setContent(content);
+
+            Scene scene = new Scene(scrollPane, 900, 700);
+            stage.setScene(scene);
+            stage.show();
+
+            System.out.println("✅ Fenêtre magasin simple créée");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur création fenêtre simple: " + e.getMessage());
+            afficherInfosMagasinSimple(magasin);
+        }
+    }
+
+    private void afficherInfosMagasinSimple(Magasin magasin) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Magasin - " + magasin.getNomMagasin());
+        alert.setHeaderText("Détails du Magasin");
+
+        VBox content = new VBox(10);
+        content.setStyle("-fx-padding: 20;");
+
+        Label nomLabel = new Label("🏪 " + magasin.getNomMagasin());
+        nomLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        Label adresseLabel = new Label("📍 " + magasin.getAdresse());
+        Label telLabel = new Label("📞 " + magasin.getTelephone());
+        Label emailLabel = new Label("📧 " + magasin.getEmailContact());
+        Label siteLabel = new Label("🌐 " + magasin.getSiteWeb());
+
+        content.getChildren().addAll(nomLabel, adresseLabel, telLabel, emailLabel, siteLabel);
+        alert.getDialogPane().setContent(content);
+        alert.showAndWait();
+    }
+
+    private void showInfo(String title, String message, int vendeurId) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        ButtonType contacterBtn = new ButtonType("Contacter le vendeur", ButtonBar.ButtonData.OK_DONE);
+        ButtonType fermerBtn = new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(contacterBtn, fermerBtn);
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == contacterBtn) {
+                handleContact();
+            }
+        });
+    }
+
+    private Magasin getMagasinDetails(int vendeurId) {
+        try {
+            MagasinDAO magasinDAO = new MagasinDAO();
+            return magasinDAO.getMagasinByVendeurId(vendeurId);
+        } catch (Exception e) {
+            System.err.println("❌ Erreur récupération magasin: " + e.getMessage());
+            return null;
+        }
+    }
+
     private int getVendeurIdFromDatabase(int articleId) {
         String sql = "SELECT id_vendeur FROM Article WHERE id_article = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -684,14 +890,37 @@ public class VehiDetaiCo implements DataReceiver {
         return 0;
     }
 
-    /**
-     * Ouvre le formulaire de rendez-vous depuis FXML
-     */
+    @FXML
+    private void handleRendezvous() {
+        System.out.println("📅 === DÉBUT handleRendezvous ===");
+
+        if (article == null) {
+            showError("Erreur", "Aucun véhicule sélectionné");
+            return;
+        }
+
+        int idVendeur = getVendeurIdFromDatabase(article.getId());
+        System.out.println("🔍 Récupération BD - Article ID: " + article.getId() + ", Vendeur ID: " + idVendeur);
+
+        if (idVendeur <= 0) {
+            showError("Erreur", "Impossible de trouver le vendeur de ce véhicule");
+            return;
+        }
+
+        article.setIdVendeur(idVendeur);
+        Vehicle vehicle = convertArticleToVehicle(article);
+        System.out.println("✅ Données finales - Vehicle Seller ID: " + vehicle.getSellerId());
+
+        boolean formulaireOuvert = openRendezVousForm();
+        if (!formulaireOuvert) {
+            openRendezVousFormIntegre();
+        }
+    }
+
     private boolean openRendezVousForm() {
         try {
             System.out.println("🔧 Tentative d'ouverture du formulaire FXML...");
 
-            // Essayer plusieurs chemins possibles
             String[] cheminsFXML = {
                     "/view/client/rendezvous-form.fxml",
                     "/com/example/vehiclegestion/view/client/rendezvous-form.fxml",
@@ -718,10 +947,7 @@ public class VehiDetaiCo implements DataReceiver {
                 return false;
             }
 
-            // Récupérer le contrôleur du formulaire
             RendezVousFormController controller = loader.getController();
-
-            // Convertir Article en Vehicle
             Vehicle vehicle = convertArticleToVehicle(article);
             controller.setVehicle(vehicle);
 
@@ -744,31 +970,23 @@ public class VehiDetaiCo implements DataReceiver {
         }
     }
 
-    /**
-     * Ouvre un formulaire de rendez-vous intégré (fallback)
-     */
     private void openRendezVousFormIntegre() {
         try {
             System.out.println("🔧 Ouverture du formulaire intégré...");
 
-            // Créer une nouvelle fenêtre
             Stage stage = new Stage();
             stage.setTitle("Prendre un Rendez-vous - " + article.getTitre());
 
-            // Créer le formulaire intégré
             VBox formContainer = new VBox(20);
             formContainer.setStyle("-fx-background-color: white; -fx-padding: 25; -fx-border-radius: 10;");
             formContainer.setPrefSize(500, 600);
 
-            // Titre
             Label titleLabel = new Label("📅 Prendre un Rendez-vous");
             titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-            // Info véhicule
             Label vehicleLabel = new Label("Véhicule: " + article.getTitre());
             vehicleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #7f8c8d;");
 
-            // Formulaire simple
             VBox form = new VBox(15);
 
             Label dateLabel = new Label("Date souhaitée:");
@@ -792,7 +1010,6 @@ public class VehiDetaiCo implements DataReceiver {
             descArea.setPromptText("Précisez vos besoins...");
             descArea.setPrefRowCount(3);
 
-            // Boutons
             HBox buttons = new HBox(15);
             buttons.setAlignment(Pos.CENTER_RIGHT);
 
@@ -803,7 +1020,6 @@ public class VehiDetaiCo implements DataReceiver {
             Button confirmBtn = new Button("Confirmer");
             confirmBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 10 20;");
             confirmBtn.setOnAction(e -> {
-                // Logique de confirmation
                 showSuccess("Succès", "Rendez-vous demandé pour le " +
                         datePicker.getValue() + " à " + timeCombo.getValue());
                 stage.close();
@@ -811,13 +1027,11 @@ public class VehiDetaiCo implements DataReceiver {
 
             buttons.getChildren().addAll(cancelBtn, confirmBtn);
 
-            // Assemblage
             form.getChildren().addAll(dateLabel, datePicker, timeLabel, timeCombo,
                     typeLabel, typeCombo, descLabel, descArea, buttons);
 
             formContainer.getChildren().addAll(titleLabel, vehicleLabel, form);
 
-            // Afficher la fenêtre
             Scene scene = new Scene(formContainer);
             stage.setScene(scene);
             stage.show();
@@ -836,21 +1050,15 @@ public class VehiDetaiCo implements DataReceiver {
         vehicle.setPrice(article.getPrix());
         vehicle.setCategory(article.getCategorie());
         vehicle.setState(article.getEtat());
-
-        // ✅ CORRECTION CRITIQUE - Transférer l'ID vendeur
         vehicle.setSellerId(article.getIdVendeur());
 
-        // Améliorer le titre avec marque et modèle si disponibles
         if (article.getMarque() != null && article.getModele() != null) {
             vehicle.setTitle(article.getMarque() + " " + article.getModele());
         }
 
         System.out.println("🔄 Conversion Article→Vehicle - Vendeur ID: " + vehicle.getSellerId());
-
         return vehicle;
     }
-
-
 
     @FXML
     private void handleContact() {
@@ -861,7 +1069,6 @@ public class VehiDetaiCo implements DataReceiver {
             return;
         }
 
-        // Vérifier que l'utilisateur est connecté
         if (!SessionManager.getInstance().estConnecte()) {
             showWarning("Connexion requise", "Vous devez être connecté pour contacter le vendeur");
             return;
@@ -870,7 +1077,6 @@ public class VehiDetaiCo implements DataReceiver {
         int clientId = SessionManager.getInstance().getUserId();
         String clientRole = SessionManager.getInstance().getUserRole();
 
-        // Récupérer l'ID du vendeur depuis la base de données
         int vendeurId = getVendeurIdFromDatabase(article.getId());
 
         System.out.println("👤 Client ID: " + clientId + " (" + clientRole + ")");
@@ -882,26 +1088,13 @@ public class VehiDetaiCo implements DataReceiver {
             return;
         }
 
-        // Vérifier qu'un client ne contacte pas son propre article
         if (clientId == vendeurId) {
             showWarning("Action non autorisée", "Vous ne pouvez pas contacter votre propre annonce");
             return;
         }
 
-        // Ouvrir la fenêtre de chat
         openChatWindow(vendeurId, clientId, article);
     }
-
-    /**
-     * Ouvre la fenêtre de chat avec le vendeur
-     */
-    /**
-     * Ouvre la fenêtre de chat avec le vendeur
-     */
-    /**
-     * Ouvre la fenêtre de chat avec le vendeur
-     */
-    // ... dans la méthode openChatWindow() ...
 
     private void openChatWindow(int vendeurId, int clientId, Article article) {
         try {
@@ -911,13 +1104,11 @@ public class VehiDetaiCo implements DataReceiver {
             System.out.println("   Client ID: " + clientId);
             System.out.println("   Article: " + article.getTitre());
 
-            // Essayer différents chemins
             String[] possiblePaths = {
                     "/com/example/vehiclegestion/view/common/ChatWindow.fxml",
                     "/view/common/ChatWindow.fxml",
                     "view/common/ChatWindow.fxml",
-                    "/ChatWindow.fxml",
-                    "ChatWindow.fxml"
+                    "/ChatWindow.fxml"
             };
 
             FXMLLoader loader = null;
@@ -944,13 +1135,9 @@ public class VehiDetaiCo implements DataReceiver {
                 return;
             }
 
-            // Récupérer le contrôleur
             ChatWindowController chatController = loader.getController();
-
-            // Définir le mode "depuis les détails du véhicule"
             chatController.setFromVehicleDetails(true);
 
-            // Créer ou récupérer la conversation
             ChatDAO chatDAO = new ChatDAO();
             Conversation conversation = chatDAO.getOrCreateConversationVendeurClient(
                     vendeurId,
@@ -966,21 +1153,18 @@ public class VehiDetaiCo implements DataReceiver {
 
             System.out.println("✅ Conversation ID: " + conversation.getIdConversation());
 
-            // Créer et afficher la fenêtre
             Stage chatStage = new Stage();
             chatStage.setTitle("Chat avec le vendeur - " + article.getTitre());
             chatStage.setScene(new Scene(chatRoot, 1000, 700));
             chatStage.setMinWidth(800);
             chatStage.setMinHeight(600);
 
-            // APRÈS l'affichage, ouvrir la conversation automatiquement
             chatStage.setOnShown(e -> {
                 Platform.runLater(() -> {
                     chatController.openSpecificConversation(conversation.getIdConversation());
                 });
             });
 
-            // Fermer proprement
             chatStage.setOnCloseRequest(e -> {
                 if (chatController != null) {
                     chatController.cleanup();
@@ -996,13 +1180,12 @@ public class VehiDetaiCo implements DataReceiver {
             showError("Erreur", "Erreur: " + e.getMessage());
         }
     }
+
     @FXML
     private void handleAddToFavorites() {
         System.out.println("❤️ Ajouter aux favoris: " + article.getTitre());
         showSuccess("Favoris", "Véhicule ajouté à vos favoris !");
     }
-
-    // ==================== MÉTHODES UTILITAIRES ====================
 
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -1051,30 +1234,25 @@ public class VehiDetaiCo implements DataReceiver {
     public void testCommentaireSystem() {
         System.out.println("🧪 === TEST SYSTÈME COMMENTAIRES ===");
 
-        // 1. Test session
         SessionManager session = SessionManager.getInstance();
         System.out.println("1. SESSION - Connecté: " + session.estConnecte());
         System.out.println("   User ID: " + session.getUserId());
         System.out.println("   Role: " + session.getUserRole());
 
-        // 2. Test article
         System.out.println("2. ARTICLE - Chargé: " + articleCharge);
         if (article != null) {
             System.out.println("   ID: " + article.getId());
             System.out.println("   Titre: " + article.getTitre());
         }
 
-        // 3. Test DAO
         CommentaireDAO dao = new CommentaireDAO();
         System.out.println("3. DAO - Instance: " + (dao != null ? "✅" : "❌"));
 
-        // 4. Test déjà commenté
         if (session.estConnecte() && article != null) {
             boolean dejaCommente = dao.aDejaCommente(session.getUserId(), article.getId());
             System.out.println("4. DÉJÀ COMMENTÉ: " + dejaCommente);
         }
 
-        // 5. Test nombre commentaires
         if (article != null) {
             int nbComments = dao.getNombreCommentaires(article.getId());
             System.out.println("5. NOMBRE COMMENTAIRES: " + nbComments);
