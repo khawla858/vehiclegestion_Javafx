@@ -19,6 +19,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+
+import java.util.Map;
+
 
 public class EditVehicleFormController implements Initializable {
 
@@ -51,6 +57,10 @@ public class EditVehicleFormController implements Initializable {
     private Article currentArticle;
     private String selectedImagePath;
     private boolean imageChanged = false;
+    // En haut de la classe
+    private static final Logger logger = LoggerUtil.getLogger(EditVehicleFormController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -316,6 +326,17 @@ public class EditVehicleFormController implements Initializable {
         }
 
         try {
+            logger.info("Modification article ID={} par l'utilisateur", currentArticle.getId());
+
+            elasticLogService.sendLog(
+                    "INFO",
+                    "Modification article",
+                    Map.of(
+                            "articleId", currentArticle.getId(),
+                            "titre", titreField.getText(),
+                            "prix", prixField.getText()
+                    )
+            );
             // ✅ CORRECTION : Vérifier null avant trim()
             currentArticle.setTitre(titreField.getText() != null ? titreField.getText().trim() : "");
             currentArticle.setDescription(descriptionField.getText() != null ? descriptionField.getText().trim() : "");
@@ -366,9 +387,19 @@ public class EditVehicleFormController implements Initializable {
             boolean success = articleDAO.updateArticle(currentArticle);
 
             if (success) {
-                System.out.println("   ✅ Modification réussie en base de données");
-                showMessage("✅ Véhicule modifié avec succès!", false);
+                logger.info("Article ID={} modifié avec succès", currentArticle.getId());
 
+                elasticLogService.sendLog(
+                        "INFO",
+                        "Article modifié avec succès",
+                        Map.of(
+                                "articleId", currentArticle.getId(),
+                                "titre", currentArticle.getTitre(),
+                                "prix", currentArticle.getPrix()
+                        )
+                );
+
+                showMessage("✅ Véhicule modifié avec succès!", false);
                 // Fermer la fenêtre après 2 secondes
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
@@ -383,14 +414,27 @@ public class EditVehicleFormController implements Initializable {
                         }, 2000
                 );
             } else {
-                System.err.println("   ❌ Échec de la modification en base");
+                logger.warn("Échec modification article ID={}", currentArticle.getId());
+
+                elasticLogService.sendLog(
+                        "WARN",
+                        "Échec modification article",
+                        Map.of("articleId", currentArticle.getId())
+                );
+
                 showMessage("❌ Erreur lors de la modification du véhicule", true);
             }
 
         } catch (SQLException e) {
-            System.err.println("   ❌ Erreur SQL: " + e.getMessage());
+            logger.error("Erreur SQL modification article ID={}", currentArticle.getId(), e);
+
+            elasticLogService.sendLog(
+                    "ERROR",
+                    "Erreur SQL modification article",
+                    Map.of("articleId", currentArticle.getId(), "message", e.getMessage())
+            );
+
             showMessage("❌ Erreur base de données: " + e.getMessage(), true);
-            e.printStackTrace();
         } catch (NumberFormatException e) {
             System.err.println("   ❌ Erreur format numérique");
             showMessage("❌ Format de nombre invalide", true);

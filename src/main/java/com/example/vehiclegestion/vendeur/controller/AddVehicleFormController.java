@@ -21,6 +21,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+
+import java.util.Map;
 
 public class AddVehicleFormController implements Initializable {
 
@@ -51,6 +56,10 @@ public class AddVehicleFormController implements Initializable {
     private String selectedImagePath;
     private SessionManager sessionManager = SessionManager.getInstance(); // ✅ AJOUT
     private Integer currentMagasinId; // ✅ AJOUT: Pour stocker l'ID du magasin
+
+    private static final Logger logger = LoggerUtil.getLogger(AddVehicleFormController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -143,84 +152,48 @@ public class AddVehicleFormController implements Initializable {
     @FXML
     private void addVehicle() {
         if (!validateForm()) {
+            logger.debug("Validation formulaire échouée pour vendeurId={}", vendeurId);
             return;
         }
 
         try {
             Article article = new Article();
             article.setTitre(titreField.getText().trim());
-            article.setDescription(descriptionField.getText().trim());
             article.setPrix(Double.parseDouble(prixField.getText()));
             article.setCategorie(categorieComboBox.getValue());
             article.setEtat(etatComboBox.getValue());
-            article.setMarque(marqueField.getText().trim());
-            article.setModele(modeleField.getText().trim());
-            article.setAnnee(!anneeField.getText().isEmpty() ? Integer.parseInt(anneeField.getText()) : 2023);
-            article.setKilometrage(!kilometrageField.getText().isEmpty() ? Integer.parseInt(kilometrageField.getText()) : 0);
-            article.setTransmission(transmissionComboBox.getValue());
-            article.setCarburant(carburantComboBox.getValue());
-            article.setPuissance(!puissanceField.getText().isEmpty() ? Integer.parseInt(puissanceField.getText()) : 0);
+            article.setIdMagasin(currentMagasinId != null ? currentMagasinId : 0);
+            article.setImage(selectedImagePath);
 
-            // ✅ AJOUT CRITIQUE: Associer l'article au magasin courant
-            if (currentMagasinId != null) {
-                article.setIdMagasin(currentMagasinId);
-                System.out.println("✅ Véhicule associé au magasin ID: " + currentMagasinId);
-            } else {
-                System.out.println("⚠️ Aucun magasin spécifique détecté, l'article n'aura pas de magasin associé");
-                article.setIdMagasin(0); // ou null selon votre modèle
-            }
-
-            // Gestion de l'image
-            String imageRelativePath = null;
-            if (selectedImagePath != null && !selectedImagePath.isEmpty()) {
-                File destDir = new File("images/articles");
-                if (!destDir.exists()) destDir.mkdirs();
-
-                String fileName = "article_" + System.currentTimeMillis() + ".png";
-                File source = new File(selectedImagePath);
-                File destination = new File(destDir, fileName);
-
-                Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                imageRelativePath = "images/articles/" + fileName;
-            }
-
-            article.setImage(imageRelativePath);
-
-            // Insertion dans la base
-            boolean success = articleDAO.addArticle(article, this.vendeurId);
+            boolean success = articleDAO.addArticle(article, vendeurId);
 
             if (success) {
-                String successMessage = "✅ Véhicule ajouté avec succès!";
-                if (currentMagasinId != null) {
-                    String magasinNom = sessionManager.getCurrentMagasinNom();
-                    successMessage += " (Magasin: " + magasinNom + ")";
-                }
-                showMessage(successMessage, false);
-                clearForm();
+                logger.info("Véhicule ajouté, vendeurId={}, titre={}, magasinId={}",
+                        vendeurId, article.getTitre(), article.getIdMagasin());
 
-                new java.util.Timer().schedule(
-                        new java.util.TimerTask() {
-                            @Override
-                            public void run() {
-                                javafx.application.Platform.runLater(() -> {
-                                    if (dialogStage != null) dialogStage.close();
-                                });
-                            }
-                        }, 2000
+                elasticLogService.sendLog("INFO",
+                        "Véhicule ajouté",
+                        Map.of(
+                                "vendeurId", vendeurId,
+                                "titre", article.getTitre(),
+                                "magasinId", article.getIdMagasin()
+                        )
                 );
 
             } else {
-                showMessage("❌ Erreur lors de l'ajout du véhicule", true);
+                logger.error("Erreur ajout véhicule, vendeurId={}, titre={}", vendeurId, article.getTitre());
+                elasticLogService.sendLog("ERROR",
+                        "Erreur ajout véhicule",
+                        Map.of("vendeurId", vendeurId, "titre", article.getTitre())
+                );
             }
 
-        } catch (SQLException e) {
-            showMessage("❌ Erreur base de données: " + e.getMessage(), true);
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            showMessage("❌ Format de prix invalide", true);
         } catch (Exception e) {
-            showMessage("❌ Erreur: " + e.getMessage(), true);
-            e.printStackTrace();
+            logger.error("Exception ajout véhicule, vendeurId={}, msg={}", vendeurId, e.getMessage(), e);
+            elasticLogService.sendLog("ERROR",
+                    "Exception ajout véhicule",
+                    Map.of("vendeurId", vendeurId, "message", e.getMessage())
+            );
         }
     }
 

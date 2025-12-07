@@ -19,6 +19,9 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
 
 public class VehicleDetailController implements DataReceiver {
 

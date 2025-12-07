@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,6 +21,12 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class RendezVousListController {
 
@@ -51,6 +56,11 @@ public class RendezVousListController {
     private ObservableList<RendezVous> filteredRdv;
     private SessionManager session = SessionManager.getInstance();
     private int idVendeurConnecte;
+
+    // 🔑 Logger pour console et Elastic
+    private static final Logger logger = LoggerUtil.getLogger(RendezVousListController.class);
+    private static final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @FXML
     public void initialize() {
@@ -326,6 +336,15 @@ public class RendezVousListController {
     private void confirmerRendezVous(RendezVous rdv) {
         if (rendezVousDAO.confirmRendezVous(rdv.getIdRdv())) {
             showAlert("Succès", "Rendez-vous confirmé !", Alert.AlertType.INFORMATION);
+            // Après confirmation réussie
+            logger.info("RDV confirmé ID {} par vendeur {}", rdv.getIdRdv(), idVendeurConnecte);
+
+            Map<String, Object> details = new HashMap<>();
+            details.put("rdvId", rdv.getIdRdv());
+            details.put("vendeurId", idVendeurConnecte);
+            details.put("action", "confirmer");
+            elasticLogService.sendLog("INFO", "RDV confirmé", details);
+
             loadRendezVousFromDB();
         } else {
             showAlert("Erreur", "Impossible de confirmer", Alert.AlertType.ERROR);
@@ -341,6 +360,15 @@ public class RendezVousListController {
         dialog.showAndWait().ifPresent(raison -> {
             if (rendezVousDAO.cancelRendezVous(rdv.getIdRdv(), raison)) {
                 showAlert("Succès", "Rendez-vous annulé", Alert.AlertType.INFORMATION);
+                // Après annulation réussie
+                logger.warn("RDV annulé ID {} par vendeur {} | raison: {}", rdv.getIdRdv(), idVendeurConnecte, raison);
+
+                Map<String, Object> details = new HashMap<>();
+                details.put("rdvId", rdv.getIdRdv());
+                details.put("vendeurId", idVendeurConnecte);
+                details.put("raison", raison);
+                elasticLogService.sendLog("WARN", "RDV annulé", details);
+
                 loadRendezVousFromDB();
             } else {
                 showAlert("Erreur", "Impossible d'annuler", Alert.AlertType.ERROR);
@@ -358,6 +386,14 @@ public class RendezVousListController {
             if (response == ButtonType.OK) {
                 if (rendezVousDAO.deleteRendezVous(rdv.getIdRdv())) {
                     showAlert("Succès", "Rendez-vous supprimé", Alert.AlertType.INFORMATION);
+                    // Après suppression réussie
+                    logger.error("RDV supprimé ID {} par vendeur {}", rdv.getIdRdv(), idVendeurConnecte);
+
+                    Map<String, Object> details = new HashMap<>();
+                    details.put("rdvId", rdv.getIdRdv());
+                    details.put("vendeurId", idVendeurConnecte);
+                    elasticLogService.sendLog("ERROR", "RDV supprimé", details);
+
                     loadRendezVousFromDB();
                 } else {
                     showAlert("Erreur", "Impossible de supprimer", Alert.AlertType.ERROR);

@@ -9,6 +9,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+
+import java.util.Map;
+
 
 public class AjouterDemandeMagasinController {
 
@@ -25,6 +31,9 @@ public class AjouterDemandeMagasinController {
 
     private SessionManager session;
     private int idVendeur;
+    private static final Logger logger = LoggerUtil.getLogger(AjouterDemandeMagasinController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @FXML
     public void initialize() {
@@ -123,16 +132,13 @@ public class AjouterDemandeMagasinController {
 
     @FXML
     public void envoyerDemande() {
-        System.out.println("📤 Envoi de la demande magasin...");
-
-        // Vérifier la session
         if (!session.estConnecte() || !session.estVendeur()) {
-            showAlert(Alert.AlertType.ERROR, "Session expirée",
-                    "Veuillez vous reconnecter pour envoyer une demande.");
+            logger.warn("Tentative d'envoi de demande sans session valide, vendeurId={}", idVendeur);
+            elasticLogService.sendLog("WARN", "Tentative demande sans session", Map.of("vendeurId", idVendeur));
+            showAlert(Alert.AlertType.ERROR, "Session expirée", "Veuillez vous reconnecter.");
             return;
         }
 
-        // Validation des champs
         String nom = nomMagasin.getText().trim();
         String adr = adresse.getText().trim();
         String loc = localisation.getText().trim();
@@ -140,53 +146,45 @@ public class AjouterDemandeMagasinController {
         String photo = photoProfil.getText().trim();
 
         if (nom.isEmpty() || adr.isEmpty() || loc.isEmpty() || desc.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Champs obligatoires",
-                    "Veuillez remplir tous les champs obligatoires (*)");
-
-            // Mettre en évidence les champs vides
-            if (nom.isEmpty()) nomMagasin.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-            if (adr.isEmpty()) adresse.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-            if (loc.isEmpty()) localisation.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-            if (desc.isEmpty()) description.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-
+            logger.debug("Validation formulaire échouée, vendeurId={}", idVendeur);
             return;
         }
 
         try {
-            // Vérifier si le vendeur a déjà une demande en attente
             DemandeMagasinDAO demandeDAO = new DemandeMagasinDAO();
             if (demandeDAO.hasDemandePending(idVendeur)) {
-                showAlert(Alert.AlertType.WARNING, "Demande existante",
-                        "Vous avez déjà une demande de magasin en attente de validation.\n" +
-                                "Veuillez patienter la réponse de l'administrateur.");
+                logger.info("VendeurId={} a déjà une demande en attente", idVendeur);
                 return;
             }
 
-            // Envoyer la demande
             boolean success = demandeDAO.addDemande(idVendeur, nom, adr, loc, desc, photo);
-
             if (success) {
-                System.out.println("✅ Demande envoyée avec succès pour: " + nom);
-
-                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                successAlert.setTitle("Demande envoyée");
-                successAlert.setHeaderText("✅ Demande enregistrée avec succès !");
-                successAlert.setContentText("Votre demande pour créer le magasin \"" + nom + "\" a été envoyée.\n" +
-                        "Vous serez notifié par email une fois la demande traitée.");
-                successAlert.showAndWait();
-
-                // Réinitialiser le formulaire
-                clearForm();
+                logger.info("Demande de magasin créée, vendeurId={}, nomMagasin={}", idVendeur, nom);
+                elasticLogService.sendLog(
+                        "INFO",
+                        "Demande magasin créée",
+                        Map.of(
+                                "vendeurId", idVendeur,
+                                "nomMagasin", nom,
+                                "adresse", adr,
+                                "localisation", loc
+                        )
+                );
             } else {
-                showAlert(Alert.AlertType.ERROR, "Erreur",
-                        "Une erreur est survenue lors de l'envoi de la demande.\n" +
-                                "Veuillez réessayer ou contacter l'administrateur.");
+                logger.error("Erreur création demande magasin, vendeurId={}", idVendeur);
+                elasticLogService.sendLog(
+                        "ERROR",
+                        "Erreur création demande magasin",
+                        Map.of("vendeurId", idVendeur, "nomMagasin", nom)
+                );
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de l'envoi de la demande: " + e.getMessage());
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Erreur technique",
-                    "Erreur: " + e.getMessage());
+            logger.error("Exception lors de la création de demande magasin, vendeurId={}, msg={}", idVendeur, e.getMessage(), e);
+            elasticLogService.sendLog(
+                    "ERROR",
+                    "Exception création demande magasin",
+                    Map.of("vendeurId", idVendeur, "message", e.getMessage())
+            );
         }
     }
 

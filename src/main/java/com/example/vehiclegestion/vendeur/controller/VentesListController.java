@@ -18,6 +18,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+
+import java.util.Map;
+
 
 public class VentesListController implements Initializable {
 
@@ -40,6 +46,9 @@ public class VentesListController implements Initializable {
     private ObservableList<Vente> ventesList = FXCollections.observableArrayList();
     private int vendeurId;
     private SessionManager session = SessionManager.getInstance();
+    private static final Logger logger = LoggerUtil.getLogger(VentesListController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -396,13 +405,38 @@ public class VentesListController implements Initializable {
 
         dialog.showAndWait().ifPresent(statut -> {
             if (venteDAO.updateStatutVente(vente.getIdVente(), statut)) {
+                logger.info("✅ Statut de la vente modifié, venteId={}, ancienStatut={}, nouveauStatut={}, vendeurId={}",
+                        vente.getIdVente(), vente.getStatutVente(), statut, vendeurId);
+
+                elasticLogService.sendLog("INFO",
+                        "Modification statut vente",
+                        Map.of(
+                                "venteId", vente.getIdVente(),
+                                "ancienStatut", vente.getStatutVente(),
+                                "nouveauStatut", statut,
+                                "vendeurId", vendeurId
+                        )
+                );
+
                 refreshVentes();
                 showSuccessNotification("Mise à jour réussie", "Le statut a été modifié");
             } else {
+                logger.error("❌ Erreur mise à jour statut vente, venteId={}, vendeurId={}",
+                        vente.getIdVente(), vendeurId);
+
+                elasticLogService.sendLog("ERROR",
+                        "Erreur modification statut vente",
+                        Map.of(
+                                "venteId", vente.getIdVente(),
+                                "vendeurId", vendeurId
+                        )
+                );
+
                 showError("Erreur", "Impossible de mettre à jour le statut");
             }
         });
     }
+
 
     private void deleteVente(Vente vente) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

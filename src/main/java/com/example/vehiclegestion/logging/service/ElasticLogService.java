@@ -36,12 +36,17 @@ public class ElasticLogService {
         this.executor = Executors.newSingleThreadExecutor();
     }
 
-    public void sendLog(String level, String message) {
+    public void sendLog(String level, String message, Map<String, Object> details) {
         executor.submit(() -> {
             Map<String, Object> log = new HashMap<>();
             log.put("level", level);
             log.put("message", message);
             log.put("timestamp", new Date());
+
+            // Ajouter les détails si fournis
+            if (details != null) {
+                log.putAll(details);
+            }
 
             try {
                 client.index(i -> i
@@ -53,5 +58,6 @@ public class ElasticLogService {
             }
         });
     }
+
 }
 

@@ -207,7 +207,6 @@ public class VendeurVehicleController {
     }
     private void showMagasinFilterBadge(String magasinNom) {
         // Ajouter un badge visuel si nécessaire
-        System.out.println("🏷️ Filtre actif - Magasin: " + magasinNom);
 
         // Optionnel: Ajouter un bouton pour effacer le filtre
         if (searchField != null) {

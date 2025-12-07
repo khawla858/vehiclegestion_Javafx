@@ -20,8 +20,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.time.LocalTime;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
 
-
+import java.util.Map;
 public class FormVenteController {
 
     // FXML Elements
@@ -58,6 +61,8 @@ public class FormVenteController {
     private Client clientSelectionne;
     private Stage dialogStage;
     private int vendeurId;
+    private static final Logger logger = LoggerUtil.getLogger(FormVenteController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
 
     @FXML
     public void initialize() {
@@ -256,7 +261,7 @@ public class FormVenteController {
     private void enregistrerVente() {
         errorLabel.setText("");
 
-        // Validation
+        // ✅ Validation
         if (clientSelectionne == null) {
             showError("⚠️ Veuillez sélectionner un client");
             return;
@@ -295,8 +300,23 @@ public class FormVenteController {
             return;
         }
 
-        // Créer l'objet Vente
         try {
+            // ✅ LOG + ELASTIC : début tentative création vente
+            logger.info("Tentative création vente | Vendeur={} | Client={} | Article={} | Montant={}",
+                    vendeurId, clientSelectionne.getId(), articleAVendre.getId(), montant);
+
+            elasticLogService.sendLog(
+                    "INFO",
+                    "Tentative création vente",
+                    Map.of(
+                            "vendeurId", vendeurId,
+                            "clientId", clientSelectionne.getId(),
+                            "articleId", articleAVendre.getId(),
+                            "montant", montant
+                    )
+            );
+
+            // ✅ Création de la vente
             Vente nouvelleVente = new Vente();
             nouvelleVente.setIdClient(clientSelectionne.getId());
             nouvelleVente.setIdVendeur(vendeurId);
@@ -305,44 +325,40 @@ public class FormVenteController {
             nouvelleVente.setMoyenPaiement(moyenPaiement);
             nouvelleVente.setStatutVente(statut);
 
-            // Combiner date et heure (aujourd'hui à l'heure actuelle)
             LocalDateTime dateTimeVente = dateVente.atTime(LocalTime.now());
             nouvelleVente.setDateVente(dateTimeVente);
 
-            // Ajouter les infos supplémentaires pour les logs
             nouvelleVente.setNomClient(clientSelectionne.getNom());
             nouvelleVente.setPrenomClient(clientSelectionne.getPrenom());
             nouvelleVente.setEmailClient(clientSelectionne.getEmail());
             nouvelleVente.setNomArticle(articleAVendre.getTitre());
 
-            System.out.println("💾 === CRÉATION DE VENTE ===");
-            System.out.println("   - Client: " + clientSelectionne.getFullName() + " (ID: " + clientSelectionne.getId() + ")");
-            System.out.println("   - Article: " + articleAVendre.getTitre() + " (ID: " + articleAVendre.getId() + ")");
-            System.out.println("   - Vendeur: " + vendeurId);
-            System.out.println("   - Montant: " + montant + " DH");
-            System.out.println("   - Moyen: " + moyenPaiement);
-            System.out.println("   - Statut: " + statut);
-            System.out.println("   - Date: " + dateTimeVente);
-
-            // Insérer la vente dans la base de données
             boolean succes = venteDAO.creerVente(nouvelleVente);
 
             if (succes) {
-                // Si la vente est terminée, marquer l'article comme vendu
-                if (statut.equalsIgnoreCase("terminée") || statut.equalsIgnoreCase("terminee")) {
-                    System.out.println("   ✅ Article marqué comme VENDU");
-                } else if (statut.equalsIgnoreCase("en cours")) {
-                    System.out.println("   ⏳ Article marqué comme RÉSERVÉ");
-                }
+                // ✅ LOG + ELASTIC : Vente validée
+                logger.info("Vente enregistrée avec succès | VenteID={}", nouvelleVente.getIdVente());
+
+                elasticLogService.sendLog(
+                        "INFO",
+                        "Vente validée avec succès",
+                        Map.of(
+                                "venteId", nouvelleVente.getIdVente(),
+                                "vendeurId", vendeurId,
+                                "clientId", clientSelectionne.getId(),
+                                "articleId", articleAVendre.getId(),
+                                "montant", montant,
+                                "moyenPaiement", moyenPaiement,
+                                "statut", statut
+                        )
+                );
 
                 showSuccess("✅ Vente enregistrée avec succès ! ID: #" + nouvelleVente.getIdVente());
 
-                // Mettre à jour le statut de l'article localement
                 if ("terminée".equalsIgnoreCase(statut) || "terminee".equalsIgnoreCase(statut)) {
                     articleAVendre.setEtat("vendu");
                 }
 
-                // Fermer la fenêtre après 2 secondes
                 new Thread(() -> {
                     try {
                         Thread.sleep(2000);
@@ -352,24 +368,60 @@ public class FormVenteController {
                             }
                         });
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        logger.error("Erreur lors de la fermeture automatique du formulaire", e);
                     }
                 }).start();
 
             } else {
+                // ✅ LOG + ELASTIC : échec vente
+                logger.warn("Échec enregistrement vente | Client={} | Article={}",
+                        clientSelectionne.getId(), articleAVendre.getId());
+
+                elasticLogService.sendLog(
+                        "WARN",
+                        "Échec création vente",
+                        Map.of(
+                                "vendeurId", vendeurId,
+                                "clientId", clientSelectionne.getId(),
+                                "articleId", articleAVendre.getId()
+                        )
+                );
+
                 showError("❌ Erreur lors de l'enregistrement de la vente");
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ ERREUR SQL: " + e.getMessage());
-            e.printStackTrace();
+            // ✅ LOG + ELASTIC : Erreur SQL
+            logger.error("Erreur SQL lors de la création de la vente", e);
+
+            elasticLogService.sendLog(
+                    "ERROR",
+                    "Erreur SQL création vente",
+                    Map.of(
+                            "vendeurId", vendeurId,
+                            "message", e.getMessage()
+                    )
+            );
+
             showError("❌ Erreur base de données : " + e.getMessage());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            // ✅ LOG + ELASTIC : Erreur critique imprévue
+            logger.error("Erreur inattendue lors de la création de la vente", e);
+
+            elasticLogService.sendLog(
+                    "ERROR",
+                    "Erreur inattendue création vente",
+                    Map.of(
+                            "vendeurId", vendeurId,
+                            "message", e.getMessage()
+                    )
+            );
+
             showError("❌ Erreur inattendue : " + e.getMessage());
         }
     }
+
 
     /**
      * Annuler

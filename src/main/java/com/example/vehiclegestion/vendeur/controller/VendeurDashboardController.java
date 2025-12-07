@@ -3,7 +3,6 @@ package com.example.vehiclegestion.vendeur.controller;
 import com.example.vehiclegestion.vendeur.dao.VendeurDAO;
 import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
-import com.example.vehiclegestion.logging.service.ElasticLogService;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -39,39 +38,24 @@ public class VendeurDashboardController implements Initializable {
 
     private final DecimalFormat df = new DecimalFormat("#,##0.00");
     private VendeurDAO vendeurDAO;
-    private final ElasticLogService logService = new ElasticLogService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            logService.sendLog("INFO", "Initialisation du Dashboard");
-            System.out.println("🚀 Initialisation du Dashboard...");
 
-            // Vérifier utilisateur connecté
-            Utilisateur utilisateurConnecte = SessionManager.getInstance().getUtilisateurConnecte();
-            if (utilisateurConnecte == null || !SessionManager.getInstance().estVendeur()) {
-                logService.sendLog("WARN", "Aucun vendeur connecté ou accès refusé");
-                System.err.println("❌ Aucun vendeur connecté ou accès refusé !");
-                return;
-            }
-
-            int vendeurId = utilisateurConnecte.getIdUtilisateur();
-            vendeurDAO = new VendeurDAO(vendeurId);
-
-            // Initialisation
-            initializeStatistics();
-            initializeAdditionalStatistics();
-            initializeCharts();
-            loadCategorySalesChart();
-            initializeActivities();
-
-            logService.sendLog("INFO", "Dashboard initialisé avec succès");
-
-        } catch (Exception e) {
-            logService.sendLog("ERROR", "Erreur lors de l'initialisation du dashboard: " + e.getMessage());
-            e.printStackTrace();
-            showErrorStatistics();
+        Utilisateur utilisateurConnecte = SessionManager.getInstance().getUtilisateurConnecte();
+        if (utilisateurConnecte == null || !SessionManager.getInstance().estVendeur()) {
+            System.err.println("❌ Aucun vendeur connecté ou accès refusé !");
+            return;
         }
+
+        int vendeurId = utilisateurConnecte.getIdUtilisateur();
+        vendeurDAO = new VendeurDAO(vendeurId);
+
+        initializeStatistics();
+        initializeAdditionalStatistics();
+        initializeCharts();
+        loadCategorySalesChart();
+        initializeActivities();
     }
 
     private void initializeStatistics() {
@@ -86,10 +70,7 @@ public class VendeurDashboardController implements Initializable {
             activeClientsLabel.setText(String.valueOf(activeClients));
             pendingOrdersLabel.setText(String.valueOf(pendingOrders));
 
-            logService.sendLog("INFO", "Statistiques principales chargées");
-
         } catch (SQLException e) {
-            logService.sendLog("ERROR", "Erreur statistiques principales: " + e.getMessage());
             showErrorStatistics();
         }
     }
@@ -104,10 +85,7 @@ public class VendeurDashboardController implements Initializable {
             availableArticlesLabel.setText(String.valueOf(availableArticles));
             avgRatingLabel.setText(String.format("%.1f", avgRating));
 
-            logService.sendLog("INFO", "Statistiques supplémentaires chargées");
-
         } catch (SQLException e) {
-            logService.sendLog("ERROR", "Erreur statistiques supplémentaires: " + e.getMessage());
             totalArticlesLabel.setText("0");
             availableArticlesLabel.setText("0");
             avgRatingLabel.setText("0.0");
@@ -118,9 +96,7 @@ public class VendeurDashboardController implements Initializable {
         try {
             initializeSalesChart();
             initializeProductsChart();
-            logService.sendLog("INFO", "Graphiques chargés");
         } catch (SQLException e) {
-            logService.sendLog("ERROR", "Erreur lors du chargement des graphiques: " + e.getMessage());
             initializeSampleCharts();
         }
     }
@@ -159,9 +135,7 @@ public class VendeurDashboardController implements Initializable {
         try {
             refreshActivities();
             initializeSystemStatus();
-        } catch (Exception e) {
-            logService.sendLog("ERROR", "Erreur lors du chargement des activités: " + e.getMessage());
-        }
+        } catch (Exception ignored) {}
     }
 
     @FXML
@@ -186,10 +160,8 @@ public class VendeurDashboardController implements Initializable {
                 activitiesContainer.getChildren().add(card);
             }
 
-            logService.sendLog("INFO", "Activités récentes chargées");
-
         } catch (SQLException e) {
-            logService.sendLog("ERROR", "Erreur rafraîchissement activités: " + e.getMessage());
+            System.err.println("Erreur chargement activités : " + e.getMessage());
         }
     }
 
@@ -232,7 +204,6 @@ public class VendeurDashboardController implements Initializable {
             systemStatusValue.setText(systemStatus.get("statut"));
             systemStatusDesc.setText(systemStatus.get("description"));
         } catch (SQLException e) {
-            logService.sendLog("ERROR", "Erreur statut système: " + e.getMessage());
             systemStatusValue.setText("ERREUR");
             systemStatusDesc.setText("Impossible de charger le statut système");
         }
@@ -263,7 +234,6 @@ public class VendeurDashboardController implements Initializable {
 
     @FXML
     private void refreshData() {
-        logService.sendLog("INFO", "Actualisation des données du Dashboard");
         initializeStatistics();
         initializeAdditionalStatistics();
         initializeCharts();
@@ -290,10 +260,7 @@ public class VendeurDashboardController implements Initializable {
                 categorySalesChart.getData().add(series);
             }
 
-            logService.sendLog("INFO", "Graphique ventes par catégorie chargé");
-
         } catch (SQLException e) {
-            logService.sendLog("ERROR", "Erreur chargement graphique ventes par catégorie: " + e.getMessage());
             e.printStackTrace();
         }
     }
