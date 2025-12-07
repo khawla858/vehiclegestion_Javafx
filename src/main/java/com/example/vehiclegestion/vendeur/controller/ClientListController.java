@@ -1,5 +1,6 @@
 package com.example.vehiclegestion.vendeur.controller;
 
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.ClientDAO;
 import com.example.vehiclegestion.vendeur.model.Client;
 import javafx.fxml.FXML;
@@ -12,7 +13,6 @@ import java.util.ResourceBundle;
 import java.util.List;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
-import com.example.vehiclegestion.auth.SessionManager;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class ClientListController implements Initializable {

@@ -1,7 +1,6 @@
 package com.example.vehiclegestion.vendeur.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
-import com.example.vehiclegestion.auth.model.Utilisateur;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.MagasinDAO;
 import com.example.vehiclegestion.vendeur.dao.DemandeMagasinDAO;
 import com.example.vehiclegestion.vendeur.model.Magasin;
@@ -9,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;

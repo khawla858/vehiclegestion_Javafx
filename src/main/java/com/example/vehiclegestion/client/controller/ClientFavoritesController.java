@@ -1,10 +1,10 @@
 package com.example.vehiclegestion.client.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
 import com.example.vehiclegestion.client.doa.FavoriteDAO;
 import com.example.vehiclegestion.client.doa.ReservationDAO;
 import com.example.vehiclegestion.client.doa.VehicleDAO;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.client.model.Vehicle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

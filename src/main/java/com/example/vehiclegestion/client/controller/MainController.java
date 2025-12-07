@@ -1,8 +1,8 @@
 package com.example.vehiclegestion.client.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
 import com.example.vehiclegestion.common.dao.ChatDAO;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;

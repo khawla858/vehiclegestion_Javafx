@@ -1,8 +1,8 @@
 package com.example.vehiclegestion.vendeur.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.VenteDAO;
 import com.example.vehiclegestion.vendeur.model.Vente;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

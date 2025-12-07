@@ -1,20 +1,19 @@
 package com.example.vehiclegestion.vendeur.controller;
 
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import javafx.scene.control.Alert;
 import com.example.vehiclegestion.vendeur.model.Article;
 import com.example.vehiclegestion.vendeur.model.Commentaire;
 import com.example.vehiclegestion.vendeur.dao.CommentaireDAO;
 import com.example.vehiclegestion.utils.DataReceiver;
 import com.example.vehiclegestion.utils.NavigationManager;
-import com.example.vehiclegestion.auth.SessionManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.geometry.Pos;
-import javafx.geometry.Insets;
+
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

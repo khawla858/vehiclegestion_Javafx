@@ -2,7 +2,7 @@ package com.example.vehiclegestion.vendeur.controller;
 
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.Article;
-import com.example.vehiclegestion.auth.SessionManager; // ✅ AJOUT IMPORT
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;

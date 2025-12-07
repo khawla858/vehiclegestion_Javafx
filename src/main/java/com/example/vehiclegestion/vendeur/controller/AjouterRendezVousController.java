@@ -1,8 +1,8 @@
 package com.example.vehiclegestion.vendeur.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.RendezVousDAO;
 import com.example.vehiclegestion.vendeur.dao.ClientDAO;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.RendezVous;
 import com.example.vehiclegestion.vendeur.model.Client;

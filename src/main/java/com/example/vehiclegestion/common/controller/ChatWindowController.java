@@ -1,6 +1,6 @@
 package com.example.vehiclegestion.common.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.common.dao.ChatDAO;
 import com.example.vehiclegestion.common.model.Conversation;
 import com.example.vehiclegestion.common.model.Message;
@@ -14,7 +14,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.net.URL;

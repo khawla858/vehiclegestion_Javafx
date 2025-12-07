@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);"
+            fx:controller="com.example.vehiclegestion.admin.controller.AdminDashboardController">
+
+    <!-- HEADER -->
+    <top>
+        <VBox style="-fx-background-color: linear-gradient(to right, #0f172a, #1e40af);
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);"
+              spacing="10">
+            <padding>
+                <Insets top="25" right="25" bottom="25" left="25"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Rectangle width="4" height="40" arcWidth="10" arcHeight="10"
+                               style="-fx-fill: linear-gradient(to bottom, #3b82f6, #8b5cf6);"/>
+
+                    <VBox spacing="2">
+                        <Label text="🏎️ DASHBOARD ADMIN"
+                               style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28px;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0.5, 0, 2);"/>
+                        <Label text="Gestionnaire de Véhicules • Tableau de Bord Analytique"
+                               style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </VBox>
+                </HBox>
+
+                <HBox HBox.hgrow="ALWAYS"/>
+
+                <Button text="🔄 Rafraîchir les Données" onAction="#handleRefresh"
+                        style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-font-size: 14px;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 10, 0.5, 0, 3);"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- MAIN CONTENT AVEC SCROLLPANE -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background: transparent; -fx-background-color: transparent;"
+                    hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+
+            <VBox spacing="25" style="-fx-background-color: transparent;">
+                <padding>
+                    <Insets top="25" right="25" bottom="25" left="25"/>
+                </padding>
+
+                <!-- STATISTIQUES GÉNÉRALES -->
+                <VBox spacing="15">
+                    <Label text="📊 TABLEAU DE BORD ANALYTIQUE"
+                           style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 22px;
+                                  -fx-border-color: #3b82f6; -fx-border-width: 0 0 3 0; -fx-padding: 0 0 10 0;"/>
+
+                    <GridPane hgap="20" vgap="20">
+                        <!-- Total Utilisateurs -->
+                        <VBox spacing="10" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                                  -fx-background-radius: 12;
+                                                  -fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                                                  -fx-border-width: 2;
+                                                  -fx-border-radius: 12;
+                                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <padding>
+                                <Insets top="20" right="20" bottom="20" left="20"/>
+                            </padding>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Rectangle width="40" height="40" arcWidth="10" arcHeight="10"
+                                           style="-fx-fill: radial-gradient(center 50% 50%, radius 50%, #3b82f6, #1e40af);"/>
+                                <VBox>
+                                    <Label text="UTILISATEURS"
+                                           style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                    <Label fx:id="totalUsersLabel" text="0"
+                                           style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 32px;"/>
+                                </VBox>
+                            </HBox>
+                            <Label text="👥 Membres Inscrits"
+                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-padding: 5 0 0 0;"/>
+                        </VBox>
+
+                        <!-- Total Magasins -->
+                        <VBox spacing="10" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                                  -fx-background-radius: 12;
+                                                  -fx-border-color: linear-gradient(to right, #10b981, #3b82f6);
+                                                  -fx-border-width: 2;
+                                                  -fx-border-radius: 12;
+                                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <padding>
+                                <Insets top="20" right="20" bottom="20" left="20"/>
+                            </padding>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Rectangle width="40" height="40" arcWidth="10" arcHeight="10"
+                                           style="-fx-fill: radial-gradient(center 50% 50%, radius 50%, #10b981, #047857);"/>
+                                <VBox>
+                                    <Label text="MAGASINS"
+                                           style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                    <Label fx:id="totalMagasinsLabel" text="0"
+                                           style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 32px;"/>
+                                </VBox>
+                            </HBox>
+                            <Label text="🏪 Concessionnaires"
+                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-padding: 5 0 0 0;"/>
+                        </VBox>
+
+                        <!-- Nouveaux Utilisateurs -->
+                        <VBox spacing="10" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                                  -fx-background-radius: 12;
+                                                  -fx-border-color: linear-gradient(to right, #f59e0b, #f97316);
+                                                  -fx-border-width: 2;
+                                                  -fx-border-radius: 12;
+                                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);"
+                              GridPane.columnIndex="2" GridPane.rowIndex="0">
+                            <padding>
+                                <Insets top="20" right="20" bottom="20" left="20"/>
+                            </padding>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Rectangle width="40" height="40" arcWidth="10" arcHeight="10"
+                                           style="-fx-fill: radial-gradient(center 50% 50%, radius 50%, #f59e0b, #d97706);"/>
+                                <VBox>
+                                    <Label text="NOUVEAUX"
+                                           style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                    <Label fx:id="newUsersLabel" text="0"
+                                           style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 32px;"/>
+                                </VBox>
+                            </HBox>
+                            <Label text="🆕 Inscriptions (30 jours)"
+                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-padding: 5 0 0 0;"/>
+                        </VBox>
+
+                        <!-- Utilisateurs Actifs -->
+                        <VBox spacing="10" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                                  -fx-background-radius: 12;
+                                                  -fx-border-color: linear-gradient(to right, #8b5cf6, #d946ef);
+                                                  -fx-border-width: 2;
+                                                  -fx-border-radius: 12;
+                                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);"
+                              GridPane.columnIndex="3" GridPane.rowIndex="0">
+                            <padding>
+                                <Insets top="20" right="20" bottom="20" left="20"/>
+                            </padding>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Rectangle width="40" height="40" arcWidth="10" arcHeight="10"
+                                           style="-fx-fill: radial-gradient(center 50% 50%, radius 50%, #8b5cf6, #7c3aed);"/>
+                                <VBox>
+                                    <Label text="ACTIFS"
+                                           style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                    <Label fx:id="activeUsersLabel" text="0"
+                                           style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 32px;"/>
+                                </VBox>
+                            </HBox>
+                            <Label text="✅ Utilisateurs en ligne"
+                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px; -fx-padding: 5 0 0 0;"/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <!-- GRAPHIQUES -->
+                <VBox spacing="20">
+                    <Label text="📈 ANALYSE DES DONNÉES"
+                           style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 22px;
+                                  -fx-border-color: #3b82f6; -fx-border-width: 0 0 3 0; -fx-padding: 0 0 10 0;"/>
+
+                    <!-- Ligne 1: Graphiques Utilisateurs -->
+                    <HBox spacing="20">
+                        <!-- Utilisateurs par Rôle -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                     -fx-background-radius: 12;
+                                     -fx-border-color: #334155;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 12;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                            <padding>
+                                <Insets top="15" right="15" bottom="15" left="15"/>
+                            </padding>
+
+                            <VBox spacing="10">
+                                <Label text="👥 Répartition par Rôle"
+                                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+                                <!-- Textes explicatifs à côté du graphe -->
+                                <VBox spacing="8" style="-fx-background-color: rgba(15, 23, 42, 0.5);
+                                                         -fx-background-radius: 8;
+                                                         -fx-padding: 12;">
+                                    <Label text="📊 Distribution des rôles utilisateurs"
+                                           style="-fx-text-fill: #3b82f6; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                    <Label text="Ce graphique présente la répartition des utilisateurs selon leurs rôles dans le système (Admin, Gestionnaire, Utilisateur standard)."
+                                           style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"
+                                           wrapText="true"/>
+                                </VBox>
+                            </VBox>
+
+                            <PieChart fx:id="usersByRolePieChart" legendVisible="true"
+                                      style="-fx-background-color: transparent; -fx-text-fill: white;"
+                                      prefHeight="280" prefWidth="400"/>
+                        </VBox>
+
+                        <!-- Utilisateurs par Statut -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                     -fx-background-radius: 12;
+                                     -fx-border-color: #334155;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 12;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                            <padding>
+                                <Insets top="15" right="15" bottom="15" left="15"/>
+                            </padding>
+
+                            <VBox spacing="10">
+                                <Label text="📊 Statuts Utilisateurs"
+                                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+                                <!-- Textes explicatifs à côté du graphe -->
+                                <VBox spacing="8" style="-fx-background-color: rgba(15, 23, 42, 0.5);
+                                                         -fx-background-radius: 8;
+                                                         -fx-padding: 12;">
+                                    <Label text="✅ État des comptes utilisateurs"
+                                           style="-fx-text-fill: #10b981; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                    <Label text="Visualisez l'état d'activité des comptes : Actifs, Inactifs, Suspendus ou En attente de validation."
+                                           style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"
+                                           wrapText="true"/>
+                                </VBox>
+                            </VBox>
+
+                            <PieChart fx:id="usersByStatusPieChart" legendVisible="true"
+                                      style="-fx-background-color: transparent; -fx-text-fill: white;"
+                                      prefHeight="280" prefWidth="400"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Ligne 2: Graphiques Magasins -->
+                    <HBox spacing="20">
+                        <!-- Magasins par Catégorie -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                     -fx-background-radius: 12;
+                                     -fx-border-color: #334155;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 12;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                            <padding>
+                                <Insets top="15" right="15" bottom="15" left="15"/>
+                            </padding>
+
+                            <VBox spacing="10">
+                                <Label text="🏪 Magasins par Catégorie"
+                                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+                                <!-- Textes explicatifs à côté du graphe -->
+                                <VBox spacing="8" style="-fx-background-color: rgba(15, 23, 42, 0.5);
+                                                         -fx-background-radius: 8;
+                                                         -fx-padding: 12;">
+                                    <Label text="🏬 Classification des concessionnaires"
+                                           style="-fx-text-fill: #f59e0b; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                    <Label text="Distribution des magasins selon leur catégorie : Neufs, Occasions, Luxe, Services et Réparations."
+                                           style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"
+                                           wrapText="true"/>
+                                </VBox>
+                            </VBox>
+
+                            <BarChart fx:id="magasinsByCategorie" legendVisible="false"
+                                      prefHeight="280" prefWidth="400">
+                                <xAxis>
+                                    <CategoryAxis side="BOTTOM" label="Catégorie"
+                                                  style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis side="LEFT" label="Nombre"
+                                                style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
+                                </yAxis>
+                            </BarChart>
+                        </VBox>
+
+                        <!-- Top Magasins -->
+                        <VBox spacing="15" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                     -fx-background-radius: 12;
+                                     -fx-border-color: #334155;
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 12;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                            <padding>
+                                <Insets top="15" right="15" bottom="15" left="15"/>
+                            </padding>
+
+                            <VBox spacing="10">
+                                <Label text="🏆 Top 5 Magasins"
+                                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+                                <!-- Textes explicatifs à côté du graphe -->
+                                <VBox spacing="8" style="-fx-background-color: rgba(15, 23, 42, 0.5);
+                                                         -fx-background-radius: 8;
+                                                         -fx-padding: 12;">
+                                    <Label text="⭐ Meilleurs performeurs"
+                                           style="-fx-text-fill: #8b5cf6; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                    <Label text="Classement des 5 magasins les plus performants selon le nombre de véhicules en stock et les ventes."
+                                           style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"
+                                           wrapText="true"/>
+                                </VBox>
+                            </VBox>
+
+                            <BarChart fx:id="topMagasinsChart" legendVisible="false"
+                                      prefHeight="280" prefWidth="400">
+                                <xAxis>
+                                    <CategoryAxis side="BOTTOM" label="Magasin"
+                                                  style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis side="LEFT" label="Véhicules"
+                                                style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
+                                </yAxis>
+                            </BarChart>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

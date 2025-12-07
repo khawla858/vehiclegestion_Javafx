@@ -1,7 +1,7 @@
 package com.example.vehiclegestion.vendeur.controller;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.utils.NavigationManager;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXML;

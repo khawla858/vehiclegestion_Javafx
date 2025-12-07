@@ -84,7 +84,7 @@ public class RegisterController {
         Utilisateur user = new Utilisateur(nom, prenom, email, password, role);
 
         // Inscription
-        if (utilisateurDAO.inscrire(user,password)) {
+        if (utilisateurDAO.inscrire(user)) {
             hideError();
             showSuccessAndRedirect();
         } else {
