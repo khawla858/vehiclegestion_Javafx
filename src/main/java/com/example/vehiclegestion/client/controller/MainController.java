@@ -2,23 +2,24 @@ package com.example.vehiclegestion.client.controller;
 
 import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
-import com.example.vehiclegestion.common.dao.ChatDAO;
+import com.example.vehiclegestion.common.controller.ChatWindowController;
+import com.example.vehiclegestion.common.model.Notification;
+import com.example.vehiclegestion.common.utils.NotificationService;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
 public class MainController {
 
@@ -30,18 +31,23 @@ public class MainController {
     @FXML private Button historyBtn;
     @FXML private Button profileBtn;
     @FXML private Button logoutBtn;
+    @FXML private Button notificationBtn;
+    @FXML private Button btnMarkAllRead;
+    @FXML private Button btnSeeAll;
 
-    // ✅ NOUVEAU : Badge messages
-    @FXML private Label badgeMessages;  // Le badge "3" sur l'icône messages
-    @FXML private Button btnMessages;   // Le bouton messages dans le header
+    // Éléments du dropdown de notifications
+    @FXML private BorderPane notificationDropdown;
+    @FXML private VBox notificationItemsContainer;
+    @FXML private Label lblNotificationStatus;
+    @FXML private Label notificationBadge;
+    @FXML private ScrollPane notificationScrollPane;
 
     private SessionManager sessionManager = SessionManager.getInstance();
-
-    // ✅ NOUVEAU : DAO pour le chat
-    private ChatDAO chatDAO = new ChatDAO();
-
-    // ✅ NOUVEAU : Timeline pour rafraîchir le badge
-    private Timeline badgeRefreshTimeline;
+    private NotificationService notificationService;
+    private Timeline notificationCheckTimeline;
+    private Timeline notificationRefreshTimeline;
+    private int lastNotificationCount = 0;
+    private boolean notificationDropdownVisible = false;
 
     @FXML
     public void initialize() {
@@ -52,10 +58,15 @@ public class MainController {
             return;
         }
 
+        notificationService = NotificationService.getInstance();
+
         Utilisateur currentUser = sessionManager.getUtilisateurConnecte();
         userNameLabel.setText(currentUser.getPrenom() + " " + currentUser.getNom());
 
         System.out.println("👤 Utilisateur connecté: " + currentUser.getPrenom() + " " + currentUser.getNom());
+
+        // Initialiser les notifications
+        setupNotifications();
 
         // Charger la page véhicules par défaut
         showVehicles();
@@ -63,143 +74,504 @@ public class MainController {
         // Initialiser la recherche
         initializeSearch();
 
-        // ✅ NOUVEAU : Initialiser le chat
-        initializeChat();
+        // Initialiser les boutons du dropdown
+        setupDropdownButtons();
+
+        // Cacher le dropdown au démarrage
+        notificationDropdown.setVisible(false);
+        notificationDropdown.setManaged(false);
+
+        // Fermer le dropdown en cliquant ailleurs
+        setupClickOutsideListener();
     }
 
-    // ========================================
-    // 💬 GESTION DU CHAT
-    // ========================================
+    private void setupNotifications() {
+        // Mettre à jour le badge
+        updateNotificationBadge();
 
-    /**
-     * Initialise le système de chat (badge + refresh)
-     */
-    private void initializeChat() {
-        // Mise à jour initiale du badge
-        updateMessageBadge();
+        // Vérifier les nouvelles notifications périodiquement
+        startNotificationChecker();
 
-        // Démarrer le rafraîchissement automatique
-        startBadgeRefresh();
-
-        System.out.println("✅ Système de chat initialisé");
+        // Rafraîchir la liste toutes les 30 secondes
+        startNotificationRefresh();
     }
 
-    /**
-     * Met à jour le badge avec le nombre de messages non lus
-     */
-    private void updateMessageBadge() {
-        if (!sessionManager.estConnecte()) return;
+    private void setupDropdownButtons() {
+        // Bouton "Tout marquer comme lu"
+        btnMarkAllRead.setOnAction(e -> markAllNotificationsAsRead());
+
+        // Bouton "Voir tout"
+        btnSeeAll.setOnAction(e -> showAllNotificationsPage());
+    }
+
+    @FXML
+    private void toggleNotificationDropdown() {
+        System.out.println("🔔 Toggle dropdown notifications");
+
+        if (!notificationDropdownVisible) {
+            // Afficher le dropdown
+            showNotificationDropdown();
+        } else {
+            // Cacher le dropdown
+            hideNotificationDropdown();
+        }
+    }
+
+    private void showNotificationDropdown() {
+        System.out.println("📱 Affichage dropdown notifications");
+
+        notificationDropdownVisible = true;
+        notificationDropdown.setVisible(true);
+        notificationDropdown.setManaged(true);
+
+        // ✨ AJUSTER LA TAILLE DYNAMIQUEMENT
+        notificationDropdown.setPrefWidth(500);
+        notificationDropdown.setPrefHeight(600);
+        notificationDropdown.setMaxWidth(550);
+        notificationDropdown.setMaxHeight(650);
+
+        // Positionner le dropdown sous le bouton
+        positionNotificationDropdown();
+
+        // Charger les notifications
+        loadNotificationDropdown();
+
+        // Rafraîchir le badge
+        updateNotificationBadge();
+
+        // Empêcher la propagation du clic
+        notificationDropdown.setOnMouseClicked(e -> e.consume());
+    }
+    private void hideNotificationDropdown() {
+        System.out.println("📱 Masquage dropdown notifications");
+
+        notificationDropdownVisible = false;
+        notificationDropdown.setVisible(false);
+        notificationDropdown.setManaged(false);
+    }
+
+    private void positionNotificationDropdown() {
+        // Position approximative - ajustez selon votre layout
+        double dropdownX = notificationBtn.localToScene(0, 0).getX() - 150;
+        double dropdownY = notificationBtn.localToScene(0, 0).getY() + 65;
+
+        notificationDropdown.setTranslateX(dropdownX);
+        notificationDropdown.setTranslateY(dropdownY);
+
+        notificationDropdown.setPrefWidth(350);
+        notificationDropdown.setPrefHeight(450);
+        notificationDropdown.setMinWidth(300);
+
+
+        notificationDropdown.setTranslateX(dropdownX);
+        notificationDropdown.setTranslateY(dropdownY);
+    }
+
+    private void loadNotificationDropdown() {
+        if (!sessionManager.estConnecte() || notificationService == null) return;
+
+        int userId = sessionManager.getUtilisateurConnecte().getIdUtilisateur();
+        List<Notification> notifications = notificationService.getNotificationsUtilisateur(userId, false);
+
+        Platform.runLater(() -> {
+            notificationItemsContainer.getChildren().clear();
+
+            if (notifications.isEmpty()) {
+                showEmptyNotificationState();
+                lblNotificationStatus.setText("0 notification(s)");
+                return;
+            }
+
+            int nonLuesCount = 0;
+
+            for (Notification notif : notifications) {
+                if (!notif.isEstLue()) {
+                    nonLuesCount++;
+                }
+                addNotificationItemToDropdown(notif);
+            }
+
+            lblNotificationStatus.setText(notifications.size() + " notification(s) • " +
+                    nonLuesCount + " non lue(s)");
+        });
+    }
+
+    private void addNotificationItemToDropdown(Notification notification) {
+        try {
+            HBox notificationItem = new HBox(10);
+            notificationItem.setStyle("-fx-padding: 12 15; " +
+                    "-fx-border-width: 0 0 1 0; " +
+                    "-fx-border-color: #f0f0f0; " +
+                    "-fx-background-color: " +
+                    (notification.isEstLue() ? "white" : "#f8fbff") + ";");
+
+            // Icône
+            Label iconLabel = new Label(notification.getIcon());
+            iconLabel.setStyle("-fx-font-size: 18px; -fx-padding: 0 10 0 0;");
+
+            // Contenu
+            VBox contentBox = new VBox(3);
+            contentBox.setMaxWidth(250);
+
+            // Titre et temps
+            HBox headerBox = new HBox(5);
+            Label titleLabel = new Label(notification.getTitre());
+            titleLabel.setStyle("-fx-font-weight: bold; " +
+                    "-fx-text-fill: #1a1a1a; " +
+                    "-fx-font-size: 13px;");
+            titleLabel.setWrapText(true);
+
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            Label timeLabel = new Label(notification.getTimeAgo());
+            timeLabel.setStyle("-fx-text-fill: #999; -fx-font-size: 11px;");
+
+            headerBox.getChildren().addAll(titleLabel, spacer, timeLabel);
+
+            // Message
+            Label messageLabel = new Label(notification.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+            messageLabel.setWrapText(true);
+
+            // Catégorie
+            HBox footerBox = new HBox(5);
+            Label categoryLabel = new Label(notification.getCategorie());
+            categoryLabel.setStyle("-fx-background-color: #e8f4fd; " +
+                    "-fx-text-fill: #3498db; " +
+                    "-fx-padding: 2 8; " +
+                    "-fx-font-size: 10px; " +
+                    "-fx-background-radius: 10;");
+
+            Region footerSpacer = new Region();
+            HBox.setHgrow(footerSpacer, Priority.ALWAYS);
+
+            // Indicateur "non lu"
+            if (!notification.isEstLue()) {
+                Label unreadDot = new Label("●");
+                unreadDot.setStyle("-fx-text-fill: #3498db; -fx-font-size: 8px;");
+                footerBox.getChildren().add(unreadDot);
+            }
+
+            footerBox.getChildren().addAll(categoryLabel, footerSpacer);
+
+            contentBox.getChildren().addAll(headerBox, messageLabel, footerBox);
+
+            notificationItem.getChildren().addAll(iconLabel, contentBox);
+
+            // Style pour les priorités
+            if ("urgente".equals(notification.getPriorite())) {
+                notificationItem.setStyle(notificationItem.getStyle() +
+                        "-fx-border-left-color: #dc3545; -fx-border-left-width: 3;");
+            } else if ("haute".equals(notification.getPriorite())) {
+                notificationItem.setStyle(notificationItem.getStyle() +
+                        "-fx-border-left-color: #ffc107; -fx-border-left-width: 3;");
+            }
+
+            // Gestion du clic
+            notificationItem.setOnMouseClicked(e -> {
+                System.out.println("📱 Notification cliquée: " + notification.getTitre());
+
+                // Marquer comme lue
+                if (!notification.isEstLue()) {
+                    notificationService.marquerCommeLue(notification.getIdNotification());
+
+                    // Mettre à jour l'UI
+                    notificationItem.setStyle(notificationItem.getStyle().replace("#f8fbff", "white"));
+                    loadNotificationDropdown();
+                    updateNotificationBadge();
+                }
+
+                // Fermer le dropdown
+                hideNotificationDropdown();
+
+                // Naviguer selon le type
+                handleNotificationNavigation(notification);
+
+                e.consume();
+            });
+
+            // Effet hover
+            notificationItem.setOnMouseEntered(e -> {
+                notificationItem.setStyle(notificationItem.getStyle() +
+                        "-fx-background-color: #f5f9ff; -fx-cursor: hand;");
+            });
+
+            notificationItem.setOnMouseExited(e -> {
+                String baseStyle = "-fx-padding: 12 15; -fx-border-width: 0 0 1 0; " +
+                        "-fx-border-color: #f0f0f0; " +
+                        "-fx-background-color: " +
+                        (notification.isEstLue() ? "white" : "#f8fbff") + ";";
+
+                if ("urgente".equals(notification.getPriorite())) {
+                    baseStyle += "-fx-border-left-color: #dc3545; -fx-border-left-width: 3;";
+                } else if ("haute".equals(notification.getPriorite())) {
+                    baseStyle += "-fx-border-left-color: #ffc107; -fx-border-left-width: 3;";
+                }
+
+                notificationItem.setStyle(baseStyle);
+            });
+
+            notificationItemsContainer.getChildren().add(notificationItem);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur création item notification: " + e.getMessage());
+        }
+    }
+
+    private void showEmptyNotificationState() {
+        VBox emptyState = new VBox(15);
+        emptyState.setStyle("-fx-alignment: center; -fx-padding: 40 20;");
+
+        Label icon = new Label("🔔");
+        icon.setStyle("-fx-font-size: 40px;");
+
+        Label message = new Label("Aucune notification");
+        message.setStyle("-fx-font-size: 16px; -fx-text-fill: #666;");
+
+        Label subMessage = new Label("Vous serez notifié ici des nouvelles activités");
+        subMessage.setStyle("-fx-font-size: 12px; -fx-text-fill: #999; -fx-alignment: center;");
+        subMessage.setWrapText(true);
+
+        emptyState.getChildren().addAll(icon, message, subMessage);
+        notificationItemsContainer.getChildren().add(emptyState);
+    }
+
+    private void handleNotificationNavigation(Notification notification) {
+        // Navigation selon le type de notification
+        String lien = notification.getLienAction();
+        String type = notification.getTypeNotification();
+
+        System.out.println("🎯 Navigation depuis notification: " + type);
+
+        if (lien != null) {
+            if (lien.contains("message") || lien.startsWith("/messages")) {
+                openChatFromMenu();
+            } else if (lien.contains("vehicule") || lien.startsWith("/vehicules")) {
+                showVehicles();
+            } else if (lien.contains("reservation") || lien.startsWith("/reservations")) {
+                showHistory();
+            }
+        } else {
+            // Navigation par type
+            switch (notification.getCategorie()) {
+                case "message":
+                    openChatFromMenu();
+                    break;
+                case "vehicule":
+                    showVehicles();
+                    break;
+                case "transaction":
+                    showHistory();
+                    break;
+                default:
+                    // Ne rien faire
+                    break;
+            }
+        }
+    }
+
+    private void setupClickOutsideListener() {
+        // Fermer le dropdown quand on clique ailleurs
+        mainBorderPane.setOnMouseClicked(e -> {
+            if (notificationDropdownVisible &&
+                    !notificationDropdown.getBoundsInParent().contains(e.getX(), e.getY()) &&
+                    !notificationBtn.getBoundsInParent().contains(e.getX(), e.getY())) {
+                hideNotificationDropdown();
+            }
+        });
+    }
+
+    private void markAllNotificationsAsRead() {
+        if (!sessionManager.estConnecte() || notificationService == null) return;
+
+        int userId = sessionManager.getUtilisateurConnecte().getIdUtilisateur();
+        notificationService.marquerToutesCommeLues(userId);
+
+        // Rafraîchir l'UI
+        loadNotificationDropdown();
+        updateNotificationBadge();
+
+        System.out.println("✅ Toutes les notifications marquées comme lues");
+    }
+
+    private void showAllNotificationsPage() {
+        System.out.println("📋 Navigation vers page notifications complète");
+
+        // Cacher le dropdown
+        hideNotificationDropdown();
+
+        // Vous pouvez créer une page dédiée pour l'historique complet
+        // Pour l'instant, simplement logger
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Notifications complètes");
+        alert.setHeaderText("Page des notifications");
+        alert.setContentText("Cette fonctionnalité sera implémentée prochainement.");
+        alert.showAndWait();
+    }
+
+    private void startNotificationChecker() {
+        // Vérifier les nouvelles notifications toutes les 30 secondes
+        notificationCheckTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(30), e -> updateNotificationBadge())
+        );
+        notificationCheckTimeline.setCycleCount(Timeline.INDEFINITE);
+        notificationCheckTimeline.play();
+    }
+
+    private void startNotificationRefresh() {
+        // Rafraîchir la liste des notifications toutes les 30 secondes
+        notificationRefreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(30), e -> {
+                    if (notificationDropdownVisible) {
+                        loadNotificationDropdown();
+                    }
+                })
+        );
+        notificationRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        notificationRefreshTimeline.play();
+    }
+
+    private void updateNotificationBadge() {
+        if (!sessionManager.estConnecte() || notificationService == null) return;
+
+        Platform.runLater(() -> {
+            try {
+                int userId = sessionManager.getUtilisateurConnecte().getIdUtilisateur();
+                int count = notificationService.getNombreNotificationsNonLues(userId);
+
+                if (notificationBadge != null) {
+                    if (count > 0) {
+                        notificationBadge.setText(String.valueOf(count > 99 ? "99+" : count));
+                        notificationBadge.setVisible(true);
+
+                        // Animation pour nouvelles notifications
+                        if (count > lastNotificationCount && lastNotificationCount > 0) {
+                            animateNotificationBadge();
+                        }
+                    } else {
+                        notificationBadge.setVisible(false);
+                    }
+                }
+
+                lastNotificationCount = count;
+
+            } catch (Exception e) {
+                System.err.println("❌ Erreur mise à jour badge: " + e.getMessage());
+            }
+        });
+    }
+
+    private void animateNotificationBadge() {
+        if (notificationBadge == null) return;
+
+        Timeline pulse = new Timeline(
+                new KeyFrame(Duration.millis(0), e -> {
+                    notificationBadge.setScaleX(1.0);
+                    notificationBadge.setScaleY(1.0);
+                }),
+                new KeyFrame(Duration.millis(150), e -> {
+                    notificationBadge.setScaleX(1.3);
+                    notificationBadge.setScaleY(1.3);
+                }),
+                new KeyFrame(Duration.millis(300), e -> {
+                    notificationBadge.setScaleX(1.0);
+                    notificationBadge.setScaleY(1.0);
+                })
+        );
+        pulse.setCycleCount(2);
+        pulse.play();
+    }
+
+    // Les autres méthodes restent les mêmes...
+
+    @FXML
+    private void openChatFromMenu() {
+        System.out.println("\n💬 === OUVERTURE CHAT DEPUIS MENU ===");
 
         try {
-            int unreadCount = chatDAO.countUnreadMessages(
-                    sessionManager.getUserId(),
-                    sessionManager.getUserRole()
-            );
+            String[] possiblePaths = {
+                    "/view/common/ChatWindow.fxml",
+                    "/com/example/vehiclegestion/view/common/ChatWindow.fxml",
+                    "view/common/ChatWindow.fxml",
+                    "/ChatWindow.fxml",
+                    "ChatWindow.fxml"
+            };
 
-            if (badgeMessages != null) {
-                if (unreadCount > 0) {
-                    badgeMessages.setText(String.valueOf(unreadCount));
-                    badgeMessages.setVisible(true);
-                    System.out.println("📬 " + unreadCount + " messages non lus");
-                } else {
-                    badgeMessages.setVisible(false);
+            FXMLLoader loader = null;
+            Parent chatRoot = null;
+            String foundPath = null;
+
+            for (String path : possiblePaths) {
+                try {
+                    System.out.println("🔍 Essai du chemin: " + path);
+                    URL url = getClass().getResource(path);
+                    if (url != null) {
+                        System.out.println("✅ URL trouvée: " + url);
+                        loader = new FXMLLoader(url);
+                        chatRoot = loader.load();
+                        foundPath = path;
+                        System.out.println("✅ FXML chargé avec succès: " + path);
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Échec pour: " + path + " - " + e.getMessage());
                 }
             }
 
-        } catch (Exception e) {
-            System.err.println("❌ Erreur mise à jour badge: " + e.getMessage());
-        }
-    }
+            if (chatRoot == null || loader == null) {
+                System.err.println("❌ Fichier ChatWindow.fxml introuvable dans tous les chemins testés");
+                showError("Erreur", "Impossible de charger l'interface de chat");
+                return;
+            }
 
-    /**
-     * Démarre le rafraîchissement automatique du badge toutes les 10 secondes
-     */
-    private void startBadgeRefresh() {
-        badgeRefreshTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(10), e -> updateMessageBadge())
-        );
-        badgeRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
-        badgeRefreshTimeline.play();
-        System.out.println("🔄 Auto-refresh badge messages démarré");
-    }
+            System.out.println("✅ FXML chargé depuis: " + foundPath);
 
-    /**
-     * Arrête le rafraîchissement (à appeler lors de la fermeture)
-     */
-    public void stopBadgeRefresh() {
-        if (badgeRefreshTimeline != null) {
-            badgeRefreshTimeline.stop();
-        }
-    }
+            // Récupérer le contrôleur
+            ChatWindowController chatController = loader.getController();
 
-    /**
-     * Ouvre la fenêtre de chat
-     */
-    @FXML
-    private void showMessages() {
-        System.out.println("💬 Ouverture de la fenêtre de chat...");
+            // Vérifier que le contrôleur a bien été chargé
+            if (chatController == null) {
+                System.err.println("❌ Contrôleur ChatWindowController non trouvé!");
+                return;
+            }
 
-        if (!sessionManager.estConnecte()) {
-            showError("Erreur", "Vous devez être connecté pour accéder au chat");
-            return;
-        }
+            // Créer et afficher la fenêtre
+            Stage stage = new Stage();
+            stage.setTitle("Messages - Historique des conversations");
+            stage.setScene(new Scene(chatRoot, 1000, 700));
+            stage.setMinWidth(800);
+            stage.setMinHeight(600);
 
-        try {
-            // Option 1 : Ouvrir dans la zone de contenu principale
-            loadContent("/view/common/ChatWindow.fxml");
-
-            // Option 2 : Ouvrir dans une fenêtre séparée (décommentez si préféré)
-            // openChatInNewWindow();
-
-            // Rafraîchir le badge après ouverture
-            updateMessageBadge();
-
-            System.out.println("✅ Chat ouvert avec succès");
-
-        } catch (Exception e) {
-            System.err.println("❌ Erreur ouverture chat: " + e.getMessage());
-            e.printStackTrace();
-            showError("Erreur", "Impossible d'ouvrir le chat: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Option alternative : Ouvre le chat dans une nouvelle fenêtre
-     */
-    private void openChatInNewWindow() throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/view/common/ChatWindow.fxml")
-        );
-        Parent root = loader.load();
-
-        Stage chatStage = new Stage();
-        chatStage.setTitle("💬 Messages - AutoSales Pro");
-        chatStage.setScene(new Scene(root, 900, 600));
-        chatStage.show();
-    }
-
-    // ========================================
-    // 🔍 RECHERCHE
-    // ========================================
-
-    private void initializeSearch() {
-        if (searchField != null) {
-            searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue != null && newValue.length() > 2) {
-                    performSearch(newValue);
+            // Fermer proprement
+            stage.setOnCloseRequest(e -> {
+                if (chatController != null) {
+                    chatController.cleanup();
                 }
             });
+
+            stage.show();
+
+            System.out.println("✅ Fenêtre de chat (mode menu) ouverte avec succès");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur inattendue: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    private void initializeSearch() {
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.length() > 2) {
+                performSearch(newValue);
+            }
+        });
     }
 
     private void performSearch(String query) {
         System.out.println("🔍 Recherche globale: " + query);
-        // La recherche sera gérée dans chaque contrôleur spécifique
+        // Implémentation de la recherche
     }
-
-    // ========================================
-    // 🚀 NAVIGATION
-    // ========================================
 
     @FXML
     private void showVehicles() {
@@ -232,17 +604,16 @@ public class MainController {
     @FXML
     private void logout() {
         System.out.println("🚪 Déconnexion");
-
-        // Arrêter le refresh du badge
-        stopBadgeRefresh();
-
+        // Nettoyer les timers
+        if (notificationCheckTimeline != null) {
+            notificationCheckTimeline.stop();
+        }
+        if (notificationRefreshTimeline != null) {
+            notificationRefreshTimeline.stop();
+        }
         sessionManager.fermerSession();
         redirectToLogin();
     }
-
-    // ========================================
-    // 🛠️ UTILITAIRES
-    // ========================================
 
     private void setActiveMenu(Button activeButton) {
         // Réinitialiser tous les boutons
@@ -280,7 +651,6 @@ public class MainController {
 
         } catch (IOException e) {
             System.err.println("❌ Erreur de chargement: " + fxmlPath);
-            e.printStackTrace();
             showErrorPage("Page non disponible: " + fxmlPath);
         }
     }
@@ -299,6 +669,14 @@ public class MainController {
         mainBorderPane.setCenter(errorBox);
     }
 
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     private void redirectToLogin() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
@@ -315,11 +693,12 @@ public class MainController {
         }
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    public void cleanup() {
+        if (notificationCheckTimeline != null) {
+            notificationCheckTimeline.stop();
+        }
+        if (notificationRefreshTimeline != null) {
+            notificationRefreshTimeline.stop();
+        }
     }
 }

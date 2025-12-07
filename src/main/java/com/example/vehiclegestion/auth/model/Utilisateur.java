@@ -12,6 +12,7 @@ public class Utilisateur extends com.example.vehiclegestion.vendeur.model.Utilis
     private LocalDateTime dateCreation;
     private String statut;
 
+
     // Constructeur par défaut
     public Utilisateur() {}
 

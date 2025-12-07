@@ -17,26 +17,26 @@ public class Magasin {
     private String logoMagasin;
     private String telephone;
     private String emailContact;
-    private Map<String, String> horairesOuverture; // pour JSONB
+    private Map<String, String> horairesOuverture;
     private String siteWeb;
     private String facebook;
     private String instagram;
-    private String horaires;  // ✅ AJOUT
+    private String horaires;
 
-
-    // Champ supplémentaire pour la catégorie (si nécessaire)
+    // Champ supplémentaire pour la catégorie
     private String categorie;
-    private String imagePath; // Chemin vers l'image
+    private String imagePath;
 
-    public String getImagePath() {
-        return imagePath;
-    }
+    // ✅ NOUVEAUX CHAMPS POUR STATISTIQUES DYNAMIQUES
+    private int nbVehicules;
+    private int nbVehiculesDisponibles;
+    private int nbVehiculesReserves;
+    private int nbVehiculesVendus;
+    private int nbCommentaires;
+    private int nbRdvAvenir;
+    private double noteMoyenne;
+    private int nbVentesMois;
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    // Constructeurs
     public Magasin() {}
 
     public Magasin(String nom, String adresse, String localisation, String description, int idVendeur) {
@@ -46,16 +46,7 @@ public class Magasin {
         this.description = description;
         this.idVendeur = idVendeur;
     }
-    private int nbCommentaires;
 
-    // ... getter et setter ...
-    public int getNbCommentaires() {
-        return nbCommentaires;
-    }
-
-    public void setNbCommentaires(int nbCommentaires) {
-        this.nbCommentaires = nbCommentaires;
-    }
     public Magasin(int id, String nom, String adresse, String localisation, String description, int idVendeur) {
         this.idMagasin = id;
         this.nomMagasin = nom;
@@ -126,7 +117,7 @@ public class Magasin {
     }
 
     // ==========================================
-    // Getters & Setters des nouveaux champs
+    // Getters & Setters des champs supplémentaires
     // ==========================================
 
     public String getLogoMagasin() {
@@ -185,13 +176,6 @@ public class Magasin {
         this.instagram = instagram;
     }
 
-    // ==========================================
-    // MÉTHODES MANQUANTES - À AJOUTER
-    // ==========================================
-
-    /**
-     * Retourne la catégorie du magasin
-     */
     public String getCategorie() {
         return categorie;
     }
@@ -200,9 +184,107 @@ public class Magasin {
         this.categorie = categorie;
     }
 
-    /**
-     * Alias pour getFacebook() - pour compatibilité avec le contrôleur
-     */
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public String getHoraires() {
+        return horaires;
+    }
+
+    public void setHoraires(String horaires) {
+        this.horaires = horaires;
+    }
+
+    // ==========================================
+    // Getters & Setters pour les statistiques
+    // ==========================================
+
+    public int getNbVehicules() {
+        return nbVehicules;
+    }
+
+    public void setNbVehicules(int nbVehicules) {
+        this.nbVehicules = nbVehicules;
+    }
+
+    public int getNbVehiculesDisponibles() {
+        return nbVehiculesDisponibles;
+    }
+
+    public void setNbVehiculesDisponibles(int nbVehiculesDisponibles) {
+        this.nbVehiculesDisponibles = nbVehiculesDisponibles;
+    }
+
+    public int getNbVehiculesReserves() {
+        return nbVehiculesReserves;
+    }
+
+    public void setNbVehiculesReserves(int nbVehiculesReserves) {
+        this.nbVehiculesReserves = nbVehiculesReserves;
+    }
+
+    public int getNbVehiculesVendus() {
+        return nbVehiculesVendus;
+    }
+
+    public void setNbVehiculesVendus(int nbVehiculesVendus) {
+        this.nbVehiculesVendus = nbVehiculesVendus;
+    }
+
+    public int getNbCommentaires() {
+        return nbCommentaires;
+    }
+
+    public void setNbCommentaires(int nbCommentaires) {
+        this.nbCommentaires = nbCommentaires;
+    }
+
+    public int getNbRdvAvenir() {
+        return nbRdvAvenir;
+    }
+
+    public void setNbRdvAvenir(int nbRdvAvenir) {
+        this.nbRdvAvenir = nbRdvAvenir;
+    }
+
+    public double getNoteMoyenne() {
+        return noteMoyenne;
+    }
+
+    public void setNoteMoyenne(double noteMoyenne) {
+        this.noteMoyenne = noteMoyenne;
+    }
+
+    public int getNbVentesMois() {
+        return nbVentesMois;
+    }
+
+    public void setNbVentesMois(int nbVentesMois) {
+        this.nbVentesMois = nbVentesMois;
+    }
+
+    // ==========================================
+    // Méthodes utilitaires
+    // ==========================================
+
+    public boolean hasHoraires() {
+        return horairesOuverture != null && !horairesOuverture.isEmpty();
+    }
+
+    public boolean hasLogo() {
+        return logoMagasin != null && !logoMagasin.isEmpty();
+    }
+
+    public boolean hasSocialMedia() {
+        return (facebook != null && !facebook.isEmpty()) ||
+                (instagram != null && !instagram.isEmpty());
+    }
+
     public String getFacebookUrl() {
         return facebook;
     }
@@ -210,17 +292,15 @@ public class Magasin {
     public void setFacebookUrl(String facebook) {
         this.facebook = facebook;
     }
+
     public double getPrixMinimum() {
-        return 17.0; // Valeur par défaut ou depuis la base de données
+        return 17.0;
     }
 
     public void setPrixMinimum(double prixMinimum) {
         // Implémentez si nécessaire
     }
 
-    /**
-     * Alias pour getInstagram() - pour compatibilité avec le contrôleur
-     */
     public String getInstagramUrl() {
         return instagram;
     }
@@ -229,36 +309,34 @@ public class Magasin {
         this.instagram = instagram;
     }
 
-    // ==========================================
-    // Méthodes utilitaires
-    // ==========================================
-
     /**
-     * Vérifie si le magasin a des horaires définis
+     * ✅ Méthode pour formater la note moyenne
      */
-    public boolean hasHoraires() {
-        return horairesOuverture != null && !horairesOuverture.isEmpty();
+    public String getFormattedRating() {
+        return String.format("%.1f", noteMoyenne);
     }
 
     /**
-     * Vérifie si le magasin a un logo
+     * ✅ Méthode pour obtenir le statut du magasin
      */
-    public boolean hasLogo() {
-        return logoMagasin != null && !logoMagasin.isEmpty();
+    public String getStatutMagasin() {
+        if (nbVehiculesDisponibles > 0) {
+            return "Actif";
+        } else if (nbVehicules > 0) {
+            return "En attente";
+        } else {
+            return "Inactif";
+        }
     }
 
     /**
-     * Vérifie si le magasin a des réseaux sociaux
+     * ✅ Méthode pour obtenir le pourcentage de véhicules disponibles
      */
-    public boolean hasSocialMedia() {
-        return (facebook != null && !facebook.isEmpty()) ||
-                (instagram != null && !instagram.isEmpty());
+    public int getPourcentageDisponibles() {
+        if (nbVehicules == 0) return 0;
+        return (nbVehiculesDisponibles * 100) / nbVehicules;
     }
 
-
-    /**
-     * Retourne une représentation textuelle du magasin
-     */
     @Override
     public String toString() {
         return "Magasin{" +
@@ -268,14 +346,8 @@ public class Magasin {
                 ", localisation='" + localisation + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", categorie='" + categorie + '\'' +
+                ", nbVehicules=" + nbVehicules +
+                ", noteMoyenne=" + noteMoyenne +
                 '}';
-    }
-    // ✅ Getter et Setter
-    public String getHoraires() {
-        return horaires;
-    }
-
-    public void setHoraires(String horaires) {
-        this.horaires = horaires;
     }
 }

@@ -15,6 +15,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.scene.Scene;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -305,8 +307,13 @@ public class VendeurVehicleController {
         Region priceSpacer = new Region();
         HBox.setHgrow(priceSpacer, Priority.ALWAYS);
 
-        Button favoriteBtn = new Button("♡");
-        favoriteBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 18; -fx-cursor: hand;");
+        // ✅ BOUTON VENDRE
+        Button sellBtn = new Button("💰");
+        sellBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 6 10; -fx-background-radius: 6; -fx-font-size: 16; -fx-font-weight: bold; -fx-cursor: hand;");
+        sellBtn.setOnAction(e -> {
+            e.consume();
+            vendreVehicle(article);
+        });
 
         Button editBtn = new Button("✏️");
         editBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 16; -fx-cursor: hand;");
@@ -324,8 +331,9 @@ public class VendeurVehicleController {
 
         HBox actionsBox = new HBox(8);
         actionsBox.setAlignment(Pos.CENTER_RIGHT);
-        actionsBox.getChildren().addAll(favoriteBtn, editBtn, deleteBtn);
+        actionsBox.getChildren().addAll(sellBtn, editBtn, deleteBtn);
 
+        applyHoverEffect(sellBtn);
         applyHoverEffect(editBtn);
         applyHoverEffect(deleteBtn);
 
@@ -335,6 +343,34 @@ public class VendeurVehicleController {
         setupCardHoverEffects(card);
 
         return card;
+    }
+
+    // ✅ NOUVELLE MÉTHODE : Ouvrir le formulaire de vente
+    private void vendreVehicle(Article article) {
+        System.out.println("💰 Vendre: " + article.getTitre());
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/FormVente.fxml"));
+            BorderPane form = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Vendre - " + article.getTitre());
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+
+            Scene scene = new Scene(form, 900, 700);
+            dialogStage.setScene(scene);
+
+            FormVenteController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setArticle(article); // ✅ Passer l'article
+
+            dialogStage.setOnHidden(e -> loadVehicles());
+            dialogStage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du formulaire: " + e.getMessage());
+        }
     }
 
     private void showVehicleDetails(Article article) {

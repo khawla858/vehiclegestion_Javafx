@@ -2,28 +2,89 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.vehiclegestion.vendeur.controller.AjouterDemandeMagasinController"
-            prefHeight="500.0" prefWidth="600.0">
+            prefHeight="600.0" prefWidth="700.0"
+            style="-fx-background-color: #f5f5f5;">
 
-    <VBox spacing="10" alignment="TOP_CENTER" style="-fx-padding:20;">
-        <Label text="Demande de création de magasin" style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+    <VBox spacing="15" alignment="TOP_CENTER" style="-fx-padding:30;">
+        <!-- Titre -->
+        <Label text="Demande de création de magasin"
+               style="-fx-font-size:24px; -fx-font-weight:bold; -fx-text-fill: #2c3e50;"/>
 
-        <!-- Infos magasin -->
-        <TextField fx:id="nomMagasin" promptText="Nom du magasin"/>
-        <TextField fx:id="adresse" promptText="Adresse complète"/>
-        <TextField fx:id="localisation" promptText="Localisation (ville ou GPS)"/>
-        <TextArea fx:id="description" promptText="Description du magasin" prefRowCount="4"/>
-        <TextField fx:id="photoProfil" promptText="URL photo/logo (facultatif)"/>
+        <Separator prefWidth="600"/>
 
-        <!-- Infos vendeur (lecture seule si déjà connu) -->
-        <TextField fx:id="nomVendeur" promptText="Nom du vendeur" editable="false"/>
-        <TextField fx:id="emailVendeur" promptText="Email du vendeur" editable="false"/>
-        <TextField fx:id="telVendeur" promptText="Téléphone" editable="false"/>
+        <!-- Section: Informations du vendeur (lecture seule) -->
+        <Label text="Vos informations" style="-fx-font-size:16px; -fx-font-weight:bold; -fx-text-fill: #3498db;"/>
+        <VBox spacing="8" style="-fx-padding:10; -fx-background-color: #ecf0f1; -fx-background-radius:5;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Nom complet:" style="-fx-font-weight:bold; -fx-min-width:120;"/>
+                <TextField fx:id="nomVendeur" editable="false"
+                           style="-fx-background-color: white; -fx-border-color: #bdc3c7;"
+                           prefWidth="400"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Email:" style="-fx-font-weight:bold; -fx-min-width:120;"/>
+                <TextField fx:id="emailVendeur" editable="false"
+                           style="-fx-background-color: white; -fx-border-color: #bdc3c7;"
+                           prefWidth="400"/>
+            </HBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Téléphone:" style="-fx-font-weight:bold; -fx-min-width:120;"/>
+                <TextField fx:id="telVendeur" editable="false"
+                           style="-fx-background-color: white; -fx-border-color: #bdc3c7;"
+                           prefWidth="400"/>
+            </HBox>
+        </VBox>
 
-        <Button fx:id="btnEnvoyer" text="Envoyer la demande" onAction="#envoyerDemande"/>
+        <Separator prefWidth="600"/>
+
+        <!-- Section: Informations du magasin (à remplir) -->
+        <Label text="Informations du magasin" style="-fx-font-size:16px; -fx-font-weight:bold; -fx-text-fill: #e67e22;"/>
+
+        <VBox spacing="8" style="-fx-padding:10;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Nom du magasin *:" style="-fx-font-weight:bold; -fx-min-width:150;"/>
+                <TextField fx:id="nomMagasin" promptText="Ex: AutoStar Premium"
+                           style="-fx-background-color: white;" prefWidth="400"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Adresse complète *:" style="-fx-font-weight:bold; -fx-min-width:150;"/>
+                <TextField fx:id="adresse" promptText="Ex: 123 Rue Mohamed V, Casablanca"
+                           style="-fx-background-color: white;" prefWidth="400"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Localisation *:" style="-fx-font-weight:bold; -fx-min-width:150;"/>
+                <TextField fx:id="localisation" promptText="Ex: Casablanca ou 33.5731,-7.5898"
+                           style="-fx-background-color: white;" prefWidth="400"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Description *:" style="-fx-font-weight:bold; -fx-min-width:150;"/>
+                <TextArea fx:id="description" promptText="Décrivez votre magasin, spécialités, etc."
+                          prefRowCount="3" prefWidth="400" wrapText="true"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Logo/Photo (URL):" style="-fx-font-weight:bold; -fx-min-width:150;"/>
+                <TextField fx:id="photoProfil" promptText="URL de votre logo (facultatif)"
+                           style="-fx-background-color: white;" prefWidth="400"/>
+            </HBox>
+        </VBox>
+
+        <!-- Bouton d'envoi -->
+        <Button fx:id="btnEnvoyer" text="Envoyer la demande" onAction="#envoyerDemande"
+                style="-fx-font-size:14px; -fx-font-weight:bold; -fx-background-color: #27ae60; -fx-text-fill: white;"
+                prefWidth="200" prefHeight="35"/>
+
+        <!-- Note -->
+        <Label text="* Champs obligatoires" style="-fx-font-size:11px; -fx-text-fill: #7f8c8d;"/>
+
     </VBox>
 
 </AnchorPane>

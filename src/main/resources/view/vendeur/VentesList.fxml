@@ -193,15 +193,7 @@
                                -fx-cursor: hand;
                                -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 8, 0, 0, 2);"/>
 
-                <Button text="📤 Exporter"
-                        onAction="#exportVentes"
-                        style="-fx-background-color: #0f172a;
-                               -fx-text-fill: white;
-                               -fx-padding: 12 24;
-                               -fx-background-radius: 8;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: bold;
-                               -fx-cursor: hand;"/>
+
             </HBox>
         </HBox>
 

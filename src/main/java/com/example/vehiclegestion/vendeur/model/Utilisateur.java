@@ -2,7 +2,7 @@ package com.example.vehiclegestion.vendeur.model;
 
 import java.time.LocalDateTime;
 
-public class Utilisateur {
+public class Utilisateur  {
     private int idUtilisateur;
     private String nom;
     private String prenom;
@@ -11,15 +11,18 @@ public class Utilisateur {
     private String role;
     private LocalDateTime dateCreation;
     private String statut;
+    private String telephone; // ✅ Nouveau champ
+
 
     // Constructeur par défaut
     public Utilisateur() {}
 
     // Constructeur pour l'inscription
-    public Utilisateur(String nom, String prenom, String email, String motDePasse, String role) {
+    public Utilisateur(String nom, String prenom, String email, String telephone, String motDePasse, String role) {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
+        this.telephone = telephone; // ✅ Initialisation
         this.motDePasse = motDePasse;
         this.role = role;
         this.statut = "actif";
@@ -50,4 +53,8 @@ public class Utilisateur {
 
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+
+    public String getTelephone() { return telephone; } // ✅ Getter
+    public void setTelephone(String telephone) { this.telephone = telephone; } // ✅ Setter
+
 }

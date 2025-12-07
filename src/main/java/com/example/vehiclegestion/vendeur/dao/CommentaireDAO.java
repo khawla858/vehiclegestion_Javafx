@@ -1,7 +1,7 @@
 package com.example.vehiclegestion.vendeur.dao;
 
 import com.example.vehiclegestion.vendeur.model.Commentaire;
-import com.example.vehiclegestion.utils.DatabaseConnection;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

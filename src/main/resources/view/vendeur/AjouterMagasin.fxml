@@ -1,44 +1,174 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
+
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.vehiclegestion.vendeur.controller.AjouterMagasinController"
-      spacing="10" style="-fx-padding: 20;" alignment="TOP_CENTER">
+<!-- ⚙️ TAILLE DE LA PAGE : Modifiez prefHeight et prefWidth ici -->
+<AnchorPane prefHeight="750.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.vehiclegestion.vendeur.controller.AjouterMagasinController">
+    <children>
+        <!-- ⚙️ TAILLE DU CONTENU : Modifiez les dimensions de la VBox principale ici -->
+        <VBox layoutX="20.0" layoutY="20.0" prefHeight="710.0" prefWidth="860.0" spacing="20.0" style="-fx-background-color: white; -fx-border-color: #e1e5e9; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+            <padding>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+            </padding>
+            <children>
+                <!-- En-tête -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label text="🏬" style="-fx-font-size: 28;" />
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label text="Ajouter un Magasin" style="-fx-font-weight: bold; -fx-font-size: 22; -fx-text-fill: #1e293b;" />
+                                <Label text="Créez un nouveau magasin avec toutes ses informations" style="-fx-text-fill: #6b7280; -fx-font-size: 13;" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
 
-    <Label text="Ajouter un Magasin" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+                <Separator />
 
-    <TextField fx:id="txtNom" promptText="Nom du magasin"/>
-    <TextField fx:id="txtAdresse" promptText="Adresse"/>
-    <TextField fx:id="txtLocalisation" promptText="Localisation (ex: 33.5731,-7.5898)"/>
-    <TextArea fx:id="txtDescription" promptText="Description"/>
+                <!-- ⚙️ HAUTEUR DU SCROLL : Modifiez prefHeight du ScrollPane ici -->
+                <ScrollPane fitToWidth="true" prefHeight="520.0" style="-fx-background-color: transparent; -fx-background: transparent;">
+                    <content>
+                        <VBox spacing="20.0">
+                            <padding>
+                                <Insets right="10.0" />
+                            </padding>
 
-    <TextField fx:id="txtTelephone" promptText="Téléphone"/>
-    <TextField fx:id="txtEmail" promptText="Email contact"/>
-    <TextField fx:id="txtSiteWeb" promptText="Site web"/>
-    <TextField fx:id="txtFacebook" promptText="Facebook"/>
-    <TextField fx:id="txtInstagram" promptText="Instagram"/>
-    <TextField fx:id="txtCategorie" promptText="Catégorie"/>
+                            <!-- Section Informations Générales -->
+                            <VBox spacing="15.0" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 20; -fx-background-radius: 8;">
+                                <children>
+                                    <Label text="📋 Informations Générales" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1e293b;" />
 
-    <Label text="Horaires d'ouverture (format JSON)" style="-fx-font-size: 14px; -fx-font-weight: bold;">
+                                    <GridPane hgap="15.0" vgap="12.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        </columnConstraints>
 
-    </Label>
-    <TextArea fx:id="txtHoraires" promptText='{"Lundi":"09:00-18:00", "Dimanche":"Fermé"}' prefRowCount="5"/>
+                                        <!-- Nom -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <Label text="Nom du magasin *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtNom" promptText="Ex: Auto Elite Maroc" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
 
-    <!-- Logo -->
-    <HBox spacing="10">
-        <TextField fx:id="logoField" promptText="Logo du magasin" editable="false" prefWidth="250"/>
-        <Button text="Parcourir" onAction="#browseLogo"/>
-    </HBox>
-    <ImageView fx:id="logoPreview" fitWidth="150" fitHeight="100" preserveRatio="true"/>
+                                        <!-- Catégorie -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label text="Catégorie *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtCategorie" promptText="Ex: Voitures d'occasion" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
 
-    <HBox spacing="10">
-        <Button text="Ajouter" onAction="#ajouterMagasin" style="-fx-background-color:#28a745; -fx-text-fill:white;"/>
-        <Button text="Fermer" onAction="#closeWindow" style="-fx-background-color:#dc3545; -fx-text-fill:white;"/>
-    </HBox>
+                                        <!-- Adresse -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <Label text="Adresse *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtAdresse" promptText="Ex: 456 Boulevard Zerktouni" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
 
-    <Label fx:id="messageLabel" style="-fx-text-fill:red;"/>
-</VBox>
+                                        <!-- Localisation GPS -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label text="Localisation GPS *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtLocalisation" promptText="Ex: 33.5731,-7.5898" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
+
+                                        <!-- Description -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                                            <Label text="Description *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextArea fx:id="txtDescription" promptText="Description complète du magasin, services, spécialités..." prefRowCount="3" wrapText="true" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+                                        </VBox>
+                                    </GridPane>
+                                </children>
+                            </VBox>
+
+                            <!-- Section Coordonnées -->
+                            <VBox spacing="15.0" style="-fx-background-color: #f0fdf4; -fx-border-color: #bbf7d0; -fx-border-radius: 8; -fx-padding: 20; -fx-background-radius: 8;">
+                                <children>
+                                    <Label text="📞 Coordonnées et Contact" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #15803d;" />
+
+                                    <GridPane hgap="15.0" vgap="12.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="50" />
+                                        </columnConstraints>
+
+                                        <!-- Téléphone -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <Label text="Téléphone *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtTelephone" promptText="Ex: +212 6 12 34 56 78" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
+
+                                        <!-- Email -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label text="Email *" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtEmail" promptText="contact@magasin.ma" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
+
+                                        <!-- Site Web -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <Label text="Site Web" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtSiteWeb" promptText="https://www.magasin.ma" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
+
+                                        <!-- Facebook -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label text="Facebook" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtFacebook" promptText="facebook.com/magasin" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
+
+                                        <!-- Instagram -->
+                                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                            <Label text="Instagram" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
+                                            <TextField fx:id="txtInstagram" promptText="magasin" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        </VBox>
+                                    </GridPane>
+                                </children>
+                            </VBox>
+
+                            <!-- Section Horaires -->
+                            <VBox spacing="15.0" style="-fx-background-color: #fef3c7; -fx-border-color: #fcd34d; -fx-border-radius: 8; -fx-padding: 20; -fx-background-radius: 8;">
+                                <children>
+                                    <Label text="🕒 Horaires d'Ouverture" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #92400e;" />
+                                    <Label text="Format JSON requis" style="-fx-text-fill: #78350f; -fx-font-size: 12; -fx-font-style: italic;" />
+
+                                    <TextArea fx:id="txtHoraires" promptText='{"Lundi":"09:00-18:00", "Mardi":"09:00-18:00", "Mercredi":"09:00-18:00", "Jeudi":"09:00-18:00", "Vendredi":"09:00-18:00", "Samedi":"09:00-13:00", "Dimanche":"Fermé"}' prefRowCount="5" wrapText="true" style="-fx-background-radius: 6; -fx-border-color: #fbbf24; -fx-border-radius: 6; -fx-font-family: 'Courier New';" />
+                                </children>
+                            </VBox>
+
+                            <!-- Section Logo -->
+                            <VBox spacing="15.0" style="-fx-background-color: #f3e8ff; -fx-border-color: #d8b4fe; -fx-border-radius: 8; -fx-padding: 20; -fx-background-radius: 8;">
+                                <children>
+                                    <Label text="📸 Logo du Magasin" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #6b21a8;" />
+
+                                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                        <TextField fx:id="logoField" promptText="Aucun fichier sélectionné" editable="false" HBox.hgrow="ALWAYS" style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-padding: 10;" />
+                                        <Button text="📁 Parcourir" onAction="#browseLogo" style="-fx-background-color: #9333ea; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;" />
+                                    </HBox>
+
+                                    <VBox fx:id="logoPreviewContainer" spacing="8.0" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #d8b4fe; -fx-border-radius: 8;">
+                                        <Label text="Aperçu du logo" style="-fx-font-size: 12; -fx-text-fill: #6b7280;" />
+                                        <ImageView fx:id="logoPreview" fitWidth="150" fitHeight="100" preserveRatio="true" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);" />
+                                    </VBox>
+                                </children>
+                            </VBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <!-- Boutons d'action -->
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#closeWindow" text="Fermer" style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;" />
+                        <Button mnemonicParsing="false" onAction="#ajouterMagasin" text="✅ Ajouter le Magasin" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 6; -fx-cursor: hand;" />
+                    </children>
+                </HBox>
+
+                <!-- Message et champs obligatoires -->
+                <VBox spacing="5.0">
+                    <Label fx:id="messageLabel" wrapText="true" style="-fx-text-fill: #dc2626; -fx-font-size: 13;" />
+                    <Label text="* Champs obligatoires" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-font-style: italic;" />
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

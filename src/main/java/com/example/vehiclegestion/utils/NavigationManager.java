@@ -166,6 +166,14 @@ public class NavigationManager {
     public void goToRendezVous() {
         navigateTo("/view/vendeur/RendezVousList.fxml");
     }
+    public void showMessages() {
+        navigateTo("/view/common/ChatWindow.fxml");
+    }
+
+    public void addVehicle() {
+        navigateTo("/view/vendeur/AddVehicleForm.fxml");
+    }
+
 
     /**
      * ⬅ Retour à la page précédente
@@ -234,4 +242,10 @@ public class NavigationManager {
         navigationHistory.clear();
         System.out.println("🗑️ Historique de navigation effacé");
     }
+
+
+
+
+
+
 }

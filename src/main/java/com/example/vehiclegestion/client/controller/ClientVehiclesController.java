@@ -20,9 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
 
+
+import com.example.vehiclegestion.common.dao.ChatDAO;
+import com.example.vehiclegestion.common.model.Conversation;
+
 import java.net.URL;
 
-import com.example.vehiclegestion.vendeur.controller.VehicleDetailController;
 import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -49,7 +52,6 @@ public class ClientVehiclesController {
     private VehicleDAO vehicleDAO = new VehicleDAO();
     private FavoriteDAO favoriteDAO = new FavoriteDAO();
     private ReservationDAO reservationDAO = new ReservationDAO();
-
     private SessionManager sessionManager = SessionManager.getInstance();
     private int currentClientId;
 
@@ -795,7 +797,7 @@ public class ClientVehiclesController {
         System.out.println("🎯 DEBUT viewVehicleDetails pour: " + vehicle.getTitle());
 
         try {
-            String fxmlPath = "/view/vendeur/VehicleDetail.fxml";
+            String fxmlPath = "/view/client/Vehicle-Detail.fxml";
             System.out.println("🔍 Chemin FXML testé: " + fxmlPath);
 
             URL url = getClass().getResource(fxmlPath);
@@ -803,10 +805,10 @@ public class ClientVehiclesController {
 
             if (url == null) {
                 String[] testPaths = {
-                        "/com/example/vehiclegestion/view/vendeur/VehicleDetail.fxml",
-                        "/view/vendeur/VehicleDetail.fxml",
-                        "/vendeur/VehicleDetail.fxml",
-                        "VehicleDetail.fxml"
+                        "/com/example/vehiclegestion/view/client/Vehicle-Detail.fxml",
+                        "/view/client/Vehicle-Detail.fxml",
+                        "/client/Vehicle-Detail.fxml",
+                        "Vehicle-Detail.fxml"
                 };
 
                 for (String path : testPaths) {
@@ -829,7 +831,7 @@ public class ClientVehiclesController {
             Parent root = loader.load();
             System.out.println("✅ FXML chargé avec succès");
 
-            VehicleDetailController controller = loader.getController();
+            VehiDetaiCo controller = loader.getController();
             System.out.println("✅ Contrôleur récupéré: " + controller.getClass().getSimpleName());
 
             Article article = convertVehicleToArticle(vehicle);
@@ -855,7 +857,13 @@ public class ClientVehiclesController {
     }
 
     private Article convertVehicleToArticle(Vehicle vehicle) {
+        System.out.println("🔄 === CONVERSION VEHICLE → ARTICLE ===");
+        System.out.println("   Vehicle ID: " + vehicle.getId());
+
         Article article = new Article();
+
+        // ✅ CORRECTION CRITIQUE: Définir l'ID de l'article
+        article.setId(vehicle.getId()); // ⭐⭐ CETTE LIGNE MANQUE !
 
         article.setTitre(vehicle.getTitle());
         article.setPrix(vehicle.getPrice());
@@ -871,6 +879,8 @@ public class ClientVehiclesController {
         article.setModele(vehicle.getTitle());
         article.setPuissance(120);
         article.setEtat("Excellent");
+
+        System.out.println("✅ Article converti - ID: " + article.getId() + ", Titre: " + article.getTitre());
 
         return article;
     }

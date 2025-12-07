@@ -50,16 +50,7 @@
                                -fx-cursor: hand;
                                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
 
-                <Button text="📤 Exporter"
-                        onAction="#exportRendezVous"
-                        style="-fx-background-color: linear-gradient(to bottom, #FF9800, #F57C00);
-                               -fx-text-fill: white;
-                               -fx-padding: 12 24;
-                               -fx-background-radius: 8;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: bold;
-                               -fx-cursor: hand;
-                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"/>
+
             </HBox>
         </HBox>
 

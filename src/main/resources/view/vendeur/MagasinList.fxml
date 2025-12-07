@@ -83,25 +83,7 @@
             <Region HBox.hgrow="ALWAYS"/>
 
             <!-- Actions rapides -->
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button text="📊 Statistiques"
-                        style="-fx-background-color: #f1f5f9;
-                               -fx-text-fill: #475569;
-                               -fx-padding: 10 18;
-                               -fx-background-radius: 8;
-                               -fx-font-size: 13px;
-                               -fx-font-weight: bold;
-                               -fx-cursor: hand;"/>
 
-                <Button text="📤 Exporter"
-                        style="-fx-background-color: #f1f5f9;
-                               -fx-text-fill: #475569;
-                               -fx-padding: 10 18;
-                               -fx-background-radius: 8;
-                               -fx-font-size: 13px;
-                               -fx-font-weight: bold;
-                               -fx-cursor: hand;"/>
-            </HBox>
         </HBox>
 
         <!-- ============================================ -->

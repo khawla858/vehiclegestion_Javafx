@@ -255,4 +255,5 @@ public class Vente {
                 ", date=" + getDateVenteFormatted() +
                 '}';
     }
+
 }

@@ -513,14 +513,21 @@ public class MagasinListController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/AjouterDemandeMagasin.fxml"));
             Parent root = loader.load();
             AjouterDemandeMagasinController controller = loader.getController();
-            controller.setVendeurId(vendeurId);
+            // Plus besoin de setVendeurId car récupéré automatiquement depuis la session
+            // controller.setVendeurId(vendeurId);
 
             Stage stage = new Stage();
             stage.setTitle("Demande de création de magasin");
             stage.setScene(new Scene(root));
+            stage.setOnHidden(e -> {
+                // Rafraîchir la liste après fermeture
+                chargerMagasins();
+            });
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+            showStyledAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'ouvrir le formulaire de demande");
         }
     }
 

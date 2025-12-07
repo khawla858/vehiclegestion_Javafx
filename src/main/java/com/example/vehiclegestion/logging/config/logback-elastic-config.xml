@@ -1,3 +1,4 @@
+
 <configuration>
     <appender name="ELASTIC" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

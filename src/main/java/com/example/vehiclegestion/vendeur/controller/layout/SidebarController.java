@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import java.io.IOException;
+import com.example.vehiclegestion.utils.NavigationManager;
 
 public class SidebarController {
 
@@ -62,6 +63,8 @@ public class SidebarController {
     private boolean isHovered = false;  // Pour suivre si c'est étendu par hover
     private final double collapsedWidth = 60;
     private final double expandedWidth = 255;
+    private NavigationManager navManager = NavigationManager.getInstance(); // ✅ AJOUTER
+
 
     public void setContentPane(StackPane contentPane) {
         this.contentPane = contentPane;
@@ -76,7 +79,11 @@ public class SidebarController {
         // Ajouter les listeners pour le hover
         sidebar.setOnMouseEntered(event -> onMouseEnter());
         sidebar.setOnMouseExited(event -> onMouseExit());
+        if (contentPane != null) {
+            navManager.setContentPane(contentPane);
+        }
     }
+
 
     // NOUVEAU : Méthode appelée quand la souris entre dans la sidebar
     private void onMouseEnter() {
@@ -338,6 +345,8 @@ private void showDashboard() {
         showAlert("Sécurité", "Confidentialité et sécurité");
     }
 
+
+
     // ================= MÉTHODE UTILITAIRE =================
 
     private void loadContent(String fxmlPath) {
@@ -366,4 +375,5 @@ private void showDashboard() {
         // Pour l'instant on affiche dans la console
         // Vous pouvez remplacer par des vraies alertes plus tard
     }
+
 }

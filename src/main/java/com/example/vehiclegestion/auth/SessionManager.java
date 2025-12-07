@@ -8,6 +8,8 @@ public class SessionManager {
 
     private Utilisateur utilisateurConnecte;
     private boolean sessionActive;
+    private String userFullName;
+
 
     private SessionManager() {
         System.out.println("✅ SessionManager initialisé: " + this.hashCode());
@@ -16,11 +18,11 @@ public class SessionManager {
     public static SessionManager getInstance() {
         return INSTANCE;
     }
-
     public void demarrerSession(Utilisateur utilisateur) {
         this.utilisateurConnecte = utilisateur;
         this.sessionActive = true;
-        System.out.println("🔐 Session démarrée pour: " + utilisateur.getEmail());
+        System.out.println("🔐 Session démarrée pour: " + utilisateur.getEmail() +
+                " (Téléphone: " + utilisateur.getTelephone() + ")");
         debugSession();
     }
 
@@ -99,5 +101,15 @@ public class SessionManager {
         this.currentMagasinId = null;
         this.currentMagasinNom = null;
         System.out.println("✅ SessionManager - Magasin courant effacé");
+    }
+
+    public String getUserFullName() {
+        return userFullName;
+    }
+    public String getUserTelephone() {
+        if (utilisateurConnecte != null) {
+            return utilisateurConnecte.getTelephone();
+        }
+        return null;
     }
 }

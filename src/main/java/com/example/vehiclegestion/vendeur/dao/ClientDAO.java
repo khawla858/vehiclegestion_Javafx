@@ -160,22 +160,67 @@ public class ClientDAO {
     // 🔹 Rechercher des clients
     public List<Client> searchClients(String searchTerm, int vendeurId) throws SQLException {
         List<Client> clients = new ArrayList<>();
-        String query = "SELECT * FROM Client WHERE id_vendeur = ? AND (nom LIKE ? OR prenom LIKE ? OR email LIKE ? OR telephone LIKE ?)";
+
+        // ✅ Jointure entre Client et Utilisateur + comptage des ventes
+        String query =
+                "SELECT " +
+                        "    c.id_client, " +
+                        "    u.nom, " +
+                        "    u.prenom, " +
+                        "    u.email, " +
+                        "    u.telephone, " +
+                        "    c.adresse, " +
+                        "    c.statut_client, " +
+                        "    COALESCE(COUNT(v.id_vente), 0) AS nb_ventes " +
+                        "FROM Client c " +
+                        "INNER JOIN Utilisateur u ON c.id_client = u.id_utilisateur " +
+                        "LEFT JOIN Vente v ON c.id_client = v.id_client " +
+                        "WHERE u.role = 'client' " +
+                        "    AND u.statut = 'actif' " +
+                        "    AND (LOWER(u.nom) LIKE ? " +
+                        "        OR LOWER(u.prenom) LIKE ? " +
+                        "        OR LOWER(u.email) LIKE ? " +
+                        "        OR COALESCE(u.telephone, '') LIKE ?) " +
+                        "GROUP BY c.id_client, u.nom, u.prenom, u.email, u.telephone, c.adresse, c.statut_client " +
+                        "ORDER BY u.nom, u.prenom " +
+                        "LIMIT 50";  // Limiter les résultats pour les performances
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, vendeurId);
-            String likeTerm = "%" + searchTerm + "%";
+            String likeTerm = "%" + searchTerm.toLowerCase() + "%";
+
+            // Paramètres de recherche
+            stmt.setString(1, likeTerm);
             stmt.setString(2, likeTerm);
             stmt.setString(3, likeTerm);
             stmt.setString(4, likeTerm);
-            stmt.setString(5, likeTerm);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    clients.add(mapResultSetToClient(rs));
+                    Client client = new Client();
+
+                    // Données principales
+                    client.setId(rs.getInt("id_client"));
+                    client.setNom(rs.getString("nom"));
+                    client.setPrenom(rs.getString("prenom"));
+                    client.setEmail(rs.getString("email"));
+                    client.setTelephone(rs.getString("telephone"));
+
+                    // Données spécifiques au client
+                    client.setAdresse(rs.getString("adresse"));
+                    client.setStatutClient(rs.getString("statut_client") != null
+                            ? rs.getString("statut_client")
+                            : "prospect");
+                    client.setNbVentes(rs.getInt("nb_ventes"));
+
+                    // Associer au vendeur
+                    client.setVendeurId(vendeurId);
+
+                    clients.add(client);
                 }
             }
         }
+
+        System.out.println("🔍 Recherche '" + searchTerm + "' : " + clients.size() + " clients trouvés");
         return clients;
     }
 

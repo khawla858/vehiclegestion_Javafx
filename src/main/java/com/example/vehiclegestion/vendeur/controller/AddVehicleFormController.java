@@ -11,7 +11,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import com.example.vehiclegestion.utils.DataReceiver;
+import com.example.vehiclegestion.utils.NavigationManager;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
