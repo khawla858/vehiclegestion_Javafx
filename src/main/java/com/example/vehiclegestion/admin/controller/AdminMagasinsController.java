@@ -1,24 +1,16 @@
 package com.example.vehiclegestion.admin.controller;
 
-import com.example.vehiclegestion.admin.service.AdminService;
+import com.example.vehiclegestion.admin.dao.AdminMagasinDAO;
 import com.example.vehiclegestion.vendeur.model.Magasin;
-import com.example.vehiclegestion.auth.utils.SessionManager;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.util.List;
 import java.util.Optional;
 
-/**
- * Controller JavaFX pour la gestion des magasins (Admin)
- */
 public class AdminMagasinsController {
-
-    // ========== COMPOSANTS FXML ==========
 
     @FXML private TableView<Magasin> magasinsTable;
     @FXML private TableColumn<Magasin, Integer> idColumn;
@@ -32,51 +24,34 @@ public class AdminMagasinsController {
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> categorieFilterCombo;
-
-    @FXML private Button editButton;
-    @FXML private Button deleteButton;
-    @FXML private Button viewDetailsButton;
-    @FXML private Button refreshButton;
-
     @FXML private Label totalMagasinsLabel;
     @FXML private Label selectedMagasinLabel;
 
-    // ========== SERVICES ==========
+    @FXML private Button addMagasinButton;
+    @FXML private Button refreshButton;
+    @FXML private Button viewDetailsButton;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
 
-    private final AdminService adminService;
-    private final ObservableList<Magasin> magasinsList;
+    private AdminMagasinDAO magasinDAO;
+    private ObservableList<Magasin> magasinsList;
+    private ObservableList<Magasin> filteredMagasinsList;
 
-    public AdminMagasinsController() {
-        this.adminService = new AdminService();
-        this.magasinsList = FXCollections.observableArrayList();
-    }
-
-    /**
-     * Initialisation du controller
-     */
     @FXML
     public void initialize() {
-        System.out.println("🏪 Initialisation Admin Magasins...");
+        magasinDAO = new AdminMagasinDAO();
+        magasinsList = FXCollections.observableArrayList();
+        filteredMagasinsList = FXCollections.observableArrayList();
 
-        // Configuration des colonnes
         setupTableColumns();
-
-        // Configuration des filtres
         setupFilters();
-
-        // Charger les données
+        setupTableSelection();
         loadMagasins();
-
-        // Listener de sélection
-        magasinsTable.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldSelection, newSelection) -> updateSelectedMagasinInfo(newSelection)
-        );
-
-        System.out.println("✅ Admin Magasins initialisé");
+        updateButtonStates();
     }
 
     /**
-     * Configurer les colonnes de la table
+     * Configuration des colonnes du tableau
      */
     private void setupTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idMagasin"));
@@ -88,237 +63,279 @@ public class AdminMagasinsController {
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("emailContact"));
         vendeurColumn.setCellValueFactory(new PropertyValueFactory<>("idVendeur"));
 
-        // Style pour la catégorie
-        categorieColumn.setCellFactory(column -> new TableCell<Magasin, String>() {
+        // Style des cellules pour la localisation GPS
+        localisationColumn.setCellFactory(column -> new TableCell<Magasin, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null || item.isEmpty()) {
-                    setText("Non catégorisé");
-                    setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
                 } else {
-                    setText(item);
-                    setStyle("-fx-font-weight: bold;");
+                    setText("📍 " + item);
+                    setStyle("-fx-text-fill: #3b82f6; -fx-font-weight: bold;");
+                    setTooltip(new Tooltip("Coordonnées GPS: " + item));
                 }
             }
         });
 
-        magasinsTable.setItems(magasinsList);
+        // Double-clic pour voir les détails
+        magasinsTable.setRowFactory(tv -> {
+            TableRow<Magasin> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    handleViewDetails();
+                }
+            });
+            return row;
+        });
     }
 
     /**
-     * Configurer les filtres
+     * Configuration des filtres
      */
     private void setupFilters() {
-        // ComboBox catégories
-        categorieFilterCombo.setItems(FXCollections.observableArrayList(
-                "Toutes", "Voitures neuves", "Voitures d'occasion", "Voitures de luxe",
-                "Voitures sportives", "4x4/SUV", "Utilitaires", "Motos", "Pièces détachées"
-        ));
-        categorieFilterCombo.setValue("Toutes");
+        // Remplir le ComboBox des catégories
+        categorieFilterCombo.getItems().add("Toutes les catégories");
+        categorieFilterCombo.getItems().addAll(
+                "Voitures neuves", "Voitures d'occasion", "Voitures de luxe",
+                "Voitures sportives", "4x4/SUV", "Utilitaires", "Motos",
+                "Pièces détachées", "Services & Réparations"
+        );
+        categorieFilterCombo.setValue("Toutes les catégories");
 
-        // Listeners pour filtrage automatique
-        searchField.textProperty().addListener((obs, old, newVal) -> handleSearch());
-        categorieFilterCombo.valueProperty().addListener((obs, old, newVal) -> handleSearch());
+        // Listeners pour les filtres
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> filterMagasins());
+        categorieFilterCombo.valueProperty().addListener((obs, oldVal, newVal) -> filterMagasins());
     }
 
     /**
-     * Charger tous les magasins
+     * Configuration de la sélection dans le tableau
      */
-    public void loadMagasins() {
-        try {
-            List<Magasin> magasins = adminService.getAllMagasins();
-            magasinsList.clear();
-            magasinsList.addAll(magasins);
-            totalMagasinsLabel.setText("Total: " + magasins.size() + " magasin(s)");
-            System.out.println("✅ " + magasins.size() + " magasins chargés");
-        } catch (Exception e) {
-            showError("Erreur", "Impossible de charger les magasins: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Rechercher/Filtrer les magasins
-     */
-    @FXML
-    public void handleSearch() {
-        String searchTerm = searchField.getText();
-        String categorie = getCategorieFilter();
-
-        try {
-            List<Magasin> magasins = adminService.searchMagasins(searchTerm, categorie);
-            magasinsList.clear();
-            magasinsList.addAll(magasins);
-            totalMagasinsLabel.setText("Résultats: " + magasins.size() + " magasin(s)");
-        } catch (Exception e) {
-            showError("Erreur", "Erreur lors de la recherche: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Modifier un magasin
-     */
-    @FXML
-    public void handleEdit() {
-        Magasin selected = magasinsTable.getSelectionModel().getSelectedItem();
-
-        if (selected == null) {
-            showWarning("Aucune sélection", "Veuillez sélectionner un magasin à modifier");
-            return;
-        }
-
-        try {
-            MagasinFormDialog dialog = new MagasinFormDialog(selected);
-            Optional<Magasin> result = dialog.showAndWait();
-
-            if (result.isPresent()) {
-                Magasin updatedMagasin = result.get();
-                String adminEmail = SessionManager.getInstance().getUtilisateurConnecte().getEmail();
-
-                boolean success = adminService.updateMagasin(updatedMagasin, adminEmail);
-
-                if (success) {
-                    showSuccess("Magasin mis à jour avec succès");
-                    loadMagasins();
-                } else {
-                    showError("Erreur", "Impossible de mettre à jour le magasin");
-                }
+    private void setupTableSelection() {
+        magasinsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            updateButtonStates();
+            if (newSelection != null) {
+                selectedMagasinLabel.setText("Sélectionné: " + newSelection.getNomMagasin());
+            } else {
+                selectedMagasinLabel.setText("Aucun magasin sélectionné");
             }
+        });
+    }
+
+    /**
+     * Charger les magasins depuis la base de données
+     */
+    private void loadMagasins() {
+        try {
+            magasinsList.clear();
+            magasinsList.addAll(AdminMagasinDAO.getAllMagasins());
+            filterMagasins();
+            totalMagasinsLabel.setText("Total: " + magasinsList.size() + " magasin(s)");
         } catch (Exception e) {
-            showError("Erreur", "Erreur lors de la modification: " + e.getMessage());
-            e.printStackTrace();
+            showAlert("Erreur lors du chargement des magasins: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     /**
-     * Supprimer un magasin
+     * Filtrer les magasins selon les critères de recherche
      */
-    @FXML
-    public void handleDelete() {
-        Magasin selected = magasinsTable.getSelectionModel().getSelectedItem();
+    private void filterMagasins() {
+        filteredMagasinsList.clear();
 
-        if (selected == null) {
-            showWarning("Aucune sélection", "Veuillez sélectionner un magasin à supprimer");
-            return;
+        String searchText = searchField.getText().toLowerCase().trim();
+        String selectedCategorie = categorieFilterCombo.getValue();
+
+        for (Magasin magasin : magasinsList) {
+            boolean matchesSearch = searchText.isEmpty() ||
+                    magasin.getNomMagasin().toLowerCase().contains(searchText) ||
+                    magasin.getAdresse().toLowerCase().contains(searchText) ||
+                    (magasin.getLocalisation() != null && magasin.getLocalisation().toLowerCase().contains(searchText));
+
+            boolean matchesCategorie = selectedCategorie.equals("Toutes les catégories") ||
+                    (magasin.getCategorie() != null && magasin.getCategorie().equals(selectedCategorie));
+
+            if (matchesSearch && matchesCategorie) {
+                filteredMagasinsList.add(magasin);
+            }
         }
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
-        confirm.setHeaderText("Supprimer le magasin ?");
-        confirm.setContentText("Êtes-vous sûr de vouloir supprimer \"" +
-                selected.getNomMagasin() + "\" ?\n\n" +
-                "⚠️ ATTENTION : Tous les véhicules associés seront également supprimés !");
+        magasinsTable.setItems(filteredMagasinsList);
+    }
 
-        Optional<ButtonType> result = confirm.showAndWait();
+    /**
+     * Mettre à jour l'état des boutons
+     */
+    private void updateButtonStates() {
+        boolean hasSelection = magasinsTable.getSelectionModel().getSelectedItem() != null;
+        viewDetailsButton.setDisable(!hasSelection);
+        editButton.setDisable(!hasSelection);
+        deleteButton.setDisable(!hasSelection);
+    }
 
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+    /**
+     * Gérer l'ajout d'un nouveau magasin
+     */
+    @FXML
+    private void handleAddMagasin() {
+        MagasinFormDialog dialog = new MagasinFormDialog();
+        Optional<Magasin> result = dialog.showAndWait();
+
+        result.ifPresent(magasin -> {
             try {
-                String adminEmail = SessionManager.getInstance().getUtilisateurConnecte().getEmail();
-                boolean success = adminService.deleteMagasin(selected.getIdMagasin(), adminEmail);
-
+                boolean success = AdminMagasinDAO.addMagasin(magasin);
                 if (success) {
-                    showSuccess("Magasin supprimé avec succès");
+                    showAlert("Magasin créé avec succès!", Alert.AlertType.INFORMATION);
                     loadMagasins();
                 } else {
-                    showError("Erreur", "Impossible de supprimer le magasin");
+                    showAlert("Erreur lors de la création du magasin", Alert.AlertType.ERROR);
                 }
             } catch (Exception e) {
-                showError("Erreur", "Erreur lors de la suppression: " + e.getMessage());
+                showAlert("Erreur: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    /**
+     * Gérer le rafraîchissement des données
+     */
+    @FXML
+    private void handleRefresh() {
+        loadMagasins();
+        showAlert("Données rafraîchies avec succès!", Alert.AlertType.INFORMATION);
+    }
+
+    /**
+     * Gérer l'affichage des détails
+     */
+    @FXML
+    private void handleViewDetails() {
+        Magasin selectedMagasin = magasinsTable.getSelectionModel().getSelectedItem();
+        if (selectedMagasin == null) {
+            showAlert("Veuillez sélectionner un magasin", Alert.AlertType.WARNING);
+            return;
+        }
+
+        // Créer un dialog pour afficher les détails
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Détails du magasin");
+        alert.setHeaderText(selectedMagasin.getNomMagasin());
+
+        StringBuilder details = new StringBuilder();
+        details.append("📋 ID: ").append(selectedMagasin.getIdMagasin()).append("\n\n");
+        details.append("📍 Adresse: ").append(selectedMagasin.getAdresse()).append("\n");
+        details.append("🌍 Localisation GPS: ").append(selectedMagasin.getLocalisation()).append("\n\n");
+        details.append("📦 Catégorie: ").append(selectedMagasin.getCategorie()).append("\n");
+        details.append("📞 Téléphone: ").append(selectedMagasin.getTelephone()).append("\n");
+
+        if (selectedMagasin.getEmailContact() != null) {
+            details.append("📧 Email: ").append(selectedMagasin.getEmailContact()).append("\n");
+        }
+
+        if (selectedMagasin.getSiteWeb() != null) {
+            details.append("🌐 Site web: ").append(selectedMagasin.getSiteWeb()).append("\n");
+        }
+
+        if (selectedMagasin.getHoraires() != null) {
+            details.append("🕐 Horaires: ").append(selectedMagasin.getHoraires()).append("\n");
+        }
+
+        if (selectedMagasin.getDescription() != null) {
+            details.append("\n📝 Description:\n").append(selectedMagasin.getDescription());
+        }
+
+        alert.setContentText(details.toString());
+
+        // Styliser l'alerte
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #1e293b;");
+        dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+
+        alert.showAndWait();
+    }
+
+    /**
+     * Gérer la modification d'un magasin
+     */
+    @FXML
+    private void handleEdit() {
+        Magasin selectedMagasin = magasinsTable.getSelectionModel().getSelectedItem();
+        if (selectedMagasin == null) {
+            showAlert("Veuillez sélectionner un magasin à modifier", Alert.AlertType.WARNING);
+            return;
+        }
+
+        MagasinFormDialog dialog = new MagasinFormDialog(selectedMagasin);
+        Optional<Magasin> result = dialog.showAndWait();
+
+        result.ifPresent(magasin -> {
+            try {
+                boolean success = magasinDAO.updateMagasin(magasin);
+                if (success) {
+                    showAlert("Magasin modifié avec succès!", Alert.AlertType.INFORMATION);
+                    loadMagasins();
+                } else {
+                    showAlert("Erreur lors de la modification du magasin", Alert.AlertType.ERROR);
+                }
+            } catch (Exception e) {
+                showAlert("Erreur: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    /**
+     * Gérer la suppression d'un magasin
+     */
+    @FXML
+    private void handleDelete() {
+        Magasin selectedMagasin = magasinsTable.getSelectionModel().getSelectedItem();
+        if (selectedMagasin == null) {
+            showAlert("Veuillez sélectionner un magasin à supprimer", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirmation de suppression");
+        confirmAlert.setHeaderText("Supprimer le magasin: " + selectedMagasin.getNomMagasin());
+        confirmAlert.setContentText("Êtes-vous sûr de vouloir supprimer ce magasin?\nCette action est irréversible.");
+
+        // Styliser l'alerte
+        DialogPane dialogPane = confirmAlert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #1e293b;");
+        dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                boolean success = magasinDAO.deleteMagasin(selectedMagasin.getIdMagasin());
+                if (success) {
+                    showAlert("Magasin supprimé avec succès!", Alert.AlertType.INFORMATION);
+                    loadMagasins();
+                } else {
+                    showAlert("Erreur lors de la suppression du magasin", Alert.AlertType.ERROR);
+                }
+            } catch (Exception e) {
+                showAlert("Erreur: " + e.getMessage(), Alert.AlertType.ERROR);
             }
         }
     }
 
     /**
-     * Voir les détails d'un magasin
+     * Afficher une alerte
      */
-    @FXML
-    public void handleViewDetails() {
-        Magasin selected = magasinsTable.getSelectionModel().getSelectedItem();
-
-        if (selected == null) {
-            showWarning("Aucune sélection", "Veuillez sélectionner un magasin");
-            return;
-        }
-
-        // Créer une fenêtre de détails
-        Alert details = new Alert(Alert.AlertType.INFORMATION);
-        details.setTitle("Détails du magasin");
-        details.setHeaderText(selected.getNomMagasin());
-
-        StringBuilder content = new StringBuilder();
-        content.append("ID: ").append(selected.getIdMagasin()).append("\n");
-        content.append("Nom: ").append(selected.getNomMagasin()).append("\n");
-        content.append("Adresse: ").append(selected.getAdresse()).append("\n");
-        content.append("Localisation: ").append(selected.getLocalisation()).append("\n");
-        content.append("Catégorie: ").append(selected.getCategorie() != null ? selected.getCategorie() : "Non définie").append("\n");
-        content.append("Téléphone: ").append(selected.getTelephone() != null ? selected.getTelephone() : "Non renseigné").append("\n");
-        content.append("Email: ").append(selected.getEmailContact() != null ? selected.getEmailContact() : "Non renseigné").append("\n");
-        content.append("Site web: ").append(selected.getSiteWeb() != null ? selected.getSiteWeb() : "Non renseigné").append("\n");
-        content.append("Facebook: ").append(selected.getFacebook() != null ? selected.getFacebook() : "Non renseigné").append("\n");
-        content.append("Instagram: ").append(selected.getInstagram() != null ? selected.getInstagram() : "Non renseigné").append("\n");
-        content.append("Description: ").append(selected.getDescription() != null ? selected.getDescription() : "Aucune description").append("\n");
-        content.append("Horaires: ").append(selected.getHoraires() != null ? selected.getHoraires() : "Non renseignés").append("\n");
-        content.append("\n");
-        content.append("ID Vendeur: ").append(selected.getIdVendeur()).append("\n");
-
-        details.setContentText(content.toString());
-        details.showAndWait();
-    }
-
-    /**
-     * Rafraîchir la liste
-     */
-    @FXML
-    public void handleRefresh() {
-        searchField.clear();
-        categorieFilterCombo.setValue("Toutes");
-        loadMagasins();
-    }
-
-    /**
-     * Mettre à jour les infos du magasin sélectionné
-     */
-    private void updateSelectedMagasinInfo(Magasin magasin) {
-        if (magasin != null) {
-            selectedMagasinLabel.setText("Sélectionné: " + magasin.getNomMagasin() +
-                    " (" + magasin.getLocalisation() + ")");
-        } else {
-            selectedMagasinLabel.setText("Aucun magasin sélectionné");
-        }
-    }
-
-    /**
-     * Récupérer le filtre catégorie
-     */
-    private String getCategorieFilter() {
-        String value = categorieFilterCombo.getValue();
-        return (value == null || value.equals("Toutes")) ? null : value;
-    }
-
-    // ========== ALERTES ==========
-
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Succès");
+    private void showAlert(String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(type == Alert.AlertType.ERROR ? "Erreur" :
+                type == Alert.AlertType.WARNING ? "Attention" : "Information");
         alert.setHeaderText(null);
         alert.setContentText(message);
+
+        // Styliser l'alerte
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #1e293b;");
+        dialogPane.lookup(".content.label").setStyle("-fx-text-fill: white;");
+
         alert.showAndWait();
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }

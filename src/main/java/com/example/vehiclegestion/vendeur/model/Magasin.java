@@ -1,8 +1,5 @@
 package com.example.vehiclegestion.vendeur.model;
 
-import java.util.Map;
-import java.util.HashMap;
-
 public class Magasin {
 
     private int idMagasin;
@@ -13,30 +10,21 @@ public class Magasin {
     private int idVendeur;
     private int nbVentesMensuelles;
 
-    // Nouvelles colonnes
     private String logoMagasin;
     private String telephone;
     private String emailContact;
-    private Map<String, String> horairesOuverture; // pour JSONB
+
+    // ---------- Horaires stockés en JSON ----------
+    private String horaires;  // EX: {"Lundi":"09:00-18:00", "Dimanche":"Fermé"}
+
     private String siteWeb;
     private String facebook;
     private String instagram;
-    private String horaires;  // ✅ AJOUT
-
-
-    // Champ supplémentaire pour la catégorie (si nécessaire)
     private String categorie;
-    private String imagePath; // Chemin vers l'image
+    private String imagePath;
 
-    public String getImagePath() {
-        return imagePath;
-    }
+    private int nbCommentaires;
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    // Constructeurs
     public Magasin() {}
 
     public Magasin(String nom, String adresse, String localisation, String description, int idVendeur) {
@@ -46,219 +34,73 @@ public class Magasin {
         this.description = description;
         this.idVendeur = idVendeur;
     }
-    private int nbCommentaires;
 
-    // ... getter et setter ...
-    public int getNbCommentaires() {
-        return nbCommentaires;
-    }
+    // =======================
+    // Getters / Setters
+    // =======================
 
-    public void setNbCommentaires(int nbCommentaires) {
-        this.nbCommentaires = nbCommentaires;
-    }
-    public Magasin(int id, String nom, String adresse, String localisation, String description, int idVendeur) {
-        this.idMagasin = id;
-        this.nomMagasin = nom;
-        this.adresse = adresse;
-        this.localisation = localisation;
-        this.description = description;
-        this.idVendeur = idVendeur;
-    }
+    public int getIdMagasin() { return idMagasin; }
+    public void setIdMagasin(int idMagasin) { this.idMagasin = idMagasin; }
 
-    // ==========================================
-    // Getters & Setters de base
-    // ==========================================
+    public String getNomMagasin() { return nomMagasin; }
+    public void setNomMagasin(String nomMagasin) { this.nomMagasin = nomMagasin; }
 
-    public int getIdMagasin() {
-        return idMagasin;
-    }
+    public String getAdresse() { return adresse; }
+    public void setAdresse(String adresse) { this.adresse = adresse; }
 
-    public void setIdMagasin(int idMagasin) {
-        this.idMagasin = idMagasin;
-    }
+    public String getLocalisation() { return localisation; }
+    public void setLocalisation(String localisation) { this.localisation = localisation; }
 
-    public String getNomMagasin() {
-        return nomMagasin;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setNomMagasin(String nomMagasin) {
-        this.nomMagasin = nomMagasin;
-    }
+    public int getIdVendeur() { return idVendeur; }
+    public void setIdVendeur(int idVendeur) { this.idVendeur = idVendeur; }
 
-    public String getAdresse() {
-        return adresse;
-    }
+    public int getNbVentesMensuelles() { return nbVentesMensuelles; }
+    public void setNbVentesMensuelles(int nbVentesMensuelles) { this.nbVentesMensuelles = nbVentesMensuelles; }
 
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
-    }
+    public String getLogoMagasin() { return logoMagasin; }
+    public void setLogoMagasin(String logoMagasin) { this.logoMagasin = logoMagasin; }
 
-    public String getLocalisation() {
-        return localisation;
-    }
+    public String getTelephone() { return telephone; }
+    public void setTelephone(String telephone) { this.telephone = telephone; }
 
-    public void setLocalisation(String localisation) {
-        this.localisation = localisation;
-    }
+    public String getEmailContact() { return emailContact; }
+    public void setEmailContact(String emailContact) { this.emailContact = emailContact; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getHoraires() { return horaires; }
+    public void setHoraires(String horaires) { this.horaires = horaires; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getSiteWeb() { return siteWeb; }
+    public void setSiteWeb(String siteWeb) { this.siteWeb = siteWeb; }
 
-    public int getIdVendeur() {
-        return idVendeur;
-    }
+    public String getFacebook() { return facebook; }
+    public void setFacebook(String facebook) { this.facebook = facebook; }
 
-    public void setIdVendeur(int idVendeur) {
-        this.idVendeur = idVendeur;
-    }
+    public String getInstagram() { return instagram; }
+    public void setInstagram(String instagram) { this.instagram = instagram; }
 
-    public int getNbVentesMensuelles() {
-        return nbVentesMensuelles;
-    }
+    public String getCategorie() { return categorie; }
+    public void setCategorie(String categorie) { this.categorie = categorie; }
 
-    public void setNbVentesMensuelles(int nbVentesMensuelles) {
-        this.nbVentesMensuelles = nbVentesMensuelles;
-    }
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    // ==========================================
-    // Getters & Setters des nouveaux champs
-    // ==========================================
+    public int getNbCommentaires() { return nbCommentaires; }
+    public void setNbCommentaires(int nbCommentaires) { this.nbCommentaires = nbCommentaires; }
 
-    public String getLogoMagasin() {
-        return logoMagasin;
-    }
+    // =======================
+    // Helpers
+    // =======================
 
-    public void setLogoMagasin(String logoMagasin) {
-        this.logoMagasin = logoMagasin;
-    }
+    public boolean hasLogo() { return logoMagasin != null && !logoMagasin.isEmpty(); }
 
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
-
-    public String getEmailContact() {
-        return emailContact;
-    }
-
-    public void setEmailContact(String emailContact) {
-        this.emailContact = emailContact;
-    }
-
-    public Map<String, String> getHorairesOuverture() {
-        return horairesOuverture;
-    }
-
-    public void setHorairesOuverture(Map<String, String> horairesOuverture) {
-        this.horairesOuverture = horairesOuverture;
-    }
-
-    public String getSiteWeb() {
-        return siteWeb;
-    }
-
-    public void setSiteWeb(String siteWeb) {
-        this.siteWeb = siteWeb;
-    }
-
-    public String getFacebook() {
-        return facebook;
-    }
-
-    public void setFacebook(String facebook) {
-        this.facebook = facebook;
-    }
-
-    public String getInstagram() {
-        return instagram;
-    }
-
-    public void setInstagram(String instagram) {
-        this.instagram = instagram;
-    }
-
-    // ==========================================
-    // MÉTHODES MANQUANTES - À AJOUTER
-    // ==========================================
-
-    /**
-     * Retourne la catégorie du magasin
-     */
-    public String getCategorie() {
-        return categorie;
-    }
-
-    public void setCategorie(String categorie) {
-        this.categorie = categorie;
-    }
-
-    /**
-     * Alias pour getFacebook() - pour compatibilité avec le contrôleur
-     */
-    public String getFacebookUrl() {
-        return facebook;
-    }
-
-    public void setFacebookUrl(String facebook) {
-        this.facebook = facebook;
-    }
-    public double getPrixMinimum() {
-        return 17.0; // Valeur par défaut ou depuis la base de données
-    }
-
-    public void setPrixMinimum(double prixMinimum) {
-        // Implémentez si nécessaire
-    }
-
-    /**
-     * Alias pour getInstagram() - pour compatibilité avec le contrôleur
-     */
-    public String getInstagramUrl() {
-        return instagram;
-    }
-
-    public void setInstagramUrl(String instagram) {
-        this.instagram = instagram;
-    }
-
-    // ==========================================
-    // Méthodes utilitaires
-    // ==========================================
-
-    /**
-     * Vérifie si le magasin a des horaires définis
-     */
-    public boolean hasHoraires() {
-        return horairesOuverture != null && !horairesOuverture.isEmpty();
-    }
-
-    /**
-     * Vérifie si le magasin a un logo
-     */
-    public boolean hasLogo() {
-        return logoMagasin != null && !logoMagasin.isEmpty();
-    }
-
-    /**
-     * Vérifie si le magasin a des réseaux sociaux
-     */
     public boolean hasSocialMedia() {
         return (facebook != null && !facebook.isEmpty()) ||
                 (instagram != null && !instagram.isEmpty());
     }
 
-
-    /**
-     * Retourne une représentation textuelle du magasin
-     */
     @Override
     public String toString() {
         return "Magasin{" +
@@ -266,16 +108,6 @@ public class Magasin {
                 ", nomMagasin='" + nomMagasin + '\'' +
                 ", adresse='" + adresse + '\'' +
                 ", localisation='" + localisation + '\'' +
-                ", telephone='" + telephone + '\'' +
-                ", categorie='" + categorie + '\'' +
                 '}';
-    }
-    // ✅ Getter et Setter
-    public String getHoraires() {
-        return horaires;
-    }
-
-    public void setHoraires(String horaires) {
-        this.horaires = horaires;
     }
 }

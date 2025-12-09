@@ -227,12 +227,24 @@ public class MagasinDetailsController implements DataReceiver {
     private void chargerHoraires() {
         horairesContainer.getChildren().clear();
 
-        if (magasin.getHorairesOuverture() != null && !magasin.getHorairesOuverture().isEmpty()) {
-            magasin.getHorairesOuverture().forEach((jour, horaire) -> {
-                HBox ligneHoraire = creerLigneHoraire(jour, horaire);
-                horairesContainer.getChildren().add(ligneHoraire);
-            });
+        if (magasin.getHoraires() != null && !magasin.getHoraires().isEmpty()) {
+            try {
+                org.json.JSONObject horairesJson = new org.json.JSONObject(magasin.getHoraires());
+                for (String jour : horairesJson.keySet()) {
+                    String horaire = horairesJson.getString(jour);
+                    HBox ligneHoraire = creerLigneHoraire(jour, horaire);
+                    horairesContainer.getChildren().add(ligneHoraire);
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Erreur parsing horaires : " + e.getMessage());
+                // Ajouter des horaires par défaut si erreur
+                horairesContainer.getChildren().addAll(
+                        creerLigneHoraire("Du Dimanche au Jeudi", "de 10h à 20h"),
+                        creerLigneHoraire("Vendredi et Samedi", "de 10h à 20h")
+                );
+            }
         } else {
+            // Horaires par défaut si aucun JSON
             horairesContainer.getChildren().addAll(
                     creerLigneHoraire("Du Dimanche au Jeudi", "de 10h à 20h"),
                     creerLigneHoraire("Vendredi et Samedi", "de 10h à 20h")

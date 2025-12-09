@@ -182,7 +182,7 @@ public class AdminService {
      * Récupérer tous les magasins
      */
     public List<Magasin> getAllMagasins() {
-        return magasinDAO.getAllmagasins();
+        return AdminMagasinDAO.getAllMagasins();
     }
 
     /**
@@ -248,7 +248,7 @@ public class AdminService {
      * Récupérer les magasins d'un vendeur
      */
     public List<Magasin> getMagasinsByVendeur(int vendeurId) {
-        return magasinDAO.getMagasinsByVendeur(vendeurId);
+        return AdminMagasinDAO.getMagasinsByVendeur(vendeurId);
     }
 
     // ==================== STATISTIQUES DASHBOARD ====================
@@ -267,8 +267,8 @@ public class AdminService {
             stats.put("newUsersLast30Days", userDAO.getNewUsersCount(30));
 
             // Statistiques magasins
-            stats.put("totalMagasins", magasinDAO.getTotalMagasinsCount());
-            stats.put("magasinsByCategorie", magasinDAO.getMagasinCountByCategorie());
+            stats.put("totalMagasins", AdminMagasinDAO.getTotalMagasins());
+            stats.put("magasinsByCategorie", AdminMagasinDAO.getMagasinCountByCategorie());
             stats.put("topMagasins", magasinDAO.getTopMagasinsByVehicules(5));
 
             System.out.println("✅ Statistiques dashboard récupérées");
@@ -301,7 +301,7 @@ public class AdminService {
     public Map<String, Object> getMagasinStats() {
         Map<String, Object> stats = new HashMap<>();
 
-        stats.put("total", magasinDAO.getTotalMagasinsCount());
+        stats.put("total", AdminMagasinDAO.getTotalMagasinsCount());
         stats.put("byCategorie", magasinDAO.getMagasinCountByCategorie());
         stats.put("topByVehicules", magasinDAO.getTopMagasinsByVehicules(10));
 

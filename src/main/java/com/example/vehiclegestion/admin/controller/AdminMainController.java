@@ -113,18 +113,15 @@ public class AdminMainController {
      * Afficher les logs d'authentification
      */
     @FXML
-    public void showAuthLogs() {
-        // TODO: Créer la page des logs
-        showInfo("En développement", "La page des logs sera bientôt disponible");
-    }
-
-    /**
-     * Afficher les paramètres
-     */
-    @FXML
     public void showSettings() {
-        // TODO: Créer la page des paramètres
-        showInfo("En développement", "La page des paramètres sera bientôt disponible");
+        try {
+            loadPage("/view/admin/admin-settings.fxml", "Paramètres Système");
+            // Si vous avez un bouton settings dans le FXML, ajoutez:
+            // setActiveButton(settingsBtn);
+        } catch (Exception e) {
+            showError("Erreur", "Impossible de charger la page des paramètres: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -231,4 +228,28 @@ public class AdminMainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    @FXML
+    public void showAuthLogs() {
+        try {
+            loadPage("/view/admin/admin-auth-logs.fxml", "Logs d'Authentification");
+            System.out.println("📜 Page des logs d'authentification chargée");
+        } catch (Exception e) {
+            showError("Erreur", "Impossible de charger les logs: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void showLogs() {
+        try {
+            loadPage("/view/admin/admin-logs.fxml", "Logs Système");
+            // Si vous avez un bouton logs, ajoutez: setActiveButton(logsBtn);
+        } catch (Exception e) {
+            showError("Erreur", "Impossible de charger les logs: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    @FXML private Button logsBtn;
+
 }

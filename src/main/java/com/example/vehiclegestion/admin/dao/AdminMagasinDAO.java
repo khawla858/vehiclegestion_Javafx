@@ -1,7 +1,8 @@
 package com.example.vehiclegestion.admin.dao;
 
-import com.example.vehiclegestion.vendeur.model.Magasin;
 import com.example.vehiclegestion.common.dao.DatabaseConnection;
+import com.example.vehiclegestion.vendeur.model.Magasin;
+import org.postgresql.util.PGobject;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,302 +10,267 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * DAO pour la gestion administrative des magasins
- */
 public class AdminMagasinDAO {
 
-    // ==================== LISTE & RECHERCHE ====================
-
-    /**
-     * Récupérer tous les magasin
-     */
-    public List<Magasin> getAllmagasins() {
+    // ====================== GET ALL MAGASINS ======================
+    public static List<Magasin> getAllMagasins() {
         List<Magasin> magasins = new ArrayList<>();
-        String sql = "SELECT m.*, u.nom as vendeur_nom, u.prenom as vendeur_prenom, u.email as vendeur_email " +
-                "FROM magasin m " +
-                "LEFT JOIN utilisateurs u ON m.id_vendeur = u.id_utilisateur " +
-                "ORDER BY m.id_magasin DESC";
+        String query = "SELECT * FROM Magasin ORDER BY id_magasin DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+             PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                magasins.add(mapResultSetToMagasin(rs));
+                magasins.add(extractMagasinFromResultSet(rs));
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur récupération magasins: " + e.getMessage());
+            System.err.println("Erreur récupération magasins: " + e.getMessage());
         }
 
         return magasins;
     }
 
-    /**
-     * Rechercher des magasins par critères
-     */
-    public List<Magasin> searchMagasins(String searchTerm, String categorie) {
-        List<Magasin> magasins = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-                "SELECT m.*, u.nom as vendeur_nom, u.prenom as vendeur_prenom, u.email as vendeur_email " +
-                        "FROM magasin m " +
-                        "LEFT JOIN utilisateurs u ON m.id_vendeur = u.id_utilisateur " +
-                        "WHERE 1=1"
-        );
-
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            sql.append(" AND (LOWER(m.nom_magasin) LIKE ? OR LOWER(m.adresse) LIKE ? OR LOWER(m.localisation) LIKE ?)");
-        }
-        if (categorie != null && !categorie.isEmpty()) {
-            sql.append(" AND m.categorie = ?");
-        }
-
-        sql.append(" ORDER BY m.id_magasin DESC");
+    // ====================== GET BY ID ======================
+    public Magasin getMagasinById(int idMagasin) {
+        String query = "SELECT * FROM Magasin WHERE id_magasin = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            int paramIndex = 1;
-
-            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                String search = "%" + searchTerm.toLowerCase() + "%";
-                stmt.setString(paramIndex++, search);
-                stmt.setString(paramIndex++, search);
-                stmt.setString(paramIndex++, search);
-            }
-            if (categorie != null && !categorie.isEmpty()) {
-                stmt.setString(paramIndex++, categorie);
-            }
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                magasins.add(mapResultSetToMagasin(rs));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur recherche magasins: " + e.getMessage());
-        }
-
-        return magasins;
-    }
-
-    /**
-     * Récupérer un magasin par ID avec détails complets
-     */
-    public Magasin getMagasinById(int magasinId) {
-        String sql = "SELECT m.*, u.nom as vendeur_nom, u.prenom as vendeur_prenom, u.email as vendeur_email " +
-                "FROM magasin m " +
-                "LEFT JOIN utilisateurs u ON m.id_vendeur = u.id_utilisateur " +
-                "WHERE m.id_magasin = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, magasinId);
+            stmt.setInt(1, idMagasin);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return mapResultSetToMagasin(rs);
+                return extractMagasinFromResultSet(rs);
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur récupération magasin: " + e.getMessage());
+            System.err.println("Erreur récupération magasin: " + e.getMessage());
         }
 
         return null;
     }
 
-    /**
-     * Récupérer les magasins d'un vendeur
-     */
-    public List<Magasin> getMagasinsByVendeur(int vendeurId) {
-        List<Magasin> magasins = new ArrayList<>();
-        String sql = "SELECT * FROM magasin WHERE id_vendeur = ? ORDER BY id_magasin DESC";
+    // ====================== ADD ======================
+    public static boolean addMagasin(Magasin magasin) {
+        String query = "INSERT INTO Magasin (nom_magasin, adresse, localisation, description, " +
+                "id_vendeur, telephone, email_contact, site_web, facebook, instagram, categorie, " +
+                "logo_magasin, nb_ventes_mensuelles, horaires_ouverture) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, vendeurId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                magasins.add(mapResultSetToMagasin(rs));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur: " + e.getMessage());
-        }
-
-        return magasins;
-    }
-
-    // ==================== MODIFICATION ====================
-
-    /**
-     * Mettre à jour un magasin
-     */
-    public boolean updateMagasin(Magasin magasin) {
-        String sql = "UPDATE magasin SET " +
-                "nom_magasin = ?, adresse = ?, localisation = ?, description = ?, " +
-                "telephone = ?, email_contact = ?, site_web = ?, " +
-                "facebook = ?, instagram = ?, categorie = ?, horaires = ? " +
-                "WHERE id_magasin = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, magasin.getNomMagasin());
             stmt.setString(2, magasin.getAdresse());
             stmt.setString(3, magasin.getLocalisation());
             stmt.setString(4, magasin.getDescription());
-            stmt.setString(5, magasin.getTelephone());
-            stmt.setString(6, magasin.getEmailContact());
-            stmt.setString(7, magasin.getSiteWeb());
-            stmt.setString(8, magasin.getFacebook());
-            stmt.setString(9, magasin.getInstagram());
-            stmt.setString(10, magasin.getCategorie());
-            stmt.setString(11, magasin.getHoraires());
-            stmt.setInt(12, magasin.getIdMagasin());
+            stmt.setObject(5, magasin.getIdVendeur() == 0 ? null : magasin.getIdVendeur());
+            stmt.setString(6, magasin.getTelephone());
+            stmt.setString(7, magasin.getEmailContact());
+            stmt.setString(8, magasin.getSiteWeb());
+            stmt.setString(9, magasin.getFacebook());
+            stmt.setString(10, magasin.getInstagram());
+            stmt.setString(11, magasin.getCategorie());
+            stmt.setString(12, magasin.getLogoMagasin());
+            stmt.setInt(13, magasin.getNbVentesMensuelles());
+            stmt.setObject(14, magasin.getHoraires(), Types.OTHER);
 
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("✅ Magasin mis à jour: " + magasin.getNomMagasin());
-            return rowsAffected > 0;
 
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur mise à jour magasin: " + e.getMessage());
-        }
+            int rows = stmt.executeUpdate();
 
-        return false;
-    }
-
-    /**
-     * Supprimer un magasin (attention: supprime aussi les véhicules associés)
-     */
-    public boolean deleteMagasin(int magasinId) {
-        String sql = "DELETE FROM magasin WHERE id_magasin = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, magasinId);
-            int rowsAffected = stmt.executeUpdate();
-
-            System.out.println("✅ Magasin supprimé: ID " + magasinId);
-            return rowsAffected > 0;
-
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur suppression magasin: " + e.getMessage());
-        }
-
-        return false;
-    }
-
-    // ==================== STATISTIQUES ====================
-
-    /**
-     * Compter le nombre total de magasins
-     */
-    public int getTotalMagasinsCount() {
-        String sql = "SELECT COUNT(*) FROM magasin";
-        return getCount(sql);
-    }
-
-    /**
-     * Compter les magasins par catégorie
-     */
-    public Map<String, Integer> getMagasinCountByCategorie() {
-        Map<String, Integer> counts = new HashMap<>();
-        String sql = "SELECT categorie, COUNT(*) as count FROM magasin GROUP BY categorie";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                String cat = rs.getString("categorie");
-                if (cat == null || cat.isEmpty()) {
-                    cat = "Non catégorisé";
-                }
-                counts.put(cat, rs.getInt("count"));
+            if (rows > 0) {
+                ResultSet rs = stmt.getGeneratedKeys();
+                if (rs.next()) magasin.setIdMagasin(rs.getInt(1));
+                return true;
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur stats catégories: " + e.getMessage());
+            System.err.println("Erreur ajout magasin: " + e.getMessage());
         }
 
-        return counts;
+        return false;
     }
 
-    /**
-     * Récupérer les magasins les plus actifs (par nombre de véhicules)
-     */
-    public List<Map<String, Object>> getTopMagasinsByVehicules(int limit) {
-        List<Map<String, Object>> topMagasins = new ArrayList<>();
-        String sql = "SELECT m.id_magasin, m.nom_magasin, COUNT(a.id_article) as nb_vehicules " +
-                "FROM magasin m " +
-                "LEFT JOIN article a ON m.id_magasin = a.id_magasin " +
-                "GROUP BY m.id_magasin, m.nom_magasin " +
-                "ORDER BY nb_vehicules DESC " +
-                "LIMIT ?";
+    // ====================== UPDATE ======================
+    public boolean updateMagasin(Magasin magasin) {
+        String query = "UPDATE Magasin SET nom_magasin = ?, adresse = ?, localisation = ?, " +
+                "description = ?, id_vendeur = ?, telephone = ?, email_contact = ?, " +
+                "site_web = ?, facebook = ?, instagram = ?, categorie = ?, logo_magasin = ?, " +
+                "nb_ventes_mensuelles = ?, horaires_ouverture = ?::jsonb " +
+                "WHERE id_magasin = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, magasin.getNomMagasin());
+            stmt.setString(2, magasin.getAdresse());
+            stmt.setString(3, magasin.getLocalisation());
+            stmt.setString(4, magasin.getDescription());
+            stmt.setObject(5, magasin.getIdVendeur() == 0 ? null : magasin.getIdVendeur());
+            stmt.setString(6, magasin.getTelephone());
+            stmt.setString(7, magasin.getEmailContact());
+            stmt.setString(8, magasin.getSiteWeb());
+            stmt.setString(9, magasin.getFacebook());
+            stmt.setString(10, magasin.getInstagram());
+            stmt.setString(11, magasin.getCategorie());
+            stmt.setString(12, magasin.getLogoMagasin());
+            stmt.setInt(13, magasin.getNbVentesMensuelles());
+            stmt.setObject(14, magasin.getHoraires(), Types.OTHER);
+
+            stmt.setInt(15, magasin.getIdMagasin());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erreur update magasin: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    // ====================== DELETE ======================
+    public boolean deleteMagasin(int idMagasin) {
+        String query = "DELETE FROM Magasin WHERE id_magasin = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, idMagasin);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Erreur suppression magasin: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    // ====================== SEARCH (nom, adresse, localisation) ======================
+    public List<Magasin> searchMagasins(String searchTerm) {
+        List<Magasin> magasins = new ArrayList<>();
+        String query = "SELECT * FROM Magasin WHERE " +
+                "LOWER(nom_magasin) LIKE ? OR LOWER(adresse) LIKE ? OR LOWER(localisation) LIKE ? " +
+                "ORDER BY id_magasin DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            String s = "%" + searchTerm.toLowerCase() + "%";
+            stmt.setString(1, s);
+            stmt.setString(2, s);
+            stmt.setString(3, s);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) magasins.add(extractMagasinFromResultSet(rs));
+
+        } catch (SQLException e) {
+            System.err.println("Erreur search magasin: " + e.getMessage());
+        }
+
+        return magasins;
+    }
+
+    // ====================== SEARCH WITH CATEGORIE (compatibilité AdminService) ======================
+    public List<Magasin> searchMagasins(String searchTerm, String categorie) {
+        List<Magasin> magasins = new ArrayList<>();
+        String query = "SELECT * FROM Magasin WHERE " +
+                "(LOWER(nom_magasin) LIKE ? OR LOWER(adresse) LIKE ? OR LOWER(localisation) LIKE ?) " +
+                "AND (? IS NULL OR categorie = ?) " +
+                "ORDER BY id_magasin DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            String s = "%" + searchTerm.toLowerCase() + "%";
+            stmt.setString(1, s);
+            stmt.setString(2, s);
+            stmt.setString(3, s);
+            stmt.setObject(4, categorie);
+            stmt.setObject(5, categorie);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) magasins.add(extractMagasinFromResultSet(rs));
+
+        } catch (SQLException e) {
+            System.err.println("Erreur search + categorie: " + e.getMessage());
+        }
+
+        return magasins;
+    }
+
+    // ====================== MAGASINS PAR CATEGORIE ======================
+    public static Map<String, Integer> getMagasinCountByCategorie() {
+        Map<String, Integer> map = new HashMap<>();
+        String query = "SELECT categorie, COUNT(*) FROM Magasin GROUP BY categorie";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                map.put(rs.getString(1), rs.getInt(2));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erreur stats catégories: " + e.getMessage());
+        }
+
+        return map;
+    }
+
+    // ====================== TOP N MAGASINS BY VEHICLES ======================
+    public List<Magasin> getTopMagasinsByVehicules(int limit) {
+        List<Magasin> top = new ArrayList<>();
+        String query = "SELECT * FROM Magasin ORDER BY nb_ventes_mensuelles DESC LIMIT ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, limit);
             ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                Map<String, Object> magasin = new HashMap<>();
-                magasin.put("id", rs.getInt("id_magasin"));
-                magasin.put("nom", rs.getString("nom_magasin"));
-                magasin.put("nbVehicules", rs.getInt("nb_vehicules"));
-                topMagasins.add(magasin);
-            }
+            while (rs.next()) top.add(extractMagasinFromResultSet(rs));
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur top magasins: " + e.getMessage());
+            System.err.println("Erreur top magasins: " + e.getMessage());
         }
 
-        return topMagasins;
+        return top;
     }
 
-    /**
-     * Compter les véhicules par magasin
-     */
-    public int getVehiculesCountByMagasin(int magasinId) {
-        String sql = "SELECT COUNT(*) FROM vehicules WHERE id_magasin = ?";
+    // ====================== COUNT ======================
+    public static int getTotalMagasins() {
+        String query = "SELECT COUNT(*) FROM Magasin";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
-            stmt.setInt(1, magasinId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
+            if (rs.next()) return rs.getInt(1);
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur comptage véhicules: " + e.getMessage());
+            System.err.println("Erreur count magasins: " + e.getMessage());
         }
 
         return 0;
     }
 
-    // ==================== UTILITAIRES ====================
-
-    /**
-     * Mapper ResultSet vers Magasin
-     */
-    private Magasin mapResultSetToMagasin(ResultSet rs) throws SQLException {
+    // ====================== EXTRACTOR ======================
+    private static Magasin extractMagasinFromResultSet(ResultSet rs) throws SQLException {
         Magasin magasin = new Magasin();
+
         magasin.setIdMagasin(rs.getInt("id_magasin"));
         magasin.setNomMagasin(rs.getString("nom_magasin"));
         magasin.setAdresse(rs.getString("adresse"));
         magasin.setLocalisation(rs.getString("localisation"));
         magasin.setDescription(rs.getString("description"));
-        magasin.setIdVendeur(rs.getInt("id_vendeur"));
+
+        int idVendeur = rs.getInt("id_vendeur");
+        if (!rs.wasNull()) magasin.setIdVendeur(idVendeur);
+
         magasin.setTelephone(rs.getString("telephone"));
         magasin.setEmailContact(rs.getString("email_contact"));
         magasin.setSiteWeb(rs.getString("site_web"));
@@ -312,34 +278,55 @@ public class AdminMagasinDAO {
         magasin.setInstagram(rs.getString("instagram"));
         magasin.setCategorie(rs.getString("categorie"));
         magasin.setLogoMagasin(rs.getString("logo_magasin"));
-        magasin.setHoraires(rs.getString("horaires"));
+        magasin.setNbVentesMensuelles(rs.getInt("nb_ventes_mensuelles"));
 
-        // Nombre de ventes mensuelles si disponible
-        try {
-            magasin.setNbVentesMensuelles(rs.getInt("nb_ventes_mensuelles"));
-        } catch (SQLException e) {
-            // Colonne non présente dans cette requête
+        Object horaires = rs.getObject("horaires_ouverture");
+        if (horaires != null) {
+            if (horaires instanceof PGobject) {
+                magasin.setHoraires(((PGobject) horaires).getValue());
+            } else {
+                magasin.setHoraires(horaires.toString());
+            }
         }
 
         return magasin;
     }
 
-    /**
-     * Méthode helper pour les comptages
-     */
-    private int getCount(String sql) {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
 
-            if (rs.next()) {
-                return rs.getInt(1);
+    public static List<Magasin> getMagasinsByVendeur(int idVendeur) {
+        List<Magasin> magasins = new ArrayList<>();
+        String query = "SELECT * FROM Magasin WHERE id_vendeur = ? ORDER BY id_magasin DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, idVendeur);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                magasins.add(extractMagasinFromResultSet(rs));
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur comptage: " + e.getMessage());
+            System.err.println("Erreur getMagasinsByVendeur: " + e.getMessage());
+        }
+
+        return magasins;
+    }
+    public static int getTotalMagasinsCount() {
+        String query = "SELECT COUNT(*) FROM Magasin";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (SQLException e) {
+            System.err.println("Erreur getTotalMagasinsCount: " + e.getMessage());
         }
 
         return 0;
     }
+
 }

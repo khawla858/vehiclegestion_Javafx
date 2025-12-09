@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.vehiclegestion.admin.controller.AdminLogsController"
+      style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);"
+      spacing="20">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- EN-TÊTE -->
+    <HBox alignment="CENTER_LEFT" spacing="20"
+          style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                 -fx-background-radius: 12;
+                 -fx-border-color: #3b82f6;
+                 -fx-border-width: 2;
+                 -fx-border-radius: 12;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <VBox spacing="5">
+            <Label text="📋 GESTION DES LOGS SYSTÈME"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 24px;"/>
+            <Label text="Visualisation et analyse des journaux d'événements"
+                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 14px;"/>
+        </VBox>
+
+        <HBox HBox.hgrow="ALWAYS"/>
+
+        <HBox spacing="10">
+            <Button text="🔄 Rafraîchir" onAction="#handleRefresh"
+                    style="-fx-background-color: #3b82f6;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-font-size: 13px;
+                           -fx-padding: 10 20;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;"/>
+
+            <Button text="📥 Exporter" onAction="#handleExport"
+                    style="-fx-background-color: #10b981;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-font-size: 13px;
+                           -fx-padding: 10 20;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;"/>
+
+            <Button text="🗑️ Tout effacer" onAction="#handleClearLogs"
+                    style="-fx-background-color: #ef4444;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-font-size: 13px;
+                           -fx-padding: 10 20;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;"/>
+        </HBox>
+    </HBox>
+
+    <!-- STATISTIQUES -->
+    <HBox spacing="15">
+        <!-- Total Logs -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                     -fx-background-radius: 10;
+                     -fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                     -fx-border-width: 2;
+                     -fx-border-radius: 10;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="TOTAL LOGS"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            <Label fx:id="totalLogsLabel" text="0"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28px;"/>
+            <Label text="📊 Entrées affichées"
+                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <!-- Erreurs -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                     -fx-background-radius: 10;
+                     -fx-border-color: linear-gradient(to right, #ef4444, #dc2626);
+                     -fx-border-width: 2;
+                     -fx-border-radius: 10;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="ERREURS"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            <Label fx:id="errorCountLabel" text="0"
+                   style="-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 28px;"/>
+            <Label text="❌ Niveau ERROR"
+                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <!-- Avertissements -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                     -fx-background-radius: 10;
+                     -fx-border-color: linear-gradient(to right, #f59e0b, #d97706);
+                     -fx-border-width: 2;
+                     -fx-border-radius: 10;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="AVERTISSEMENTS"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            <Label fx:id="warningCountLabel" text="0"
+                   style="-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-font-size: 28px;"/>
+            <Label text="⚠️ Niveau WARN"
+                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <!-- Informations -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                     -fx-background-radius: 10;
+                     -fx-border-color: linear-gradient(to right, #10b981, #059669);
+                     -fx-border-width: 2;
+                     -fx-border-radius: 10;">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label text="INFORMATIONS"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            <Label fx:id="infoCountLabel" text="0"
+                   style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 28px;"/>
+            <Label text="ℹ️ Niveau INFO"
+                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px;"/>
+        </VBox>
+    </HBox>
+
+    <!-- FILTRES -->
+    <VBox spacing="15"
+          style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                 -fx-background-radius: 12;
+                 -fx-border-color: #334155;
+                 -fx-border-width: 1;
+                 -fx-border-radius: 12;">
+        <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+        </padding>
+
+        <Label text="🔍 FILTRES DE RECHERCHE"
+               style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+        <GridPane hgap="15" vgap="10">
+            <!-- Recherche texte -->
+            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label text="Recherche texte"
+                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                <TextField fx:id="searchField" promptText="Rechercher dans les logs..."
+                           prefWidth="300"
+                           style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                  -fx-text-fill: white;
+                                  -fx-prompt-text-fill: #94a3b8;
+                                  -fx-border-color: #334155;
+                                  -fx-border-radius: 6;
+                                  -fx-background-radius: 6;
+                                  -fx-padding: 8;"/>
+            </VBox>
+
+            <!-- Niveau -->
+            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label text="Niveau de log"
+                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                <ComboBox fx:id="levelFilterCombo" prefWidth="150"
+                          style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                 -fx-text-fill: white;"/>
+            </VBox>
+
+            <!-- Action -->
+            <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                <Label text="Type d'action"
+                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                <ComboBox fx:id="actionFilterCombo" prefWidth="150"
+                          style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                 -fx-text-fill: white;"/>
+            </VBox>
+
+            <!-- Date début -->
+            <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <Label text="Date début"
+                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                <DatePicker fx:id="startDatePicker" prefWidth="150"
+                            style="-fx-background-color: rgba(15, 23, 42, 0.6);"/>
+            </VBox>
+
+            <!-- Date fin -->
+            <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label text="Date fin"
+                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                <DatePicker fx:id="endDatePicker" prefWidth="150"
+                            style="-fx-background-color: rgba(15, 23, 42, 0.6);"/>
+            </VBox>
+
+            <!-- Bouton reset -->
+            <VBox spacing="5" GridPane.columnIndex="2" GridPane.rowIndex="1" alignment="BOTTOM_CENTER">
+                <Button text="🔄 Réinitialiser" onAction="#handleResetFilters"
+                        style="-fx-background-color: #64748b;
+                               -fx-text-fill: white;
+                               -fx-font-size: 12px;
+                               -fx-padding: 8 16;
+                               -fx-background-radius: 6;
+                               -fx-cursor: hand;"/>
+            </VBox>
+        </GridPane>
+    </VBox>
+
+    <!-- TABLEAU DES LOGS -->
+    <VBox VBox.vgrow="ALWAYS"
+          style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                 -fx-background-radius: 12;
+                 -fx-border-color: #334155;
+                 -fx-border-width: 1;
+                 -fx-border-radius: 12;">
+        <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+        </padding>
+
+        <Label text="📜 JOURNAL DES ÉVÉNEMENTS"
+               style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;">
+            <VBox.margin>
+                <Insets bottom="10"/>
+            </VBox.margin>
+        </Label>
+
+        <TableView fx:id="logsTable" VBox.vgrow="ALWAYS"
+                   style="-fx-background-color: rgba(15, 23, 42, 0.5);
+                          -fx-border-color: #334155;
+                          -fx-border-radius: 8;
+                          -fx-background-radius: 8;">
+
+            <columns>
+                <TableColumn fx:id="timestampColumn" text="📅 Horodatage"
+                             prefWidth="180" minWidth="150"/>
+                <TableColumn fx:id="levelColumn" text="⚡ Niveau"
+                             prefWidth="100" minWidth="80"/>
+                <TableColumn fx:id="actionColumn" text="🎯 Action"
+                             prefWidth="150" minWidth="120"/>
+                <TableColumn fx:id="userColumn" text="👤 Utilisateur"
+                             prefWidth="180" minWidth="150"/>
+                <TableColumn fx:id="messageColumn" text="💬 Message"
+                             prefWidth="400" minWidth="250"/>
+            </columns>
+
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TableView>
+    </VBox>
+
+</VBox>

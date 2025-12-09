@@ -70,14 +70,14 @@
                                -fx-padding: 10px 20px; -fx-border-color: transparent;
                                -fx-cursor: hand;"/>
 
-                <Button text="📝 Logs d'Authentification"
-                        onAction="#showAuthLogs"
-                        styleClass="menu-button"
-                        prefWidth="230" prefHeight="45"
-                        style="-fx-background-color: transparent; -fx-text-fill: white;
-                               -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;
-                               -fx-padding: 10px 20px; -fx-border-color: transparent;
-                               -fx-cursor: hand;"/>
+
+                <Button fx:id="logsBtn" text="📋 Logs Système" onAction="#showLogs"
+                        style="-fx-background-color: transparent;
+               -fx-text-fill: white;
+               -fx-font-size: 14px;
+               -fx-alignment: CENTER_LEFT;
+               -fx-padding: 10px 20px;
+               -fx-cursor: hand;"/>
 
                 <Separator style="-fx-background-color: #34495e;">
                     <VBox.margin>
