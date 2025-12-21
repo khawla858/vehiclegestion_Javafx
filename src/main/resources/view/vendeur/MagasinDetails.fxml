@@ -5,6 +5,8 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.web.WebView?>
+
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
@@ -335,11 +337,11 @@
                                    -fx-border-width: 2;
                                    -fx-border-radius: 8;">
 
-                        <ImageView fx:id="carteImage"
-                                   fitWidth="400"
-                                   fitHeight="500"
-                                   preserveRatio="false"
-                                   pickOnBounds="true"/>
+                        <WebView fx:id="mapView"
+                                 prefWidth="400"
+                                 prefHeight="500"
+                                 minWidth="400"
+                                 minHeight="500"/>
 
                         <VBox alignment="BOTTOM_CENTER" style="-fx-padding: 10;">
                             <Button fx:id="btnVoirCarte"

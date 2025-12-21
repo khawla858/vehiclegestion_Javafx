@@ -72,3 +72,4 @@ java.lang.IllegalStateException: showAndWait is not allowed during animation or 
 	at javafx.graphics@25.0.1/com.sun.glass.ui.win.WinApplication.lambda$runLoop$0(WinApplication.java:168)
 	at java.base/java.lang.Thread.run(Thread.java:1575)
 2025-12-21 10:34:30 INFO  [JavaFX Application Thread] c.e.v.v.c.AjouterRendezVousController - RDV créé ID=35 client=sidi Nabil véhicule=audi900_M1 type=Visite véhicule
+2025-12-21 13:08:59 INFO  [JavaFX Application Thread] c.e.v.v.c.AjouterMagasinController - Magasin créé IDVendeur=30 Nom=wajadaCars Adresse=wajda Logo=images/logos/logo_magasin_30_1766318920168.jpg
