@@ -233,4 +233,26 @@ public class SessionManager {
 
         System.out.println("=====================");
     }
+    /**
+     * Récupérer le nom complet de l'utilisateur connecté
+     * Format: "Prénom Nom"
+     */
+    public String getUserFullName() {
+        if (utilisateurConnecte != null) {
+            String prenom = utilisateurConnecte.getPrenom() != null ? utilisateurConnecte.getPrenom() : "";
+            String nom = utilisateurConnecte.getNom() != null ? utilisateurConnecte.getNom() : "";
+
+            // Nettoyer les espaces et formater
+            String fullName = (prenom + " " + nom).trim();
+
+            // Si vide, retourner l'email ou "Utilisateur"
+            if (fullName.isEmpty()) {
+                return utilisateurConnecte.getEmail() != null ?
+                        utilisateurConnecte.getEmail() : "Utilisateur";
+            }
+
+            return fullName;
+        }
+        return "Utilisateur";
+    }
 }

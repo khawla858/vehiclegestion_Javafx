@@ -82,7 +82,7 @@ public class LoginController {
                 case "vendeur":
                     // ⚠️ VÉRIFIEZ LE NOM EXACT DU FICHIER
                     // D'après votre arborescence, c'est "VendeurDashboard.fxml"
-                    fxmlPath = "/view/vendeur/VendeurDashboard.fxml";
+                    fxmlPath = "/view/vendeur/layout/vendeur-layout.fxml";
                     title = "Dashboard Vendeur - Gestion Véhicules";
                     break;
 

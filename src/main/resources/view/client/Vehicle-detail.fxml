@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.VehiDetaiCo"
+            style="-fx-background-color: #f5f5f5;">
+
+    <!-- Header -->
+    <top>
+        <HBox style="-fx-background-color: white; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"
+              alignment="CENTER_LEFT" spacing="15">
+            <Button fx:id="backBtn" text="← Retour" />
+            <Label text="Détails du véhicule" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+        </HBox>
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" style="-fx-background-color: transparent;">
+            <HBox fx:id="mainContainer" spacing="20" style="-fx-padding: 20;">
+
+                <!-- Section Gauche (Image + Détails + Commentaires) -->
+                <VBox fx:id="leftSection" spacing="20" HBox.hgrow="ALWAYS" style="-fx-max-width: 700;">
+
+                    <!-- Image principale -->
+                    <VBox style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <ImageView fx:id="mainImageView" fitWidth="650" fitHeight="450" preserveRatio="true"
+                                   style="-fx-background-radius: 8;"/>
+                        <HBox spacing="10" style="-fx-padding: 15 0 0 0;">
+                            <Label text="📷 1 image" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Titre et localisation -->
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <Label fx:id="titleLabel" text="Titre du véhicule" wrapText="true"
+                               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Label fx:id="locationLabel" text="📍 Casablanca" style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                            <Label fx:id="dateLabel" text="Publiée aujourd'hui" style="-fx-text-fill: #999; -fx-font-size: 12px;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Caractéristiques -->
+                    <VBox fx:id="characteristicsContainer" spacing="12">
+                        <!-- Rempli dynamiquement -->
+                    </VBox>
+
+                    <!-- Description -->
+                    <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <Label text="Description" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <Label fx:id="descriptionLabel" wrapText="true"
+                               style="-fx-font-size: 14px; -fx-text-fill: #555; -fx-line-spacing: 1.5;"/>
+                    </VBox>
+
+                    <!-- ==================== SECTION COMMENTAIRES ==================== -->
+                    <VBox fx:id="commentairesSection" spacing="15">
+                        <!-- Rempli dynamiquement par le contrôleur -->
+                    </VBox>
+
+                </VBox>
+
+                <!-- Section Droite (Prix + Vendeur) -->
+                <VBox spacing="20" style="-fx-min-width: 320; -fx-max-width: 320;">
+
+                    <!-- Prix et bouton contact -->
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <Label fx:id="priceLabel" text="217 000 DH"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #0066FF;"/>
+                        <Label text="À partir de 4 520 DH / mois" style="-fx-text-fill: #999; -fx-font-size: 13px;"/>
+
+                        <Separator style="-fx-padding: 10 0;"/>
+
+
+                    </VBox>
+
+                    <!-- Section Vendeur -->
+                    <VBox fx:id="sellerSection" spacing="15">
+                        <!-- Rempli dynamiquement -->
+                    </VBox>
+
+                    <!-- Statistiques -->
+                    <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <Label text="📊 Statistiques" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333;"/>
+                        <HBox spacing="10">
+                            <Label text="👁" style="-fx-font-size: 16px;"/>
+                            <Label text="1 234 vues" style="-fx-text-fill: #666; -fx-font-size: 13px;"/>
+                        </HBox>
+                        <!-- Bouton Visiter Magasin -->
+                        <Button fx:id="visiterMagasinBtn" text="🏪 Visiter Magasin"
+                                style="-fx-background-color: #FF9800; -fx-text-fill: white;
+               -fx-padding: 10 20; -fx-background-radius: 8;
+               -fx-font-weight: bold; -fx-cursor: hand;
+               -fx-font-size: 14px; -fx-max-width: Infinity;"
+                                onAction="#handleVisiterMagasin"/>
+                    </VBox>
+
+                </VBox>
+
+            </HBox>
+        </ScrollPane>
+    </center>
+
+</BorderPan

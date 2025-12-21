@@ -32,7 +32,6 @@ public class VendeurDashboardController implements Initializable {
     @FXML private LineChart<String, Number> salesChart;
     @FXML private PieChart productsPieChart;
     @FXML private VBox activitiesContainer;
-    @FXML private Label systemStatusLabel;
     @FXML private Label systemStatusValue;
     @FXML private Label systemStatusDesc;
     @FXML private StackedBarChart<String, Number> categorySalesChart;

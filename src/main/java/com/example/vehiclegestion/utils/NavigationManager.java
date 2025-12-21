@@ -1,5 +1,7 @@
 package com.example.vehiclegestion.utils;
 
+import com.example.vehiclegestion.auth.utils.SessionManager;
+import com.example.vehiclegestion.common.controller.ChatWindowController;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -233,5 +235,22 @@ public class NavigationManager {
     public void clearHistory() {
         navigationHistory.clear();
         System.out.println("🗑️ Historique de navigation effacé");
+    }
+    public void showMessages() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/common/ChatWindow.fxml"));
+            Node content = loader.load();
+
+            ChatWindowController controller = loader.getController();
+
+            // ✅ PASSER LE VENDEUR CONNECTÉ
+            SessionManager session = SessionManager.getInstance();
+            controller.setUserInfo(session.getUserId(), session.getUserRole());
+
+            contentPane.getChildren().setAll(content);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,0 +1,2 @@
+2025-12-11 14:52:32 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Erreur récupération ID vendeur: FATAL: password authentication failed for user "postgres"
+2025-12-11 14:52:32 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ ID vendeur invalide

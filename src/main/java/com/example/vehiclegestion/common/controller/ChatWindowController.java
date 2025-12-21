@@ -4,16 +4,21 @@ import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.common.dao.ChatDAO;
 import com.example.vehiclegestion.common.model.Conversation;
 import com.example.vehiclegestion.common.model.Message;
+
+import com.example.vehiclegestion.common.utils.NotificationService;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.input.KeyCode;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -28,7 +33,7 @@ public class ChatWindowController implements Initializable {
     @FXML private Label badgeNotifications;
 
     @FXML private VBox placeholderView;
-    @FXML private VBox chatContainer;  // ← AJOUT
+    @FXML private VBox chatContainer;
     @FXML private HBox chatHeader;
     @FXML private Label avatarLabel;
     @FXML private Label interlocuteurNomLabel;
@@ -46,10 +51,17 @@ public class ChatWindowController implements Initializable {
     private Conversation currentConversation;
     private Timeline autoRefreshTimeline;
     private int lastMessageCount = 0;
+    private boolean fromVehicleDetails = false; // Nouveau flag
+
+    // AJOUTER CET ATTRIBUT
+    private NotificationService notificationService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("🚀 Initialisation du chat...");
+        System.out.println("\n🚀 === INITIALISATION CHAT WINDOW ===");
+
+        // AJOUTER CETTE LIGNE - Initialiser NotificationService
+        notificationService = NotificationService.getInstance();
 
         // Récupérer l'utilisateur connecté
         if (SessionManager.getInstance().estConnecte()) {
@@ -63,10 +75,29 @@ public class ChatWindowController implements Initializable {
         }
 
         setupMessageInput();
-        loadConversations();
         setupSearchFilter();
         startAutoRefresh();
         updateNotificationBadge();
+
+        // NE PAS charger les conversations ici immédiatement
+        // Elles seront chargées par initializeFromMenu() ou openSpecificConversation()
+
+        // Par défaut, afficher le placeholder
+        Platform.runLater(() -> {
+            showPlaceholder();
+        });
+    }
+
+    /**
+     * Affiche le placeholder (quand on vient du menu)
+     */
+    public void showPlaceholder() {
+        System.out.println("📭 Affichage du placeholder (mode menu)");
+        placeholderView.setVisible(true);
+        placeholderView.setManaged(true);
+        chatContainer.setVisible(false);
+        chatContainer.setManaged(false);
+        currentConversation = null;
     }
 
     /**
@@ -128,7 +159,8 @@ public class ChatWindowController implements Initializable {
                 conversationsListContainer.getChildren().add(emptyLabel);
             } else {
                 for (Conversation conv : conversations) {
-                    conversationsListContainer.getChildren().add(createConversationItem(conv));
+                    HBox item = createConversationItem(conv);
+                    conversationsListContainer.getChildren().add(item);
                 }
             }
 
@@ -139,103 +171,125 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Crée un item de conversation pour la liste (style moderne)
+     * Crée un item de conversation pour la liste
      */
     private HBox createConversationItem(Conversation conv) {
         HBox item = new HBox(12);
         item.setAlignment(Pos.CENTER_LEFT);
         item.setPadding(new Insets(12, 15, 12, 15));
+        item.setStyle("-fx-background-color: white; -fx-cursor: hand;");
 
-        // Style de base
-        String baseStyle = "-fx-background-color: white; -fx-cursor: hand;";
-        if (conv.hasUnreadMessages()) {
-            baseStyle = "-fx-background-color: #f0f9ff; -fx-cursor: hand;";
-        }
-        item.setStyle(baseStyle);
+        // STOCKER L'ID DE LA CONVERSATION
+        item.setUserData(conv.getIdConversation());
 
-        // Avatar (initiales)
+        // Ajouter l'événement de clic
+        item.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 1) {
+                openConversation(conv);
+                highlightConversationInList(conv.getIdConversation());
+            }
+        });
+
+        // Avatar
         StackPane avatar = new StackPane();
         avatar.setPrefSize(50, 50);
         avatar.setStyle("-fx-background-color: #0084ff; -fx-background-radius: 25;");
 
         String initiales = getInitiales(conv.getInterlocuteurComplet());
-        Label avatarText = new Label(initiales);
-        avatarText.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-        avatar.getChildren().add(avatarText);
+        Label avatarLabel = new Label(initiales);
+        avatarLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        avatar.getChildren().add(avatarLabel);
 
-        // Informations conversation
-        VBox infoBox = new VBox(4);
-        infoBox.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(infoBox, Priority.ALWAYS);
+        // Contenu
+        VBox content = new VBox(4);
+        content.setPrefWidth(200);
 
-        Label nomLabel = new Label(conv.getInterlocuteurComplet());
-        nomLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1c1e21;");
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
 
-        Label messageLabel = new Label(conv.getDernierMessagePreview());
-        messageLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #65676b;");
-        messageLabel.setMaxWidth(200);
+        Label nameLabel = new Label(conv.getInterlocuteurComplet());
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1c1e21; -fx-font-size: 14px;");
 
-        infoBox.getChildren().addAll(nomLabel, messageLabel);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Informations droite (date + badge)
-        VBox rightBox = new VBox(5);
-        rightBox.setAlignment(Pos.TOP_RIGHT);
+        Label timeLabel = new Label(conv.getDernierMessageDateFormatted());
+        timeLabel.setStyle("-fx-text-fill: #8a8d91; -fx-font-size: 12px;");
 
-        Label dateLabel = new Label(conv.getDernierMessageDateFormatted());
-        dateLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #8a8d91;");
+        header.getChildren().addAll(nameLabel, spacer, timeLabel);
 
-        // Badge messages non lus
-        if (conv.hasUnreadMessages()) {
-            Label badge = new Label(String.valueOf(conv.getNbMessagesNonLus()));
-            badge.setStyle("-fx-background-color: #0084ff; -fx-text-fill: white; " +
-                    "-fx-background-radius: 10; -fx-padding: 2 6; " +
-                    "-fx-font-size: 11px; -fx-font-weight: bold;");
-            rightBox.getChildren().addAll(dateLabel, badge);
+        Label lastMsgLabel = new Label(conv.getDernierMessagePreview());
+        lastMsgLabel.setStyle("-fx-text-fill: #8a8d91; -fx-font-size: 13px;");
+        lastMsgLabel.setWrapText(true);
+        lastMsgLabel.setMaxWidth(200);
+
+        content.getChildren().addAll(header, lastMsgLabel);
+
+        // Badge notifications non lues
+        if (conv.getNbMessagesNonLus() > 0) {
+            StackPane badge = new StackPane();
+            badge.setPrefSize(20, 20);
+            badge.setStyle("-fx-background-color: #fa3e3e; -fx-background-radius: 10;");
+
+            Label badgeText = new Label(String.valueOf(conv.getNbMessagesNonLus()));
+            badgeText.setStyle("-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;");
+            badge.getChildren().add(badgeText);
+
+            item.getChildren().addAll(avatar, content, badge);
         } else {
-            rightBox.getChildren().add(dateLabel);
+            item.getChildren().addAll(avatar, content);
         }
-
-        item.getChildren().addAll(avatar, infoBox, rightBox);
-
-        // Hover effect
-        final String finalBaseStyle = baseStyle;
-        item.setOnMouseEntered(e -> {
-            if (currentConversation == null || currentConversation.getIdConversation() != conv.getIdConversation()) {
-                item.setStyle("-fx-background-color: #f2f3f5; -fx-cursor: hand;");
-            }
-        });
-
-        item.setOnMouseExited(e -> {
-            if (currentConversation != null && currentConversation.getIdConversation() == conv.getIdConversation()) {
-                item.setStyle("-fx-background-color: #e7f3ff; -fx-cursor: hand;");
-            } else {
-                item.setStyle(finalBaseStyle);
-            }
-        });
-
-        // Click pour ouvrir la conversation
-        item.setOnMouseClicked(e -> {
-            openConversation(conv);
-            // Mettre à jour le style de la conversation sélectionnée
-            conversationsListContainer.getChildren().forEach(node -> {
-                if (node instanceof HBox) {
-                    HBox hbox = (HBox) node;
-                    if (hbox == item) {
-                        hbox.setStyle("-fx-background-color: #e7f3ff; -fx-cursor: hand;");
-                    } else {
-                        hbox.setStyle("-fx-background-color: white; -fx-cursor: hand;");
-                    }
-                }
-            });
-        });
 
         return item;
     }
 
     /**
+     * Met en surbrillance une conversation dans la liste
+     */
+    private void highlightConversationInList(int idConversation) {
+        for (javafx.scene.Node node : conversationsListContainer.getChildren()) {
+            if (node instanceof HBox) {
+                HBox hbox = (HBox) node;
+                if (hbox.getUserData() != null && hbox.getUserData().equals(idConversation)) {
+                    // Style de sélection
+                    hbox.setStyle("-fx-background-color: #e7f3ff; -fx-border-color: #0084ff; -fx-border-width: 0 0 0 3; -fx-cursor: hand;");
+                } else {
+                    hbox.setStyle("-fx-background-color: white; -fx-border-width: 0; -fx-cursor: hand;");
+                }
+            }
+        }
+    }
+
+    /**
+     * Rafraîchit la liste en gardant la sélection
+     */
+    private void refreshConversationsListKeepingSelection() {
+        Integer selectedId = currentConversation != null ? currentConversation.getIdConversation() : null;
+
+        // Sauvegarder les items sélectionnés
+        List<Object> selectedItems = new java.util.ArrayList<>();
+        for (javafx.scene.Node node : conversationsListContainer.getChildren()) {
+            if (node instanceof HBox) {
+                HBox hbox = (HBox) node;
+                if (hbox.getStyle().contains("#e7f3ff")) {
+                    selectedItems.add(hbox.getUserData());
+                }
+            }
+        }
+
+        // Recharger
+        loadConversations();
+
+        // Restaurer la sélection
+        if (selectedId != null) {
+            highlightConversationInList(selectedId);
+        }
+    }
+
+    /**
      * Ouvre une conversation et charge ses messages
      */
-    private void openConversation(Conversation conv) {
+    public void openConversation(Conversation conv) {
         System.out.println("\n========================================");
         System.out.println("📂 OUVERTURE CONVERSATION");
         System.out.println("========================================");
@@ -246,7 +300,6 @@ public class ChatWindowController implements Initializable {
         System.out.println("Utilisateur actuel: ID=" + currentUserId + ", Role=" + currentUserRole);
         System.out.println("========================================\n");
 
-        // IMPORTANT: Sauvegarder la conversation actuelle
         currentConversation = conv;
         lastMessageCount = 0;
 
@@ -272,7 +325,7 @@ public class ChatWindowController implements Initializable {
         Platform.runLater(() -> messageInputField.requestFocus());
 
         // Rafraîchir la liste des conversations
-        loadConversations();
+        refreshConversationsListKeepingSelection();
     }
 
     /**
@@ -282,14 +335,6 @@ public class ChatWindowController implements Initializable {
         try {
             System.out.println("\n🔄 Chargement messages pour conversation: " + idConversation);
 
-            // VÉRIFICATION CRITIQUE: S'assurer qu'on charge bien la bonne conversation
-            if (currentConversation == null || currentConversation.getIdConversation() != idConversation) {
-                System.err.println("⚠️ ATTENTION: idConversation ne correspond pas à currentConversation!");
-                System.err.println("   Demandé: " + idConversation);
-                System.err.println("   Actuel: " + (currentConversation != null ? currentConversation.getIdConversation() : "NULL"));
-                return;
-            }
-
             List<Message> messages = chatDAO.getMessagesByConversation(idConversation);
 
             // Ne recharger que si le nombre de messages a changé
@@ -298,7 +343,7 @@ public class ChatWindowController implements Initializable {
                 return;
             }
 
-            System.out.println("💬 " + messages.size() + " messages chargés pour conversation " + idConversation);
+            System.out.println("💬 " + messages.size() + " messages chargés");
             lastMessageCount = messages.size();
 
             messagesContainer.getChildren().clear();
@@ -327,7 +372,7 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Crée une bulle de message (style WhatsApp/Messenger)
+     * Crée une bulle de message
      */
     private HBox createMessageBubble(Message msg) {
         HBox container = new HBox();
@@ -399,7 +444,7 @@ public class ChatWindowController implements Initializable {
         String contenu = messageInputField.getText().trim();
 
         if (contenu.isEmpty()) {
-            System.out.println("⚠️ Message vide, non envoyé");
+            System.out.println("⚠ Message vide, non envoyé");
             return;
         }
 
@@ -420,17 +465,55 @@ public class ChatWindowController implements Initializable {
             );
 
             if (success) {
-                System.out.println("✅ Message envoyé: " + contenu);
+                System.out.println("\n✅ === MESSAGE ENVOYÉ DANS L'INTERFACE ===");
+                System.out.println("   Contenu: " + contenu);
+
+                // ================================================
+                // AJOUTER CE CODE POUR LA NOTIFICATION
+                // ================================================
+                try {
+                    // Déterminer qui est le destinataire
+                    int destinataireId;
+
+                    if (currentUserRole.equals("client")) {
+                        // Si le client envoie, le destinataire est le vendeur
+                        destinataireId = currentConversation.getIdVendeur();
+                        System.out.println("📤 Client → Vendeur (ID: " + destinataireId + ")");
+                    } else {
+                        // Si le vendeur envoie, le destinataire est le client
+                        destinataireId = currentConversation.getIdClient();
+                        System.out.println("📤 Vendeur → Client (ID: " + destinataireId + ")");
+                    }
+
+                    // Obtenir le nom de l'expéditeur
+                    String nomExpediteur = SessionManager.getInstance().getUserFullName();
+                    if (nomExpediteur == null || nomExpediteur.isEmpty()) {
+                        nomExpediteur = "Utilisateur";
+                    }
+
+                    // Créer la notification
+                    if (destinataireId > 0) {
+                        notificationService.notifierNouveauMessage(
+                                destinataireId,
+                                currentUserId,
+                                nomExpediteur
+                        );
+                        System.out.println("📨 Notification envoyée à l'utilisateur ID: " + destinataireId);
+                    }
+                } catch (Exception e) {
+                    System.err.println("⚠ Erreur lors de l'envoi de la notification: " + e.getMessage());
+                }
+                // ================================================
 
                 // Vider le champ
                 messageInputField.clear();
 
                 // Recharger les messages immédiatement
-                lastMessageCount = 0; // Force le rechargement
+                lastMessageCount = 0;
                 loadMessages(currentConversation.getIdConversation());
 
                 // Rafraîchir la liste des conversations
-                loadConversations();
+                refreshConversationsListKeepingSelection();
 
                 // Feedback visuel
                 showSuccessNotification("Message envoyé ✓");
@@ -530,18 +613,76 @@ public class ChatWindowController implements Initializable {
     private void startAutoRefresh() {
         autoRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
             if (currentConversation != null) {
-                // Charger les nouveaux messages sans perturber l'utilisateur
+                // Charger les nouveaux messages
                 loadMessages(currentConversation.getIdConversation());
             }
             updateNotificationBadge();
 
-            // Rafraîchir la liste des conversations en arrière-plan
-            if (currentConversation == null) {
-                loadConversations();
-            }
+            // Rafraîchir la liste
+            refreshConversationsListKeepingSelection();
         }));
         autoRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
         autoRefreshTimeline.play();
+    }
+
+    /**
+     * Ouvre une conversation spécifique par son ID
+     */
+    public void openSpecificConversation(int idConversation) {
+        System.out.println("\n🎯 === OUVERTURE AUTOMATIQUE CONVERSATION ===");
+        System.out.println("   ID Conversation: " + idConversation);
+
+        try {
+            // 1. Recharger TOUTES les conversations d'abord
+            loadConversations();
+
+            // 2. Récupérer la conversation spécifique
+            Conversation conversation = chatDAO.getConversationById(idConversation);
+
+            if (conversation != null) {
+                System.out.println("✅ Conversation trouvée: " + conversation.getInterlocuteurComplet());
+
+                // 3. Vérifier si la conversation est déjà dans la liste
+                boolean conversationInList = false;
+                for (javafx.scene.Node node : conversationsListContainer.getChildren()) {
+                    if (node instanceof HBox) {
+                        HBox hbox = (HBox) node;
+                        if (hbox.getUserData() != null &&
+                                hbox.getUserData().equals(idConversation)) {
+                            conversationInList = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 4. Si pas dans la liste, l'ajouter
+                if (!conversationInList) {
+                    System.out.println("📌 Conversation absente de la liste, ajout...");
+                    HBox newItem = createConversationItem(conversation);
+                    conversationsListContainer.getChildren().add(0, newItem);
+                }
+
+                // 5. Ouvrir la conversation
+                openConversation(conversation);
+
+                System.out.println("✅ Conversation " + idConversation + " ouverte automatiquement");
+            } else {
+                System.err.println("❌ Conversation " + idConversation + " introuvable");
+                showError("Erreur", "La conversation n'a pas pu être chargée");
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur ouverture conversation: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Définit le mode "depuis les détails du véhicule"
+     */
+    public void setFromVehicleDetails(boolean fromVehicleDetails) {
+        this.fromVehicleDetails = fromVehicleDetails;
+        System.out.println("🎯 Mode: " + (fromVehicleDetails ? "Depuis détails véhicule" : "Depuis menu"));
     }
 
     /**
@@ -556,7 +697,6 @@ public class ChatWindowController implements Initializable {
     @FXML
     private void showEmojiPicker() {
         System.out.println("😊 Sélecteur d'emoji (à implémenter)");
-        // Ajout d'emojis rapides
         String currentText = messageInputField.getText();
         messageInputField.setText(currentText + "😊");
         messageInputField.positionCaret(messageInputField.getText().length());
@@ -612,6 +752,46 @@ public class ChatWindowController implements Initializable {
     public void cleanup() {
         if (autoRefreshTimeline != null) {
             autoRefreshTimeline.stop();
+        }
+    }
+
+    /**
+     * Initialise le chat en mode "depuis le menu"
+     * (appelé quand on ouvre depuis le menu Messages)
+     */
+    public void initializeFromMenu() {
+        System.out.println("\n📭 === MODE MENU ACTIVÉ ===");
+
+        // Par défaut, montrer le placeholder (pas de conversation ouverte)
+        Platform.runLater(() -> {
+            placeholderView.setVisible(true);
+            placeholderView.setManaged(true);
+            chatContainer.setVisible(false);
+            chatContainer.setManaged(false);
+            currentConversation = null;
+
+            // Désactiver le champ de message
+            if (messageInputField != null) {
+                messageInputField.setDisable(true);
+                messageInputField.clear();
+                messageInputField.setPromptText("Sélectionnez une conversation pour envoyer un message");
+            }
+
+            if (sendButton != null) {
+                sendButton.setDisable(true);
+            }
+        });
+
+        // Charger les conversations
+        loadConversations();
+    }
+    public void setUserInfo(int userId, String userRole) {
+        this.currentUserId = userId;
+        this.currentUserRole = userRole;
+        System.out.println("✅ Chat - Utilisateur défini: ID=" + userId + ", Role=" + userRole);
+
+        if (userId > 0) {
+            loadConversations();
         }
     }
 }
