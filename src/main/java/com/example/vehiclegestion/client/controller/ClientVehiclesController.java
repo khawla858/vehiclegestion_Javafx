@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
 
-
 import com.example.vehiclegestion.common.dao.ChatDAO;
 import com.example.vehiclegestion.common.model.Conversation;
 
@@ -33,7 +32,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 
+// ========== IMPORTS LOGGING ==========
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ClientVehiclesController {
+
+    // ========== LOGGER ==========
+    private static final Logger logger = LoggerFactory.getLogger(ClientVehiclesController.class);
 
     @FXML private TextField minPriceField;
     @FXML private TextField maxPriceField;
@@ -63,26 +69,53 @@ public class ClientVehiclesController {
 
     @FXML
     public void initialize() {
-        if (!sessionManager.estConnecte()) {
-            showAlert("Erreur", "Session invalide");
-            return;
+        logger.info("=== INITIALISATION ClientVehiclesController ===");
+
+        try {
+            // VÃ©rification de la session
+            if (!sessionManager.estConnecte()) {
+                logger.warn("Tentative d'accÃ¨s sans session valide");
+                showAlert("Erreur", "Session invalide");
+                return;
+            }
+
+            currentClientId = sessionManager.getUtilisateurConnecte().getIdUtilisateur();
+            logger.info("Client connectÃ© - ID: {}", currentClientId);
+
+            // Mise Ã  jour des rÃ©servations expirÃ©es
+            logger.debug("Mise Ã  jour des rÃ©servations expirÃ©es...");
+            reservationDAO.updateExpiredReservations();
+
+            // Initialisation des composants
+            initializeFilters();
+            setupFilterAnimations();
+            loadVehiclesFromDatabase();
+
+            // Configuration des listeners
+            setupFilterListeners();
+            setupPriceFieldValidation();
+
+            logger.info("Initialisation terminÃ©e avec succÃ¨s - {} vÃ©hicules chargÃ©s", vehicles.size());
+
+        } catch (Exception e) {
+            logger.error("Erreur critique lors de l'initialisation du contrÃ´leur", e);
+            showAlert("Erreur", "Erreur lors de l'initialisation: " + e.getMessage());
         }
+    }
 
-        currentClientId = sessionManager.getUtilisateurConnecte().getIdUtilisateur();
-        reservationDAO.updateExpiredReservations();
-
-        initializeFilters();
-        setupFilterAnimations();
-        loadVehiclesFromDatabase();
-
+    private void setupFilterListeners() {
+        logger.debug("Configuration des listeners de filtres");
         brandFilter.setOnAction(e -> applyAllFilters());
         typeFilter.setOnAction(e -> applyAllFilters());
         priceFilter.setOnAction(e -> applyAllFilters());
         sortFilter.setOnAction(e -> sortVehicles());
+    }
 
+    private void setupPriceFieldValidation() {
         minPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 minPriceField.setText(newValue.replaceAll("[^\\d]", ""));
+                logger.debug("Validation prix minimum: caractÃ¨res non numÃ©riques supprimÃ©s");
             }
             applyAllFilters();
         });
@@ -90,6 +123,7 @@ public class ClientVehiclesController {
         maxPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 maxPriceField.setText(newValue.replaceAll("[^\\d]", ""));
+                logger.debug("Validation prix maximum: caractÃ¨res non numÃ©riques supprimÃ©s");
             }
             applyAllFilters();
         });
@@ -98,12 +132,12 @@ public class ClientVehiclesController {
     private void setupFilterAnimations() {
         filterToggleBtn.setOnMouseEntered(e -> showFilters());
         filterToggleBtn.setOnMouseClicked(e -> toggleFilters());
-
         filterSidebar.setOnMouseEntered(e -> keepFiltersVisible());
         filterSidebar.setOnMouseExited(e -> hideFiltersAfterDelay());
     }
 
     private void toggleFilters() {
+        logger.debug("Toggle filtres - Ã‰tat actuel: {}", filtersVisible ? "visible" : "cachÃ©");
         if (filtersVisible) {
             hideFilters();
         } else {
@@ -113,6 +147,7 @@ public class ClientVehiclesController {
 
     private void showFilters() {
         if (!filtersVisible) {
+            logger.debug("Affichage de la barre de filtres");
             filtersVisible = true;
             filterSidebar.setMinWidth(FILTERS_WIDTH);
             filterSidebar.setMaxWidth(FILTERS_WIDTH);
@@ -123,6 +158,7 @@ public class ClientVehiclesController {
 
     private void hideFilters() {
         if (filtersVisible) {
+            logger.debug("Masquage de la barre de filtres");
             filtersVisible = false;
             filterSidebar.setMinWidth(0);
             filterSidebar.setMaxWidth(0);
@@ -141,7 +177,7 @@ public class ClientVehiclesController {
                     }
                 });
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Erreur lors du dÃ©lai de masquage des filtres", e);
             }
         }).start();
     }
@@ -151,6 +187,8 @@ public class ClientVehiclesController {
     }
 
     private void initializeFilters() {
+        logger.debug("Initialisation des filtres");
+
         brandFilter.setItems(FXCollections.observableArrayList(
                 "Toutes les marques", "Toyota", "Renault", "Peugeot", "BMW", "Mercedes",
                 "Audi", "Volkswagen", "Ford", "Nissan", "Hyundai", "Dacia", "Kia", "Chevrolet", "Suzuki"
@@ -170,24 +208,39 @@ public class ClientVehiclesController {
         priceFilter.setValue("Tous les prix");
 
         sortFilter.setItems(FXCollections.observableArrayList(
-                "Plus récentes", "Prix croissant", "Prix décroissant",
-                "Marque A-Z", "Les plus consultées", "Meilleures affaires"
+                "Plus rÃ©centes", "Prix croissant", "Prix dÃ©croissant",
+                "Marque A-Z", "Les plus consultÃ©es", "Meilleures affaires"
         ));
-        sortFilter.setValue("Plus récentes");
+        sortFilter.setValue("Plus rÃ©centes");
 
         minPriceField.setText("2000");
         maxPriceField.setText("15000");
+
+        logger.debug("Filtres initialisÃ©s avec succÃ¨s");
     }
 
     private void loadVehiclesFromDatabase() {
+        logger.info("=== CHARGEMENT DES VÃ‰HICULES DEPUIS LA BASE ===");
+
         try {
+            long startTime = System.currentTimeMillis();
             vehicles = vehicleDAO.getAllVehicles();
+            long loadTime = System.currentTimeMillis() - startTime;
 
             if (vehicles.isEmpty()) {
-                System.out.println("ℹ️ Aucun véhicule trouvé dans la base de données");
-                showAlert("Information", "Aucun véhicule n'est disponible pour le moment.");
+                logger.warn("Aucun vÃ©hicule trouvÃ© dans la base de donnÃ©es");
+                showAlert("Information", "Aucun vÃ©hicule n'est disponible pour le moment.");
             } else {
-                System.out.println("✅ " + vehicles.size() + " véhicules chargés depuis la base de données");
+                logger.info("âœ… {} vÃ©hicules chargÃ©s en {} ms", vehicles.size(), loadTime);
+
+                // Log dÃ©taillÃ© du premier vÃ©hicule (debug)
+                if (logger.isDebugEnabled() && !vehicles.isEmpty()) {
+                    Vehicle firstVehicle = vehicles.get(0);
+                    logger.debug("Exemple vÃ©hicule - ID: {}, Titre: {}, Prix: {} DH",
+                            firstVehicle.getId(),
+                            firstVehicle.getTitle(),
+                            firstVehicle.getPrice());
+                }
             }
 
             filteredVehicles.setAll(vehicles);
@@ -195,13 +248,14 @@ public class ClientVehiclesController {
             displayVehicles();
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors du chargement des véhicules: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible de charger les véhicules depuis la base de données: " + e.getMessage());
+            logger.error("âŒ ERREUR CRITIQUE lors du chargement des vÃ©hicules", e);
+            showAlert("Erreur", "Impossible de charger les vÃ©hicules: " + e.getMessage());
         }
     }
 
     private void updateFiltersWithRealData() {
+        logger.debug("Mise Ã  jour des filtres avec les donnÃ©es rÃ©elles");
+
         ObservableList<String> brands = FXCollections.observableArrayList("Toutes les marques");
         ObservableList<String> types = FXCollections.observableArrayList("Tous les types");
 
@@ -219,14 +273,19 @@ public class ClientVehiclesController {
         brandFilter.setItems(brands);
         typeFilter.setItems(types);
         updateResultsCount();
+
+        logger.debug("Filtres mis Ã  jour - {} marques, {} types", brands.size() - 1, types.size() - 1);
     }
 
     private String extractBrandFromTitle(String title) {
-        if (title == null || title.isEmpty()) return "Autre";
+        if (title == null || title.isEmpty()) {
+            logger.debug("Titre vide, marque par dÃ©faut: Autre");
+            return "Autre";
+        }
 
         String[] knownBrands = {"Toyota", "Renault", "Peugeot", "BMW", "Mercedes", "Audi",
                 "Volkswagen", "Ford", "Nissan", "Hyundai", "Dacia", "Kia",
-                "Chevrolet", "Citroën", "Opel", "Fiat", "Seat", "Skoda",
+                "Chevrolet", "CitroÃ«n", "Opel", "Fiat", "Seat", "Skoda",
                 "Mazda", "Mitsubishi", "Honda", "Suzuki", "Volvo", "Jeep"};
 
         for (String brand : knownBrands) {
@@ -240,10 +299,14 @@ public class ClientVehiclesController {
     }
 
     private void displayVehicles() {
+        logger.debug("=== AFFICHAGE DES VÃ‰HICULES ===");
+        logger.debug("Nombre de vÃ©hicules Ã  afficher: {}", filteredVehicles.size());
+
         vehiclesGrid.getChildren().clear();
         favoriteButtons.clear();
 
         if (filteredVehicles.isEmpty()) {
+            logger.info("Aucun vÃ©hicule Ã  afficher - affichage de l'Ã©tat vide");
             emptyState.setVisible(true);
             emptyState.setManaged(true);
             vehiclesGrid.setVisible(false);
@@ -259,10 +322,14 @@ public class ClientVehiclesController {
         int row = 0;
         int columns = filtersVisible ? COLUMNS_WITH_FILTERS : COLUMNS_WITHOUT_FILTERS;
 
+        logger.debug("Configuration grille - Colonnes: {}, Filtres visibles: {}", columns, filtersVisible);
+
+        int displayedCount = 0;
         for (Vehicle vehicle : filteredVehicles) {
             try {
                 VBox vehicleCard = createModernVehicleCard(vehicle);
                 vehiclesGrid.add(vehicleCard, column, row);
+                displayedCount++;
 
                 column++;
                 if (column >= columns) {
@@ -270,15 +337,18 @@ public class ClientVehiclesController {
                     row++;
                 }
             } catch (Exception e) {
-                System.err.println("❌ Erreur création carte pour: " + vehicle.getTitle());
-                e.printStackTrace();
+                logger.error("Erreur lors de la crÃ©ation de la carte pour le vÃ©hicule ID: {} - {}",
+                        vehicle.getId(), vehicle.getTitle(), e);
             }
         }
 
+        logger.info("âœ… {} cartes de vÃ©hicules affichÃ©es avec succÃ¨s", displayedCount);
         updateResultsCount();
     }
 
     private VBox createModernVehicleCard(Vehicle vehicle) {
+        logger.trace("CrÃ©ation carte pour vÃ©hicule ID: {} - {}", vehicle.getId(), vehicle.getTitle());
+
         VBox card = new VBox(0);
         int cardWidth = filtersVisible ? 280 : 300;
         card.setStyle("-fx-background-color: white; " +
@@ -324,7 +394,7 @@ public class ClientVehiclesController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label premiumBadge = new Label("⭐ Premium");
+        Label premiumBadge = new Label("â­ Premium");
         premiumBadge.setStyle("-fx-background-color: #FFF3E0; " +
                 "-fx-text-fill: #FF9800; " +
                 "-fx-padding: 4 8; " +
@@ -334,7 +404,7 @@ public class ClientVehiclesController {
 
         header.getChildren().addAll(avatar, vendorInfo, spacer, premiumBadge);
 
-        // Image du véhicule
+        // Image du vÃ©hicule
         StackPane imageContainer = new StackPane();
         imageContainer.setStyle("-fx-background-color: #f5f5f5; " +
                 "-fx-background-radius: 0;");
@@ -343,7 +413,7 @@ public class ClientVehiclesController {
 
         loadVehicleImage(vehicle, imageContainer);
 
-        Label photoCount = new Label("📷 " + getRandomPhotoCount());
+        Label photoCount = new Label("ðŸ“· " + getRandomPhotoCount());
         photoCount.setStyle("-fx-background-color: rgba(0,0,0,0.6); " +
                 "-fx-text-fill: white; " +
                 "-fx-padding: 5 10; " +
@@ -359,7 +429,7 @@ public class ClientVehiclesController {
 
         HBox locationBox = new HBox(5);
         locationBox.setAlignment(Pos.CENTER_LEFT);
-        Label locationIcon = new Label("📍");
+        Label locationIcon = new Label("ðŸ“");
         Label location = new Label(getRandomCity());
         location.setStyle("-fx-text-fill: #666; -fx-font-size: 11;");
         locationBox.getChildren().addAll(locationIcon, location);
@@ -379,18 +449,18 @@ public class ClientVehiclesController {
         HBox specs = new HBox(15);
         specs.setAlignment(Pos.CENTER_LEFT);
 
-        Label year = new Label("📅 " + extractYearFromTitle(vehicle.getTitle()));
+        Label year = new Label("ðŸ“… " + extractYearFromTitle(vehicle.getTitle()));
         year.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
 
-        Label transmission = new Label("⚙️ " + getRandomTransmission());
+        Label transmission = new Label("âš™ï¸ " + getRandomTransmission());
         transmission.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
 
-        Label fuel = new Label("⛽ " + getRandomFuel());
+        Label fuel = new Label("â›½ " + getRandomFuel());
         fuel.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
 
         specs.getChildren().addAll(year, transmission, fuel);
 
-        // Footer avec prix, indicateur disponibilité et bouton favori
+        // Footer avec prix, disponibilitÃ© et favori
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER_LEFT);
         footer.setStyle("-fx-padding: 15 15 12 15; " +
@@ -412,10 +482,7 @@ public class ClientVehiclesController {
         Region priceSpacer = new Region();
         HBox.setHgrow(priceSpacer, Priority.ALWAYS);
 
-        // INDICATEUR DE DISPONIBILITÉ
         Button availabilityBtn = createAvailabilityButton(vehicle);
-
-        // Bouton favori avec état dynamique
         Button favoriteBtn = createFavoriteButton(vehicle);
         favoriteButtons.put(vehicle.getId(), favoriteBtn);
 
@@ -440,164 +507,197 @@ public class ClientVehiclesController {
         return card;
     }
 
-    // NOUVELLE MÉTHODE : Indicateur de disponibilité (remplace réservation)
     private Button createAvailabilityButton(Vehicle vehicle) {
+        logger.trace("CrÃ©ation bouton disponibilitÃ© pour vÃ©hicule ID: {}", vehicle.getId());
+
         Button availabilityBtn = new Button();
 
-        // Récupérer le statut réel depuis la base de données
-        String statut = vehicle.getStatutVehicule() != null ? vehicle.getStatutVehicule().toLowerCase() : "disponible";
-        boolean estReserve = reservationDAO.isVehiculeReserved(vehicle.getId());
-        boolean estReserveParMoi = reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId());
+        try {
+            String statut = vehicle.getStatutVehicule() != null ? vehicle.getStatutVehicule().toLowerCase() : "disponible";
+            boolean estReserve = reservationDAO.isVehiculeReserved(vehicle.getId());
+            boolean estReserveParMoi = reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId());
 
-        // Logique d'affichage basée sur le statut réel
-        switch (statut) {
-            case "vendu":
-                availabilityBtn.setText("⛔ VENDU");
-                availabilityBtn.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #D32F2F, #B71C1C); " +
-                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
-                                "-fx-padding: 8 12; -fx-background-radius: 15; " +
-                                "-fx-border-radius: 15; " +
-                                "-fx-effect: dropshadow(gaussian, rgba(211,47,47,0.3), 4, 0, 0, 2); " +
-                                "-fx-cursor: default; -fx-border-color: #C62828; -fx-border-width: 1;"
-                );
-                break;
+            logger.debug("VÃ©hicule ID {} - Statut: {}, RÃ©servÃ©: {}, Par moi: {}",
+                    vehicle.getId(), statut, estReserve, estReserveParMoi);
 
-            case "reserve":
-            case "réservé":
-                if (estReserveParMoi) {
-                    availabilityBtn.setText("⭐ VOTRE RÉSERVATION");
+            switch (statut) {
+                case "vendu":
+                    availabilityBtn.setText("â›” VENDU");
                     availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #FFD54F, #FFB300); " +
+                            "-fx-background-color: linear-gradient(to bottom, #D32F2F, #B71C1C); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                    "-fx-border-radius: 15; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(211,47,47,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #C62828; -fx-border-width: 1;"
+                    );
+                    break;
+
+                case "reserve":
+                case "rÃ©servÃ©":
+                    if (estReserveParMoi) {
+                        availabilityBtn.setText("â­ VOTRE RÃ‰SERVATION");
+                        availabilityBtn.setStyle(
+                                "-fx-background-color: linear-gradient(to bottom, #FFD54F, #FFB300); " +
+                                        "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                        "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                        "-fx-border-radius: 15; " +
+                                        "-fx-effect: dropshadow(gaussian, rgba(255,183,0,0.3), 4, 0, 0, 2); " +
+                                        "-fx-cursor: default; -fx-border-color: #FFA000; -fx-border-width: 1;"
+                        );
+                    } else {
+                        availabilityBtn.setText("ðŸ”’ RÃ‰SERVÃ‰");
+                        availabilityBtn.setStyle(
+                                "-fx-background-color: linear-gradient(to bottom, #FFB74D, #FF9800); " +
+                                        "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                        "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                        "-fx-border-radius: 15; " +
+                                        "-fx-effect: dropshadow(gaussian, rgba(255,152,0,0.3), 4, 0, 0, 2); " +
+                                        "-fx-cursor: default; -fx-border-color: #F57C00; -fx-border-width: 1;"
+                        );
+                    }
+                    break;
+
+                case "en attente":
+                    availabilityBtn.setText("â³ EN ATTENTE");
+                    availabilityBtn.setStyle(
+                            "-fx-background-color: linear-gradient(to bottom, #FFCC80, #FFA726); " +
                                     "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
                                     "-fx-padding: 8 10; -fx-background-radius: 15; " +
                                     "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(255,183,0,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #FFA000; -fx-border-width: 1;"
+                                    "-fx-effect: dropshadow(gaussian, rgba(255,167,38,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #FF9800; -fx-border-width: 1;"
                     );
-                } else {
-                    availabilityBtn.setText("🔒 RÉSERVÉ");
+                    break;
+
+                case "indisponible":
+                    availabilityBtn.setText("ðŸš« INDISPONIBLE");
                     availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #FFB74D, #FF9800); " +
-                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
-                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
-                                    "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(255,152,0,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #F57C00; -fx-border-width: 1;"
-                    );
-                }
-                break;
-
-            case "en attente":
-                availabilityBtn.setText("⏳ EN ATTENTE");
-                availabilityBtn.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #FFCC80, #FFA726); " +
-                                "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
-                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
-                                "-fx-border-radius: 15; " +
-                                "-fx-effect: dropshadow(gaussian, rgba(255,167,38,0.3), 4, 0, 0, 2); " +
-                                "-fx-cursor: default; -fx-border-color: #FF9800; -fx-border-width: 1;"
-                );
-                break;
-
-            case "indisponible":
-                availabilityBtn.setText("🚫 INDISPONIBLE");
-                availabilityBtn.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #90A4AE, #78909C); " +
-                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
-                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
-                                "-fx-border-radius: 15; " +
-                                "-fx-effect: dropshadow(gaussian, rgba(120,144,156,0.3), 4, 0, 0, 2); " +
-                                "-fx-cursor: default; -fx-border-color: #607D8B; -fx-border-width: 1;"
-                );
-                break;
-
-            case "disponible":
-            case "en stock":
-            default:
-                if (estReserve) {
-                    availabilityBtn.setText("📝 EN COURS");
-                    availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #81C784, #4CAF50); " +
+                            "-fx-background-color: linear-gradient(to bottom, #90A4AE, #78909C); " +
                                     "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
                                     "-fx-padding: 8 10; -fx-background-radius: 15; " +
                                     "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(76,175,80,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #388E3C; -fx-border-width: 1;"
+                                    "-fx-effect: dropshadow(gaussian, rgba(120,144,156,0.3), 4, 0, 0, 2); " +
+                                    "-fx-cursor: default; -fx-border-color: #607D8B; -fx-border-width: 1;"
                     );
-                } else {
-                    availabilityBtn.setText("✅ DISPONIBLE");
-                    availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #66BB6A, #43A047); " +
-                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
-                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
-                                    "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(67,160,71,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #2E7D32; -fx-border-width: 1;"
-                    );
-                }
-                break;
+                    break;
+
+                case "disponible":
+                case "en stock":
+                default:
+                    if (estReserve) {
+                        availabilityBtn.setText("ðŸ“ EN COURS");
+                        availabilityBtn.setStyle(
+                                "-fx-background-color: linear-gradient(to bottom, #81C784, #4CAF50); " +
+                                        "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
+                                        "-fx-padding: 8 10; -fx-background-radius: 15; " +
+                                        "-fx-border-radius: 15; " +
+                                        "-fx-effect: dropshadow(gaussian, rgba(76,175,80,0.3), 4, 0, 0, 2); " +
+                                        "-fx-cursor: default; -fx-border-color: #388E3C; -fx-border-width: 1;"
+                        );
+                    } else {
+                        availabilityBtn.setText("âœ… DISPONIBLE");
+                        availabilityBtn.setStyle(
+                                "-fx-background-color: linear-gradient(to bottom, #66BB6A, #43A047); " +
+                                        "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                        "-fx-padding: 8 12; -fx-background-radius: 15; " +
+                                        "-fx-border-radius: 15; " +
+                                        "-fx-effect: dropshadow(gaussian, rgba(67,160,71,0.3), 4, 0, 0, 2); " +
+                                        "-fx-cursor: default; -fx-border-color: #2E7D32; -fx-border-width: 1;"
+                        );
+                    }
+                    break;
+            }
+
+            availabilityBtn.setDisable(true);
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la crÃ©ation du bouton disponibilitÃ© pour vÃ©hicule ID: {}", vehicle.getId(), e);
+            availabilityBtn.setText("â“ STATUT INCONNU");
+            availabilityBtn.setStyle("-fx-background-color: #E0E0E0; -fx-text-fill: #666; -fx-font-size: 10; -fx-padding: 8 10;");
+            availabilityBtn.setDisable(true);
         }
 
-        availabilityBtn.setDisable(true);
         return availabilityBtn;
     }
 
-    private String getButtonStyle(String backgroundColor, String textColor) {
-        return "-fx-background-color: " + backgroundColor + "; " +
-                "-fx-text-fill: " + textColor + "; " +
-                "-fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 6 10; " +
-                "-fx-background-radius: 12; -fx-cursor: default;";
-    }
-
     private Button createFavoriteButton(Vehicle vehicle) {
-        boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
+        logger.trace("CrÃ©ation bouton favori pour vÃ©hicule ID: {}", vehicle.getId());
 
-        Button favoriteBtn = new Button("🛒");
-        favoriteBtn.setStyle(
-                "-fx-background-color: " + (isFav ? "#4CAF50" : "#f5f5f5") + "; " +
-                        "-fx-text-fill: " + (isFav ? "white" : "#666") + "; " +
-                        "-fx-font-size: 16; -fx-padding: 6 8; " +
-                        "-fx-background-radius: 20; -fx-cursor: hand; -fx-border-width: 0;"
-        );
+        try {
+            boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
+            logger.debug("VÃ©hicule ID {} - Est favori: {}", vehicle.getId(), isFav);
 
-        favoriteBtn.setOnAction(e -> toggleFavorite(vehicle, favoriteBtn));
+            Button favoriteBtn = new Button("ðŸ›’");
+            favoriteBtn.setStyle(
+                    "-fx-background-color: " + (isFav ? "#4CAF50" : "#f5f5f5") + "; " +
+                            "-fx-text-fill: " + (isFav ? "white" : "#666") + "; " +
+                            "-fx-font-size: 16; -fx-padding: 6 8; " +
+                            "-fx-background-radius: 20; -fx-cursor: hand; -fx-border-width: 0;"
+            );
 
-        return favoriteBtn;
+            favoriteBtn.setOnAction(e -> toggleFavorite(vehicle, favoriteBtn));
+
+            return favoriteBtn;
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la crÃ©ation du bouton favori pour vÃ©hicule ID: {}", vehicle.getId(), e);
+            Button errorBtn = new Button("ðŸ›’");
+            errorBtn.setDisable(true);
+            return errorBtn;
+        }
     }
 
     private void toggleFavorite(Vehicle vehicle, Button button) {
-        boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
+        logger.info("Toggle favori pour vÃ©hicule ID: {} - Client ID: {}", vehicle.getId(), currentClientId);
 
-        if (isFav) {
-            boolean success = favoriteDAO.removeFavorite(currentClientId, vehicle.getId());
-            if (success) {
-                button.setText("🛒");
-                button.setStyle(
-                        "-fx-background-color: #f5f5f5; -fx-text-fill: #666; " +
-                                "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
-                                "-fx-cursor: hand; -fx-border-width: 0;"
-                );
+        try {
+            boolean isFav = favoriteDAO.isFavorite(currentClientId, vehicle.getId());
+
+            if (isFav) {
+                boolean success = favoriteDAO.removeFavorite(currentClientId, vehicle.getId());
+                if (success) {
+                    logger.info("âœ… Favori retirÃ© - VÃ©hicule ID: {}", vehicle.getId());
+                    button.setText("ðŸ›’");
+                    button.setStyle(
+                            "-fx-background-color: #f5f5f5; -fx-text-fill: #666; " +
+                                    "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
+                                    "-fx-cursor: hand; -fx-border-width: 0;"
+                    );
+                } else {
+                    logger.warn("âŒ Ã‰chec du retrait du favori - VÃ©hicule ID: {}", vehicle.getId());
+                }
+            } else {
+                boolean success = favoriteDAO.addFavorite(currentClientId, vehicle.getId());
+                if (success) {
+                    logger.info("âœ… Favori ajoutÃ© - VÃ©hicule ID: {}", vehicle.getId());
+                    button.setText("ðŸ›’");
+                    button.setStyle(
+                            "-fx-background-color: #4CAF50; -fx-text-fill: white; " +
+                                    "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
+                                    "-fx-cursor: hand; -fx-border-width: 0;"
+                    );
+                } else {
+                    logger.warn("âŒ Ã‰chec de l'ajout du favori - VÃ©hicule ID: {}", vehicle.getId());
+                }
             }
-        } else {
-            boolean success = favoriteDAO.addFavorite(currentClientId, vehicle.getId());
-            if (success) {
-                button.setText("🛒");
-                button.setStyle(
-                        "-fx-background-color: #4CAF50; -fx-text-fill: white; " +
-                                "-fx-font-size: 16; -fx-padding: 6 8; -fx-background-radius: 20; " +
-                                "-fx-cursor: hand; -fx-border-width: 0;"
-                );
-            }
+
+        } catch (Exception e) {
+            logger.error("Erreur lors du toggle favori - VÃ©hicule ID: " + vehicle.getId(), e);
+            showAlert("Erreur", "Impossible de modifier les favoris");
         }
     }
+
     private void loadVehicleImage(Vehicle vehicle, StackPane container) {
+        logger.trace("Chargement image pour vÃ©hicule ID: {}", vehicle.getId());
+
         if (vehicle.getImage() != null && !vehicle.getImage().trim().isEmpty()) {
             try {
                 String imagePath = vehicle.getImage();
                 File imageFile = new File(imagePath);
 
                 if (imageFile.exists()) {
+                    logger.debug("Image trouvÃ©e: {}", imagePath);
                     Image image = new Image(imageFile.toURI().toString(), true);
                     ImageView imageView = new ImageView(image);
                     imageView.setFitWidth(filtersVisible ? 280 : 240);
@@ -607,18 +707,22 @@ public class ClientVehiclesController {
 
                     image.errorProperty().addListener((obs, oldVal, newVal) -> {
                         if (newVal) {
+                            logger.warn("Erreur de chargement image pour vÃ©hicule ID: {}", vehicle.getId());
                             showDefaultImage(container);
                         }
                     });
 
                     container.getChildren().add(0, imageView);
                 } else {
+                    logger.debug("Image non trouvÃ©e sur le disque: {}", imagePath);
                     showDefaultImage(container);
                 }
             } catch (Exception e) {
+                logger.error("Exception lors du chargement de l'image pour vÃ©hicule ID: {}", vehicle.getId(), e);
                 showDefaultImage(container);
             }
         } else {
+            logger.debug("Pas d'image dÃ©finie pour vÃ©hicule ID: {}", vehicle.getId());
             showDefaultImage(container);
         }
     }
@@ -634,36 +738,63 @@ public class ClientVehiclesController {
 
     @FXML
     private void applyAllFilters() {
+        logger.info("=== APPLICATION DES FILTRES ===");
+        long startTime = System.currentTimeMillis();
+
+        int initialCount = vehicles.size();
         filteredVehicles.setAll(vehicles);
 
-        if (brandFilter.getValue() != null && !brandFilter.getValue().equals("Toutes les marques")) {
-            filteredVehicles.removeIf(v -> !extractBrandFromTitle(v.getTitle()).equals(brandFilter.getValue()));
-        }
-
-        if (typeFilter.getValue() != null && !typeFilter.getValue().equals("Tous les types")) {
-            filteredVehicles.removeIf(v -> v.getCategory() == null || !v.getCategory().equals(typeFilter.getValue()));
-        }
-
-        if (priceFilter.getValue() != null && !priceFilter.getValue().equals("Tous les prix")) {
-            filteredVehicles.removeIf(v -> !matchesPriceRange(v.getPrice(), priceFilter.getValue()));
-        }
-
         try {
+            // Filtre marque
+            if (brandFilter.getValue() != null && !brandFilter.getValue().equals("Toutes les marques")) {
+                String selectedBrand = brandFilter.getValue();
+                filteredVehicles.removeIf(v -> !extractBrandFromTitle(v.getTitle()).equals(selectedBrand));
+                logger.debug("Filtre marque '{}' appliquÃ© - {} vÃ©hicules restants", selectedBrand, filteredVehicles.size());
+            }
+
+            // Filtre type
+            if (typeFilter.getValue() != null && !typeFilter.getValue().equals("Tous les types")) {
+                String selectedType = typeFilter.getValue();
+                filteredVehicles.removeIf(v -> v.getCategory() == null || !v.getCategory().equals(selectedType));
+                logger.debug("Filtre type '{}' appliquÃ© - {} vÃ©hicules restants", selectedType, filteredVehicles.size());
+            }
+
+            // Filtre gamme de prix
+            if (priceFilter.getValue() != null && !priceFilter.getValue().equals("Tous les prix")) {
+                String selectedRange = priceFilter.getValue();
+                filteredVehicles.removeIf(v -> !matchesPriceRange(v.getPrice(), selectedRange));
+                logger.debug("Filtre prix '{}' appliquÃ© - {} vÃ©hicules restants", selectedRange, filteredVehicles.size());
+            }
+
+            // Filtre prix min/max
             double minPrice = minPriceField.getText().isEmpty() ? 0 : Double.parseDouble(minPriceField.getText());
             double maxPrice = maxPriceField.getText().isEmpty() ? Double.MAX_VALUE : Double.parseDouble(maxPriceField.getText());
 
             if (minPrice > 0 || maxPrice < Double.MAX_VALUE) {
                 filteredVehicles.removeIf(v -> v.getPrice() < minPrice || v.getPrice() > maxPrice);
+                logger.debug("Filtre prix personnalisÃ© [{} - {}] appliquÃ© - {} vÃ©hicules restants",
+                        minPrice, maxPrice, filteredVehicles.size());
             }
-        } catch (NumberFormatException e) {
-            System.err.println("❌ Format de prix invalide");
-        }
 
-        displayVehicles();
+            long filterTime = System.currentTimeMillis() - startTime;
+            logger.info("âœ… Filtres appliquÃ©s en {} ms - {} â†’ {} vÃ©hicules",
+                    filterTime, initialCount, filteredVehicles.size());
+
+            displayVehicles();
+
+        } catch (NumberFormatException e) {
+            logger.error("Erreur de format dans les champs de prix", e);
+            showAlert("Erreur", "Format de prix invalide");
+        } catch (Exception e) {
+            logger.error("Erreur lors de l'application des filtres", e);
+            showAlert("Erreur", "Erreur lors du filtrage: " + e.getMessage());
+        }
     }
 
     @FXML
     private void resetFilters() {
+        logger.info("RÃ©initialisation des filtres");
+
         brandFilter.setValue("Toutes les marques");
         typeFilter.setValue("Tous les types");
         priceFilter.setValue("Tous les prix");
@@ -672,6 +803,8 @@ public class ClientVehiclesController {
 
         filteredVehicles.setAll(vehicles);
         displayVehicles();
+
+        logger.info("Filtres rÃ©initialisÃ©s - {} vÃ©hicules affichÃ©s", filteredVehicles.size());
     }
 
     private boolean matchesPriceRange(double price, String range) {
@@ -688,28 +821,139 @@ public class ClientVehiclesController {
     @FXML
     private void sortVehicles() {
         String sortBy = sortFilter.getValue();
+        logger.info("Tri des vÃ©hicules par: {}", sortBy);
+
         if (sortBy != null) {
-            switch (sortBy) {
-                case "Prix croissant":
-                    filteredVehicles.sort((v1, v2) -> Double.compare(v1.getPrice(), v2.getPrice()));
-                    break;
-                case "Prix décroissant":
-                    filteredVehicles.sort((v1, v2) -> Double.compare(v2.getPrice(), v1.getPrice()));
-                    break;
-                case "Plus récentes":
-                    filteredVehicles.sort((v1, v2) -> {
-                        if (v1.getDateAdded() == null) return -1;
-                        if (v2.getDateAdded() == null) return 1;
-                        return v2.getDateAdded().compareTo(v1.getDateAdded());
-                    });
-                    break;
-                case "Marque A-Z":
-                    filteredVehicles.sort((v1, v2) -> extractBrandFromTitle(v1.getTitle()).compareTo(extractBrandFromTitle(v2.getTitle())));
-                    break;
+            try {
+                long startTime = System.currentTimeMillis();
+
+                switch (sortBy) {
+                    case "Prix croissant":
+                        filteredVehicles.sort((v1, v2) -> Double.compare(v1.getPrice(), v2.getPrice()));
+                        break;
+                    case "Prix dÃ©croissant":
+                        filteredVehicles.sort((v1, v2) -> Double.compare(v2.getPrice(), v1.getPrice()));
+                        break;
+                    case "Plus rÃ©centes":
+                        filteredVehicles.sort((v1, v2) -> {
+                            if (v1.getDateAdded() == null) return -1;
+                            if (v2.getDateAdded() == null) return 1;
+                            return v2.getDateAdded().compareTo(v1.getDateAdded());
+                        });
+                        break;
+                    case "Marque A-Z":
+                        filteredVehicles.sort((v1, v2) -> extractBrandFromTitle(v1.getTitle()).compareTo(extractBrandFromTitle(v2.getTitle())));
+                        break;
+                }
+
+                long sortTime = System.currentTimeMillis() - startTime;
+                logger.info("âœ… Tri effectuÃ© en {} ms", sortTime);
+                displayVehicles();
+
+            } catch (Exception e) {
+                logger.error("Erreur lors du tri des vÃ©hicules", e);
             }
-            displayVehicles();
         }
     }
+
+    private void viewVehicleDetails(Vehicle vehicle) {
+        logger.info("=== OUVERTURE DÃ‰TAILS VÃ‰HICULE ===");
+        logger.info("VÃ©hicule ID: {} - Titre: {}", vehicle.getId(), vehicle.getTitle());
+
+        try {
+            String fxmlPath = "/view/client/Vehicle-Detail.fxml";
+            logger.debug("Chemin FXML: {}", fxmlPath);
+
+            URL url = getClass().getResource(fxmlPath);
+
+            if (url == null) {
+                logger.warn("Fichier FXML non trouvÃ©, tentative de chemins alternatifs");
+                String[] testPaths = {
+                        "/com/example/vehiclegestion/view/client/Vehicle-Detail.fxml",
+                        "/view/client/Vehicle-Detail.fxml",
+                        "/client/Vehicle-Detail.fxml",
+                        "Vehicle-Detail.fxml"
+                };
+
+                for (String path : testPaths) {
+                    url = getClass().getResource(path);
+                    logger.debug("Test '{}' â†’ {}", path, (url != null ? "TROUVÃ‰" : "NON TROUVÃ‰"));
+                    if (url != null) {
+                        fxmlPath = path;
+                        break;
+                    }
+                }
+            }
+
+            if (url == null) {
+                logger.error("âŒ Fichier FXML introuvable: Vehicle-Detail.fxml");
+                throw new IOException("Fichier FXML introuvable: Vehicle-Detail.fxml");
+            }
+
+            logger.info("âœ… Chargement FXML depuis: {}", fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent root = loader.load();
+            logger.debug("âœ… FXML chargÃ©");
+
+            VehiDetaiCo controller = loader.getController();
+            logger.debug("âœ… ContrÃ´leur rÃ©cupÃ©rÃ©: {}", controller.getClass().getSimpleName());
+
+            Article article = convertVehicleToArticle(vehicle);
+            logger.debug("âœ… Vehicle converti en Article - ID: {}", article.getId());
+
+            controller.receiveData(article);
+            logger.debug("âœ… DonnÃ©es transmises au contrÃ´leur");
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.setTitle("DÃ©tails du vÃ©hicule - " + vehicle.getTitle());
+            stage.show();
+
+            logger.info("ðŸŽ‰ FenÃªtre de dÃ©tails ouverte avec succÃ¨s");
+
+        } catch (IOException e) {
+            logger.error("âŒ Erreur IO lors de l'ouverture des dÃ©tails", e);
+            showAlert("Erreur", "Impossible d'ouvrir les dÃ©tails: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("âŒ Erreur critique lors de l'ouverture des dÃ©tails", e);
+            showAlert("Erreur", "Erreur inattendue: " + e.getMessage());
+        }
+    }
+
+    private Article convertVehicleToArticle(Vehicle vehicle) {
+        logger.debug("Conversion Vehicle â†’ Article - ID: {}", vehicle.getId());
+
+        Article article = new Article();
+        article.setId(vehicle.getId());
+        article.setTitre(vehicle.getTitle());
+        article.setPrix(vehicle.getPrice());
+        article.setDescription(vehicle.getDescription());
+        article.setImage(vehicle.getImage());
+        article.setCategorie(vehicle.getCategory());
+        article.setAnnee(2023);
+        article.setKilometrage(50000);
+        article.setTransmission("Manuelle");
+        article.setCarburant("Essence");
+        article.setMarque(extractBrandFromTitle(vehicle.getTitle()));
+        article.setModele(vehicle.getTitle());
+        article.setPuissance(120);
+        article.setEtat("Excellent");
+
+        logger.debug("âœ… Article crÃ©Ã© - ID: {}, Titre: {}", article.getId(), article.getTitre());
+        return article;
+    }
+
+    private void showAlert(String title, String message) {
+        logger.debug("Affichage alerte - Titre: {}, Message: {}", title, message);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // ========== MÃ‰THODES UTILITAIRES ==========
 
     private void showDefaultImage(StackPane container) {
         container.getChildren().clear();
@@ -719,7 +963,7 @@ public class ClientVehiclesController {
         placeholder.setAlignment(Pos.CENTER);
         placeholder.setStyle("-fx-padding: 20;");
 
-        Label carIcon = new Label("🚗");
+        Label carIcon = new Label("ðŸš—");
         carIcon.setStyle("-fx-font-size: 48;");
 
         Label noImageText = new Label("Aucune image");
@@ -753,7 +997,7 @@ public class ClientVehiclesController {
     }
 
     private String getRandomCity() {
-        String[] cities = {"Casablanca", "Rabat", "Marrakech", "Fès", "Tanger", "Agadir", "El Jadida"};
+        String[] cities = {"Casablanca", "Rabat", "Marrakech", "FÃ¨s", "Tanger", "Agadir", "El Jadida"};
         return cities[(int)(Math.random() * cities.length)];
     }
 
@@ -765,12 +1009,12 @@ public class ClientVehiclesController {
     }
 
     private String getRandomTransmission() {
-        String[] transmissions = {"Automatique", "Manuelle", "Séquentielle"};
+        String[] transmissions = {"Automatique", "Manuelle", "SÃ©quentielle"};
         return transmissions[(int)(Math.random() * transmissions.length)];
     }
 
     private String getRandomFuel() {
-        String[] fuels = {"Essence", "Diesel", "Hybride", "Électrique"};
+        String[] fuels = {"Essence", "Diesel", "Hybride", "Ã‰lectrique"};
         return fuels[(int)(Math.random() * fuels.length)];
     }
 
@@ -791,105 +1035,5 @@ public class ClientVehiclesController {
 
     private void updateResultsCount() {
         resultsCount.setText(filteredVehicles.size() + " annonces");
-    }
-
-    private void viewVehicleDetails(Vehicle vehicle) {
-        System.out.println("🎯 DEBUT viewVehicleDetails pour: " + vehicle.getTitle());
-
-        try {
-            String fxmlPath = "/view/client/Vehicle-Detail.fxml";
-            System.out.println("🔍 Chemin FXML testé: " + fxmlPath);
-
-            URL url = getClass().getResource(fxmlPath);
-            System.out.println("📁 URL trouvée: " + (url != null ? "✅ OUI" : "❌ NON"));
-
-            if (url == null) {
-                String[] testPaths = {
-                        "/com/example/vehiclegestion/view/client/Vehicle-Detail.fxml",
-                        "/view/client/Vehicle-Detail.fxml",
-                        "/client/Vehicle-Detail.fxml",
-                        "Vehicle-Detail.fxml"
-                };
-
-                for (String path : testPaths) {
-                    url = getClass().getResource(path);
-                    System.out.println("Test '" + path + "' → " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
-                    if (url != null) {
-                        fxmlPath = path;
-                        break;
-                    }
-                }
-            }
-
-            if (url == null) {
-                throw new IOException("Fichier FXML introuvable: Vehicle-detail.fxml");
-            }
-
-            System.out.println("✅ Chargement FXML depuis: " + fxmlPath);
-
-            FXMLLoader loader = new FXMLLoader(url);
-            Parent root = loader.load();
-            System.out.println("✅ FXML chargé avec succès");
-
-            VehiDetaiCo controller = loader.getController();
-            System.out.println("✅ Contrôleur récupéré: " + controller.getClass().getSimpleName());
-
-            Article article = convertVehicleToArticle(vehicle);
-            System.out.println("✅ Article converti: " + article.getTitre());
-
-            controller.receiveData(article);
-            System.out.println("✅ Données transmises au contrôleur");
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root, 1200, 800));
-            stage.setTitle("Détails du véhicule - " + vehicle.getTitle());
-
-            System.out.println("✅ Nouvelle fenêtre créée");
-
-            stage.show();
-            System.out.println("🎉 Fenêtre de détails affichée avec succès!");
-
-        } catch (Exception e) {
-            System.err.println("❌ ERREUR CRITIQUE dans viewVehicleDetails: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible d'ouvrir les détails du véhicule: " + e.getMessage());
-        }
-    }
-
-    private Article convertVehicleToArticle(Vehicle vehicle) {
-        System.out.println("🔄 === CONVERSION VEHICLE → ARTICLE ===");
-        System.out.println("   Vehicle ID: " + vehicle.getId());
-
-        Article article = new Article();
-
-        // ✅ CORRECTION CRITIQUE: Définir l'ID de l'article
-        article.setId(vehicle.getId()); // ⭐⭐ CETTE LIGNE MANQUE !
-
-        article.setTitre(vehicle.getTitle());
-        article.setPrix(vehicle.getPrice());
-        article.setDescription(vehicle.getDescription());
-        article.setImage(vehicle.getImage());
-        article.setCategorie(vehicle.getCategory());
-
-        article.setAnnee(2023);
-        article.setKilometrage(50000);
-        article.setTransmission("Manuelle");
-        article.setCarburant("Essence");
-        article.setMarque(extractBrandFromTitle(vehicle.getTitle()));
-        article.setModele(vehicle.getTitle());
-        article.setPuissance(120);
-        article.setEtat("Excellent");
-
-        System.out.println("✅ Article converti - ID: " + article.getId() + ", Titre: " + article.getTitre());
-
-        return article;
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

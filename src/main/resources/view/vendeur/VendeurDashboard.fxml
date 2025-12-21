@@ -12,154 +12,136 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.VendeurDashboardController"
             fitToWidth="true"
-            style="-fx-background-color: #f4f6f9;"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);"
             vbarPolicy="ALWAYS"
             stylesheets="@/com/example/vehiclegestion/css/vendeur.css">
 
-    <!-- Contenu principal encapsulé dans le ScrollPane -->
-    <VBox spacing="25" style="-fx-padding: 25">
-        <!-- 1. CARTES DE STATISTIQUES -->
+    <VBox spacing="25" style="-fx-padding: 25; -fx-background-color: transparent;">
+        <!-- 1. CARTES DE STATISTIQUES PRINCIPALES -->
         <HBox spacing="20" alignment="CENTER">
             <!-- Total ventes -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-shopping-cart" iconSize="30" iconColor="#3498db"/>
-                <Label text="Total ventes" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-                <Label fx:id="totalSalesLabel" text="120" style="-fx-font-size: 22px; -fx-text-fill: #2c3e50;"/>
+            <VBox alignment="CENTER" spacing="12" prefWidth="220" prefHeight="140"
+                  style="-fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6); -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-color: rgba(30, 41, 59, 0.9); -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.4), 15, 0.6, 0, 4); -fx-border-width: 2;">
+                <FontIcon iconLiteral="fas-shopping-cart" iconSize="36" iconColor="#3b82f6"/>
+                <Label text="Total ventes" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #cbd5e1;"/>
+                <Label fx:id="totalSalesLabel" text="120" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
 
             <!-- Revenus -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-money-bill-wave" iconSize="30" iconColor="#27ae60"/>
-                <Label text="Revenus" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-                <Label fx:id="revenueLabel" text="45.000 MAD" style="-fx-font-size: 22px; -fx-text-fill: #2c3e50;"/>
+            <VBox alignment="CENTER" spacing="12" prefWidth="220" prefHeight="140"
+                  style="-fx-border-color: linear-gradient(to right, #10b981, #3b82f6); -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-color: rgba(30, 41, 59, 0.9); -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 15, 0.6, 0, 4); -fx-border-width: 2;">
+                <FontIcon iconLiteral="fas-money-bill-wave" iconSize="36" iconColor="#10b981"/>
+                <Label text="Revenus totaux" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #cbd5e1;"/>
+                <Label fx:id="revenueLabel" text="45.000 MAD" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
 
             <!-- Clients actifs -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-users" iconSize="30" iconColor="#e74c3c"/>
-                <Label text="Clients actifs" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-                <Label fx:id="activeClientsLabel" text="25" style="-fx-font-size: 22px; -fx-text-fill: #2c3e50;"/>
+            <VBox alignment="CENTER" spacing="12" prefWidth="220" prefHeight="140"
+                  style="-fx-border-color: linear-gradient(to right, #f59e0b, #f97316); -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-color: rgba(30, 41, 59, 0.9); -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.4), 15, 0.6, 0, 4); -fx-border-width: 2;">
+                <FontIcon iconLiteral="fas-users" iconSize="36" iconColor="#f59e0b"/>
+                <Label text="Clients actifs" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #cbd5e1;"/>
+                <Label fx:id="activeClientsLabel" text="25" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
 
-            <!-- Commandes en cours -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-truck" iconSize="30" iconColor="#f39c12"/>
-                <Label text="Commandes en cours" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-                <Label fx:id="pendingOrdersLabel" text="8" style="-fx-font-size: 22px; -fx-text-fill: #2c3e50;"/>
-            </VBox>
-        </HBox>
 
         <!-- Statistiques supplémentaires -->
-        <HBox spacing="20" alignment="CENTER">
+
             <!-- Total Articles -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-cubes" iconSize="24" iconColor="#3498db"/>
-                <Label text="Total Articles" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                <Label fx:id="totalArticlesLabel" text="0" style="-fx-font-size: 18px; -fx-text-fill: #2c3e50;"/>
+            <VBox alignment="CENTER" spacing="10" prefWidth="200" prefHeight="110"
+                  style="-fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6); -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-color: rgba(30, 50, 59, 0.9); -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.4), 15, 0.6, 0, 4); -fx-border-width: 2;">
+                <FontIcon iconLiteral="fas-cubes" iconSize="28" iconColor="#3b82f6"/>
+                <Label text="Total Articles" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #cbd5e1;"/>
+                <Label fx:id="totalArticlesLabel" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
 
             <!-- Articles Disponibles -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-check-circle" iconSize="24" iconColor="#27ae60"/>
-                <Label text="Disponibles" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                <Label fx:id="availableArticlesLabel" text="0" style="-fx-font-size: 18px; -fx-text-fill: #2c3e50;"/>
-            </VBox>
-
-            <!-- Note Moyenne -->
-            <VBox alignment="CENTER" spacing="10" prefWidth="180"
-                  style="-fx-border-color: #e0e0e0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: white; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <FontIcon iconLiteral="fas-star" iconSize="24" iconColor="#f39c12"/>
-                <Label text="Note Moyenne" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                <Label fx:id="avgRatingLabel" text="0.0" style="-fx-font-size: 18px; -fx-text-fill: #2c3e50;"/>
+            <VBox alignment="CENTER" spacing="10" prefWidth="200" prefHeight="110"
+                  style="-fx-border-color: linear-gradient(to right, #10b981, #3b82f6); -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-color: rgba(30, 41, 59, 0.9); -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 15, 0.6, 0, 4); -fx-border-width: 2;">
+                <FontIcon iconLiteral="fas-check-circle" iconSize="28" iconColor="#10b981"/>
+                <Label text="Articles Disponibles" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #cbd5e1;"/>
+                <Label fx:id="availableArticlesLabel" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
         </HBox>
 
-        <!-- 2. BAS : DIVISÉ EN DEUX COLONNES -->
+        <!-- 2. SECTION GRAPHIQUES ET ACTIVITÉS -->
         <HBox spacing="25">
-            <!-- GAUCHE : GRAPHIQUES (plus large) -->
+            <!-- GAUCHE : GRAPHIQUES -->
             <VBox spacing="20" HBox.hgrow="ALWAYS">
                 <!-- Graphique des ventes -->
-                <VBox spacing="10">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <FontIcon iconLiteral="fas-chart-line" iconSize="16" iconColor="#3498db"/>
+                <VBox spacing="12" style="-fx-background-color: rgba(30, 41, 59, 0.9); -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.5, 0, 4);">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <FontIcon iconLiteral="fas-chart-line" iconSize="18" iconColor="#3b82f6"/>
                         <Label text="Évolution des ventes mensuelles"
-                               style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
+                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: white;"/>
                     </HBox>
-                    <LineChart fx:id="salesChart" prefWidth="700" prefHeight="250">
+                    <LineChart fx:id="salesChart" prefWidth="700" prefHeight="280"
+                               style="-fx-background-color: transparent;">
                         <xAxis>
-                            <CategoryAxis label="Mois"/>
+                            <CategoryAxis label="Mois" style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
                         </xAxis>
                         <yAxis>
-                            <NumberAxis label="Ventes"/>
+                            <NumberAxis label="Ventes" style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
                         </yAxis>
                     </LineChart>
                 </VBox>
 
                 <!-- Répartition des produits -->
-                <VBox spacing="10">
-                    <HBox spacing="20">
-                        <VBox>
-                            <HBox alignment="CENTER_LEFT" spacing="10">
-                                <FontIcon iconLiteral="fas-chart-pie" iconSize="16" iconColor="#3498db"/>
-                                <Label text="Répartition des produits vendus"
-                                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
-                            </HBox>
-                            <PieChart fx:id="productsPieChart" prefWidth="350" prefHeight="300"/>
-                        </VBox>
+                <HBox spacing="20">
+                    <VBox spacing="12" style="-fx-background-color: rgba(30, 41, 59, 0.9); -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.5, 0, 4);">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <FontIcon iconLiteral="fas-chart-pie" iconSize="18" iconColor="#8b5cf6"/>
+                            <Label text="Répartition des produits"
+                                   style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: white;"/>
+                        </HBox>
+                        <PieChart fx:id="productsPieChart" prefWidth="350" prefHeight="320"
+                                  style="-fx-background-color: transparent;"/>
+                    </VBox>
 
-                        <VBox>
-                            <HBox alignment="CENTER_LEFT" spacing="10">
-                                <FontIcon iconLiteral="fas-chart-bar" iconSize="16" iconColor="#3498db"/>
-                                <Label text="Ventes par catégorie par mois (%)"
-                                       style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;"/>
-                            </HBox>
-                            <StackedBarChart fx:id="categorySalesChart" prefWidth="390" prefHeight="320">
-                                <xAxis>
-                                    <CategoryAxis label="Mois"/>
-                                </xAxis>
-                                <yAxis>
-                                    <NumberAxis label="Pourcentage (%)"/>
-                                </yAxis>
-                            </StackedBarChart>
-                        </VBox>
-                    </HBox>
-                </VBox>
+                    <VBox spacing="12" style="-fx-background-color: rgba(30, 41, 59, 0.9); -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.5, 0, 4);">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <FontIcon iconLiteral="fas-chart-bar" iconSize="18" iconColor="#10b981"/>
+                            <Label text="Ventes par catégorie (%)"
+                                   style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: white;"/>
+                        </HBox>
+                        <StackedBarChart fx:id="categorySalesChart" prefWidth="390" prefHeight="340"
+                                         style="-fx-background-color: transparent;">
+                            <xAxis>
+                                <CategoryAxis label="Mois" style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Pourcentage (%)" style="-fx-tick-label-fill: #94a3b8; -fx-text-fill: #94a3b8;"/>
+                            </yAxis>
+                        </StackedBarChart>
+                    </VBox>
+                </HBox>
             </VBox>
 
-            <!-- DROITE : ACTIVITÉS RÉCENTES -->
-            <VBox spacing="15" prefWidth="350" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+            <!-- DROITE : ACTIVITÉS RÉCENTES AMÉLIORÉES -->
+            <VBox spacing="15" prefWidth="380" style="-fx-background-color: rgba(30, 41, 59, 0.9); -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0.6, 0, 4); -fx-border-color: #475569; -fx-border-width: 1; -fx-border-radius: 15;">
 
-                <!-- Titre avec bouton d'actualisation -->
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <FontIcon iconLiteral="fas-list-alt" iconSize="18" iconColor="#2c3e50"/>
-                    <Label text="Activités Récentes" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    <Button onAction="#refreshActivities" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-cursor: hand;">
-                        <FontIcon iconLiteral="fas-sync-alt" iconSize="14" iconColor="#3498db"/>
+                <!-- En-tête avec bouton actualiser -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <FontIcon iconLiteral="fas-clock" iconSize="20" iconColor="#3b82f6"/>
+                    <Label text="Activités Récentes" style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button onAction="#refreshActivities"
+                            style="-fx-background-color: rgba(59, 130, 246, 0.2); -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 12;">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-sync-alt" iconSize="14" iconColor="#3b82f6"/>
+                        </graphic>
                     </Button>
                 </HBox>
 
-                <!-- Liste des activités dynamiques -->
-                <VBox fx:id="activitiesContainer" spacing="10" style="-fx-padding: 10 0 0 0;"/>
+                <Separator style="-fx-background-color: #475569;"/>
 
-                <!-- Section Process Monitoring -->
-                <VBox spacing="10" style="-fx-padding: 15 0 0 0;">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <FontIcon iconLiteral="fas-tachometer-alt" iconSize="16" iconColor="#2c3e50"/>
-                        <Label text="Statut du système" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    </HBox>
-                    <VBox spacing="5" style="-fx-padding: 10; -fx-background-color: #f8f9fa; -fx-background-radius: 8;">
-                        <Label fx:id="systemStatusLabel" text="Chargement..." style="-fx-font-size: 14px;"/>
-                        <Label fx:id="systemStatusValue" text="OPTIMUM" style="-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 16px;"/>
-                        <Label fx:id="systemStatusDesc" text="Analyse des performances en cours..."
-                               style="-fx-text-fill: #666; -fx-font-size: 12px; -fx-wrap-text: true;"/>
-                    </VBox>
-                </VBox>
+                <!-- Liste des activités -->
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;"
+                            prefHeight="400" hbarPolicy="NEVER">
+                    <VBox fx:id="activitiesContainer" spacing="12" style="-fx-padding: 5;"/>
+                </ScrollPane>
+
+                <!-- Statut système -->
+
             </VBox>
         </HBox>
     </VBox>

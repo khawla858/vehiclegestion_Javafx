@@ -6,6 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.common.controller.ChatWindowController; // ✅ IMPORT AJOUTÉ
+
 
 import java.io.IOException;
 import java.util.Stack;
@@ -167,7 +170,21 @@ public class NavigationManager {
         navigateTo("/view/vendeur/RendezVousList.fxml");
     }
     public void showMessages() {
-        navigateTo("/view/common/ChatWindow.fxml");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/common/ChatWindow.fxml"));
+            Node content = loader.load();
+
+            ChatWindowController controller = loader.getController();
+
+            // ✅ PASSER LE VENDEUR CONNECTÉ
+            SessionManager session = SessionManager.getInstance();
+            controller.setUserInfo(session.getUserId(), session.getUserRole());
+
+            contentPane.getChildren().setAll(content);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void addVehicle() {

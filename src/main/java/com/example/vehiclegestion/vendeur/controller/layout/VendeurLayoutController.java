@@ -6,6 +6,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
@@ -27,8 +31,15 @@ public class VendeurLayoutController {
                     getClass().getResource("/view/vendeur/layout/Navbar.fxml")
             );
             Node navbar = navbarLoader.load();
+
+            // ✅ FORCER LES ANCRAGES (navbarContainer est un AnchorPane)
+            AnchorPane.setLeftAnchor(navbar, 0.0);
+            AnchorPane.setRightAnchor(navbar, 0.0);
+            AnchorPane.setTopAnchor(navbar, 0.0);
+            AnchorPane.setBottomAnchor(navbar, 0.0);
+
             navbarContainer.getChildren().setAll(navbar);
-            System.out.println("✅ Navbar chargée");
+            System.out.println("✅ Navbar chargée avec ancrages full-width");
 
             // ✅ ÉTAPE 2 : Récupérer le contrôleur Navbar et lui passer contentPane
             NavbarController navbarController = navbarLoader.getController();
@@ -39,7 +50,7 @@ public class VendeurLayoutController {
                 System.err.println("❌ NavbarController est null !");
             }
 
-            // ✅ ÉTAPE 3 : Initialiser NavigationManager (NOUVEAU)
+            // ✅ ÉTAPE 3 : Initialiser NavigationManager
             navigationManager = NavigationManager.getInstance();
             navigationManager.setContentPane(contentPane);
             System.out.println("✅ NavigationManager initialisé");
@@ -59,7 +70,6 @@ public class VendeurLayoutController {
             showErrorContent();
         }
     }
-
     /**
      * Affiche un message d'erreur en cas de problème
      */

@@ -112,4 +112,27 @@ public class SessionManager {
         }
         return null;
     }
+    public void connecter(int userId, String role, String nom, String prenom) {
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setIdUtilisateur(userId);
+        utilisateur.setRole(role);
+        utilisateur.setNom(nom);
+        utilisateur.setPrenom(prenom);
+
+        this.utilisateurConnecte = utilisateur;
+        this.sessionActive = true;
+        this.userFullName = prenom + " " + nom;  // ✅ DÉFINIR userFullName !
+
+        System.out.println("✅ SessionManager connecté: " + userFullName +
+                " (ID: " + userId + ", Role: " + role + ")");
+        debugSession();
+    }
+
+    public String getUserEmail() {
+        if (estConnecte() && utilisateurConnecte != null) {
+            return utilisateurConnecte.getEmail();
+        }
+        return null;
+    }
+
 }

@@ -82,6 +82,16 @@ public class FormVenteController {
             showError("Erreur d'initialisation : " + e.getMessage());
         }
     }
+    // Ajoutez cette méthode dans FormVenteController
+    public void setVendeurId(int vendeurId) {
+        this.vendeurId = vendeurId;
+        System.out.println("✅ FormVenteController - ID vendeur défini: " + vendeurId);
+
+        // Vérification immédiate
+        if (vendeurId <= 0) {
+            System.err.println("⚠️ ATTENTION: ID vendeur reçu invalide: " + vendeurId);
+        }
+    }
 
     /**
      * Configure les ComboBox
@@ -260,6 +270,14 @@ public class FormVenteController {
     @FXML
     private void enregistrerVente() {
         errorLabel.setText("");
+        // ✅ Vérification supplémentaire
+        if (vendeurId <= 0) {
+            showError("❌ ERREUR CRITIQUE: ID vendeur invalide (" + vendeurId + ")");
+            System.err.println("DEBUG - User ID: " + sessionManager.getUserId());
+            System.err.println("DEBUG - Role: " + sessionManager.getUserRole());
+            System.err.println("DEBUG - Vendeur ID: " + vendeurId);
+            return;
+        }
 
         // ✅ Validation
         if (clientSelectionne == null) {

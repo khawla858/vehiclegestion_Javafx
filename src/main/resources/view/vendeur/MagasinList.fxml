@@ -3,101 +3,110 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Rectangle?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.MagasinListController"
             fitToWidth="true"
-            style="-fx-background-color: #f8fafc;"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);"
             vbarPolicy="AS_NEEDED">
 
-    <VBox spacing="30" style="-fx-padding: 30; -fx-background-color: #f8fafc;">
+    <VBox spacing="30" style="-fx-padding: 30; -fx-background-color: transparent;">
 
-        <!-- ============================================ -->
         <!-- HEADER AVEC TITRE ET STATISTIQUES -->
-        <!-- ============================================ -->
         <VBox spacing="20">
-            <!-- Titre principal -->
             <HBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="🏪 Mes Magasins"
-                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Rectangle width="4" height="40" arcWidth="10" arcHeight="10"
+                               style="-fx-fill: linear-gradient(to bottom, #3b82f6, #8b5cf6);"/>
+
+                    <VBox spacing="2">
+                        <Label text="🏪 MES MAGASINS"
+                               style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28px;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0.5, 0, 2);"/>
+                        <Label text="Gérez tous vos magasins et points de vente"
+                               style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </VBox>
+                </HBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <!-- Badge avec nombre total -->
                 <Label fx:id="totalMagasinsLabel" text="0 magasin"
-                       style="-fx-background-color: #dbeafe;
-                              -fx-text-fill: #1e40af;
-                              -fx-padding: 8 16;
+                       style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                              -fx-text-fill: #60a5fa;
+                              -fx-padding: 8 20;
                               -fx-background-radius: 20;
                               -fx-font-size: 14px;
-                              -fx-font-weight: bold;"/>
+                              -fx-font-weight: bold;
+                              -fx-border-color: #3b82f6;
+                              -fx-border-width: 1;
+                              -fx-border-radius: 20;"/>
 
-                <!-- Bouton principal d'ajout -->
-                <Button fx:id="btnAjouterMagasin" text="➕ Nouveau Magasin"/>
+                <Button fx:id="btnAjouterMagasin" text="➕ NOUVEAU MAGASIN"
+                        style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-font-size: 14px;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 10, 0.5, 0, 3);"/>
             </HBox>
-
-            <!-- Sous-titre -->
-            <Label text="Gérez tous vos magasins et points de vente en un seul endroit"
-                   style="-fx-font-size: 14px; -fx-text-fill: #64748b;"/>
         </VBox>
 
-
-
-        <!-- ============================================ -->
         <!-- BARRE DE RECHERCHE ET FILTRES -->
-        <!-- ============================================ -->
         <HBox spacing="15" alignment="CENTER_LEFT"
-              style="-fx-background-color: white;
+              style="-fx-background-color: rgba(30, 41, 59, 0.8);
                      -fx-padding: 20;
                      -fx-background-radius: 12;
-                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);">
+                     -fx-border-color: #334155;
+                     -fx-border-width: 1;
+                     -fx-border-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
 
             <!-- Recherche -->
             <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 400;">
-                <Label text="🔍" style="-fx-font-size: 18px;"/>
+                <Label text="🔍" style="-fx-font-size: 18px; -fx-text-fill: #94a3b8;"/>
                 <TextField fx:id="searchField"
                            promptText="Rechercher un magasin par nom..."
                            style="-fx-pref-width: 350;
                                   -fx-padding: 12;
+                                  -fx-background-color: rgba(15, 23, 42, 0.6);
                                   -fx-background-radius: 8;
-                                  -fx-border-color: #cbd5e1;
+                                  -fx-border-color: #475569;
                                   -fx-border-radius: 8;
                                   -fx-border-width: 1.5;
-                                  -fx-font-size: 13px;"/>
+                                  -fx-font-size: 13px;
+                                  -fx-text-fill: white;
+                                  -fx-prompt-text-fill: #64748b;"/>
             </HBox>
 
-            <Separator orientation="VERTICAL" style="-fx-pref-height: 40;"/>
+            <Separator orientation="VERTICAL" style="-fx-pref-height: 40; -fx-background-color: #475569;"/>
 
             <!-- Filtres -->
             <VBox spacing="5" alignment="CENTER_LEFT">
-                <Label text="Filtrer par:"
-                       style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                <Label text="FILTRER PAR:"
+                       style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #94a3b8;"/>
                 <ComboBox fx:id="filterComboBox"
                           promptText="📊 Tous les magasins"
                           style="-fx-pref-width: 200;
+                                 -fx-background-color: rgba(15, 23, 42, 0.6);
                                  -fx-background-radius: 8;
-                                 -fx-border-radius: 8;"/>
+                                 -fx-border-color: #475569;
+                                 -fx-border-radius: 8;
+                                 -fx-text-fill: white;"/>
             </VBox>
 
             <Region HBox.hgrow="ALWAYS"/>
-
-            <!-- Actions rapides -->
-
         </HBox>
 
-        <!-- ============================================ -->
-        <!-- STATISTIQUES RAPIDES (CARDS) -->
-        <!-- ============================================ -->
-
-        <!-- ============================================ -->
-        <!-- GRILLE DE MAGASINS (FLOWPANE) -->
-        <!-- ============================================ -->
+        <!-- GRILLE DE MAGASINS -->
         <VBox spacing="15">
-            <Label text="📋 Tous vos magasins"
-                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+            <Label text="📋 TOUS VOS MAGASINS"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;
+                          -fx-border-color: #3b82f6; -fx-border-width: 0 0 2 0; -fx-padding: 0 0 10 0;"/>
 
-            <!-- FlowPane pour afficher les cartes en grille responsive -->
             <FlowPane fx:id="magasinContainer"
                       hgap="20" vgap="20"
                       style="-fx-padding: 0;">

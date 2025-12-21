@@ -718,4 +718,5 @@ public class ClientFavoritesController implements Initializable {
         if (description == null) return "Description non disponible";
         return description.length() <= 80 ? description : description.substring(0, 77) + "...";
     }
+
 }

@@ -5,102 +5,118 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.vehiclegestion.vendeur.controller.AddVehicleFormController"
-      spacing="10" style="-fx-padding: 15;"
+      spacing="10" style="-fx-padding: 15; -fx-background-color: rgba(30, 41, 59, 0.95);"
       prefWidth="450">
 
     <VBox spacing="8">
         <!-- Titre et Description -->
         <VBox spacing="3">
-            <Label text="Titre *" style="-fx-font-weight: bold;"/>
-            <TextField fx:id="titreField" promptText="Ex: Mercedes Classe C 2023"/>
+            <Label text="Titre *" style="-fx-font-weight: bold; -fx-text-fill: white;"/>
+            <TextField fx:id="titreField" promptText="Ex: Mercedes Classe C 2023"
+                       style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
         </VBox>
 
         <VBox spacing="3">
-            <Label text="Description *" style="-fx-font-weight: bold;"/>
+            <Label text="Description *" style="-fx-font-weight: bold; -fx-text-fill: white;"/>
             <TextArea fx:id="descriptionField" promptText="Description..."
-                      prefRowCount="2" wrapText="true"/>
+                      prefRowCount="2" wrapText="true"
+                      style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
         </VBox>
 
         <!-- Prix, Catégorie, État -->
         <HBox spacing="10">
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Prix (MAD) *"/>
-                <TextField fx:id="prixField" promptText="Ex: 150000"/>
+                <Label text="Prix (MAD) *" style="-fx-text-fill: white;"/>
+                <TextField fx:id="prixField" promptText="Ex: 150000"
+                           style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
             </VBox>
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Catégorie *"/>
-                <ComboBox fx:id="categorieComboBox" prefWidth="120"/>
+                <Label text="Catégorie *" style="-fx-text-fill: white;"/>
+                <ComboBox fx:id="categorieComboBox" prefWidth="120"
+                          style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;"/>
             </VBox>
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="État *"/>
-                <ComboBox fx:id="etatComboBox" prefWidth="100"/>
+                <Label text="État *" style="-fx-text-fill: white;"/>
+                <ComboBox fx:id="etatComboBox" prefWidth="100"
+                          style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;"/>
             </VBox>
         </HBox>
 
         <!-- Marque et Modèle -->
         <HBox spacing="10">
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Marque *"/>
-                <TextField fx:id="marqueField" promptText="Ex: Mercedes"/>
+                <Label text="Marque *" style="-fx-text-fill: white;"/>
+                <TextField fx:id="marqueField" promptText="Ex: Mercedes"
+                           style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
             </VBox>
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Modèle *"/>
-                <TextField fx:id="modeleField" promptText="Ex: Classe C"/>
+                <Label text="Modèle *" style="-fx-text-fill: white;"/>
+                <TextField fx:id="modeleField" promptText="Ex: Classe C"
+                           style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
             </VBox>
         </HBox>
 
         <!-- Année et Kilométrage -->
         <HBox spacing="10">
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Année *"/>
-                <TextField fx:id="anneeField" promptText="Ex: 2023"/>
+                <Label text="Année *" style="-fx-text-fill: white;"/>
+                <TextField fx:id="anneeField" promptText="Ex: 2023"
+                           style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
             </VBox>
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Kilométrage *"/>
-                <TextField fx:id="kilometrageField" promptText="Ex: 150000"/>
+                <Label text="Kilométrage *" style="-fx-text-fill: white;"/>
+                <TextField fx:id="kilometrageField" promptText="Ex: 150000"
+                           style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
             </VBox>
         </HBox>
 
         <!-- Transmission et Carburant -->
         <HBox spacing="10">
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Transmission *"/>
-                <ComboBox fx:id="transmissionComboBox" prefWidth="120"/>
+                <Label text="Transmission *" style="-fx-text-fill: white;"/>
+                <ComboBox fx:id="transmissionComboBox" prefWidth="120"
+                          style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;"/>
             </VBox>
             <VBox spacing="3" HBox.hgrow="ALWAYS">
-                <Label text="Carburant *"/>
-                <ComboBox fx:id="carburantComboBox" prefWidth="120"/>
+                <Label text="Carburant *" style="-fx-text-fill: white;"/>
+                <ComboBox fx:id="carburantComboBox" prefWidth="120"
+                          style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;"/>
             </VBox>
         </HBox>
 
         <!-- Puissance -->
         <VBox spacing="3">
-            <Label text="Puissance (ch)"/>
-            <TextField fx:id="puissanceField" promptText="Ex: 150"/>
+            <Label text="Puissance (ch)" style="-fx-text-fill: white;"/>
+            <TextField fx:id="puissanceField" promptText="Ex: 150"
+                       style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
         </VBox>
 
         <!-- Image -->
         <VBox spacing="3">
-            <Label text="Image"/>
+            <Label text="Image" style="-fx-text-fill: white;"/>
             <HBox spacing="5">
-                <TextField fx:id="imageField" promptText="Nom du fichier" HBox.hgrow="ALWAYS"/>
-                <Button text="Parcourir" onAction="#browseImage" prefWidth="80"/>
+                <TextField fx:id="imageField" promptText="Nom du fichier" HBox.hgrow="ALWAYS"
+                           style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
+                <Button text="Parcourir" onAction="#browseImage" prefWidth="80"
+                        style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 6; -fx-cursor: hand;"/>
             </HBox>
         </VBox>
 
         <!-- Aperçu image -->
-        <VBox spacing="3" fx:id="imagePreviewContainer" visible="false">
-            <Label text="Aperçu"/>
+        <VBox spacing="3" fx:id="imagePreviewContainer" visible="false"
+              style="-fx-background-color: rgba(15, 23, 42, 0.6); -fx-padding: 10; -fx-background-radius: 6;">
+            <Label text="Aperçu" style="-fx-text-fill: white;"/>
             <ImageView fx:id="imagePreview" fitWidth="80" fitHeight="60" preserveRatio="true"/>
         </VBox>
     </VBox>
 
     <!-- Boutons -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Annuler" onAction="#cancel" prefWidth="80"/>
-        <Button text="Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white;"
-                onAction="#addVehicle" prefWidth="100"/>
+        <Button text="Annuler" onAction="#cancel" prefWidth="80"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 6; -fx-cursor: hand;"/>
+        <Button text="Ajouter" onAction="#addVehicle" prefWkhawlaidth="100"
+                style="-fx-background-color: linear-gradient(to right, #10b981, #059669); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 6; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.5), 8, 0.5, 0, 2);"/>
     </HBox>
 
-    <Label fx:id="messageLabel" wrapText="true" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;"/>
+    <Label fx:id="messageLabel" wrapText="true" style="-fx-text-fill: #ef4444; -fx-font-size: 12px; -fx-font-weight: bold;"/>
 </VBox>

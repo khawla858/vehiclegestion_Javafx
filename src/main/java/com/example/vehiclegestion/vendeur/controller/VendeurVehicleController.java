@@ -1,7 +1,7 @@
 package com.example.vehiclegestion.vendeur.controller;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.utils.NavigationManager;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXML;
@@ -347,6 +347,7 @@ public class VendeurVehicleController {
     // ✅ NOUVELLE MÉTHODE : Ouvrir le formulaire de vente
     private void vendreVehicle(Article article) {
         System.out.println("💰 Vendre: " + article.getTitre());
+        System.out.println("🆔 ID Vendeur (VendeurVehicleController): " + vendeurIdConnecte);
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/FormVente.fxml"));
@@ -361,7 +362,16 @@ public class VendeurVehicleController {
 
             FormVenteController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setArticle(article); // ✅ Passer l'article
+            controller.setArticle(article);
+
+            // ✅ CORRECTION CRITIQUE : Passer l'ID vendeur
+            controller.setVendeurId(vendeurIdConnecte);
+
+            // ✅ Vérification supplémentaire
+            if (vendeurIdConnecte <= 0) {
+                showError("❌ ERREUR: ID vendeur invalide (" + vendeurIdConnecte + "). Veuillez vous reconnecter.");
+                return;
+            }
 
             dialogStage.setOnHidden(e -> loadVehicles());
             dialogStage.showAndWait();

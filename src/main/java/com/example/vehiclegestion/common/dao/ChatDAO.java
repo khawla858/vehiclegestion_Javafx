@@ -224,41 +224,46 @@ public class ChatDAO {
     /**
      * Récupère toutes les conversations d'un utilisateur (selon son rôle)
      */
+    /**
+     * Récupère toutes les conversations d'un utilisateur (selon son rôle)
+     */
     public List<Conversation> getConversationsByUser(int idUtilisateur, String role) {
         List<Conversation> conversations = new ArrayList<>();
 
+        // REQUÊTE CORRIGÉE - supprime les références à id_admin qui n'existe pas
         String query = """
-            SELECT 
-                c.*,
-                CASE 
-                    WHEN ? = 'vendeur' THEN 
-                        COALESCE(CONCAT(u_client.prenom, ' ', u_client.nom), 'Client #' || c.id_client)
-                    WHEN ? = 'client' THEN 
-                        COALESCE(CONCAT(u_vendeur.prenom, ' ', u_vendeur.nom), 'Vendeur #' || c.id_vendeur)
-                    ELSE 'Admin Support'
-                END AS nom_complet_interlocuteur,
-                CASE 
-                    WHEN ? = 'vendeur' THEN COALESCE(u_client.prenom, 'Client')
-                    WHEN ? = 'client' THEN COALESCE(u_vendeur.prenom, 'Vendeur')
-                    ELSE 'Admin'
-                END AS prenom_interlocuteur,
-                CASE 
-                    WHEN ? = 'vendeur' THEN COALESCE(u_client.nom, '')
-                    WHEN ? = 'client' THEN COALESCE(u_vendeur.nom, '')
-                    ELSE 'Support'
-                END AS nom_interlocuteur,
-                (SELECT contenu FROM Message WHERE id_conversation = c.id_conversation ORDER BY date_envoi DESC LIMIT 1) AS dernier_message,
-                (SELECT COUNT(*) FROM Message m WHERE m.id_conversation = c.id_conversation 
-                 AND m.est_lu = FALSE AND m.id_expediteur != ?) AS nb_non_lus
-            FROM Conversation c
-            LEFT JOIN Utilisateur u_client ON c.id_client = u_client.id_utilisateur
-            LEFT JOIN Utilisateur u_vendeur ON c.id_vendeur = u_vendeur.id_utilisateur
-            WHERE 
-                (? = 'vendeur' AND c.id_vendeur = ?) OR
-                (? = 'client' AND c.id_client = ?) OR
-                (? = 'admin' AND c.id_admin = ?)
-            ORDER BY COALESCE(c.dernier_message_date, c.date_creation) DESC
-        """;
+        SELECT 
+            c.*,
+            CASE 
+                WHEN ? = 'vendeur' THEN 
+                    COALESCE(CONCAT(u_client.prenom, ' ', u_client.nom), 'Client #' || c.id_client)
+                WHEN ? = 'client' THEN 
+                    COALESCE(CONCAT(u_vendeur.prenom, ' ', u_vendeur.nom), 'Vendeur #' || c.id_vendeur)
+                ELSE 'Support'
+            END AS nom_complet_interlocuteur,
+            CASE 
+                WHEN ? = 'vendeur' THEN COALESCE(u_client.prenom, 'Client')
+                WHEN ? = 'client' THEN COALESCE(u_vendeur.prenom, 'Vendeur')
+                ELSE 'Admin'
+            END AS prenom_interlocuteur,
+            CASE 
+                WHEN ? = 'vendeur' THEN COALESCE(u_client.nom, '')
+                WHEN ? = 'client' THEN COALESCE(u_vendeur.nom, '')
+                ELSE ''
+            END AS nom_interlocuteur,
+            (SELECT contenu FROM Message WHERE id_conversation = c.id_conversation ORDER BY date_envoi DESC LIMIT 1) AS dernier_message,
+            (SELECT COUNT(*) FROM Message m WHERE m.id_conversation = c.id_conversation 
+             AND m.est_lu = FALSE AND m.id_expediteur != ?) AS nb_non_lus,
+            (SELECT date_envoi FROM Message WHERE id_conversation = c.id_conversation ORDER BY date_envoi DESC LIMIT 1) AS dernier_message_date
+        FROM Conversation c
+        LEFT JOIN Utilisateur u_client ON c.id_client = u_client.id_utilisateur
+        LEFT JOIN Utilisateur u_vendeur ON c.id_vendeur = u_vendeur.id_utilisateur
+        WHERE 
+            (? = 'vendeur' AND c.id_vendeur = ?) OR
+            (? = 'client' AND c.id_client = ?)
+            -- Supprimé la condition admin puisque la colonne n'existe pas
+        ORDER BY COALESCE((SELECT date_envoi FROM Message WHERE id_conversation = c.id_conversation ORDER BY date_envoi DESC LIMIT 1), c.date_creation) DESC
+    """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -268,14 +273,12 @@ public class ChatDAO {
             stmt.setString(3, role);
             stmt.setString(4, role);
             stmt.setString(5, role);
-            stmt.setString(6, role);
-            stmt.setInt(7, idUtilisateur);
-            stmt.setString(8, role);
-            stmt.setInt(9, idUtilisateur);
-            stmt.setString(10, role);
-            stmt.setInt(11, idUtilisateur);
-            stmt.setString(12, role);
-            stmt.setInt(13, idUtilisateur);
+            stmt.setInt(6, idUtilisateur);
+            stmt.setString(7, role);
+            stmt.setInt(8, idUtilisateur);
+            stmt.setString(9, role);
+            stmt.setInt(10, idUtilisateur);
+            // Supprimé les paramètres pour admin
 
             ResultSet rs = stmt.executeQuery();
 
@@ -286,7 +289,15 @@ public class ChatDAO {
                 conv.setDernierMessage(rs.getString("dernier_message"));
                 conv.setNbMessagesNonLus(rs.getInt("nb_non_lus"));
 
+                // Ajouter la date du dernier message
+                Timestamp dernierMessageDate = rs.getTimestamp("dernier_message_date");
+                if (dernierMessageDate != null) {
+                    conv.setDernierMessageDate(dernierMessageDate.toLocalDateTime());
+                }
+
                 System.out.println("📋 Conversation chargée: ID=" + conv.getIdConversation() +
+                        " | Vendeur ID=" + conv.getIdVendeur() +
+                        " | Client ID=" + conv.getIdClient() +
                         " | Interlocuteur: " + conv.getInterlocuteurComplet() +
                         " | Messages non lus: " + conv.getNbMessagesNonLus());
 
@@ -514,7 +525,9 @@ public class ChatDAO {
 
         conv.setIdVendeur((Integer) rs.getObject("id_vendeur"));
         conv.setIdClient((Integer) rs.getObject("id_client"));
-        conv.setIdAdmin((Integer) rs.getObject("id_admin"));
+
+        // SUPPRIMER OU COMMENTER CETTE LIGNE - la colonne n'existe pas
+        // conv.setIdAdmin((Integer) rs.getObject("id_admin"));
 
         conv.setIdArticle((Integer) rs.getObject("id_article"));
         conv.setIdPlainte((Integer) rs.getObject("id_plainte"));

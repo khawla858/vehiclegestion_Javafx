@@ -11,8 +11,8 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.vehiclegestion.vendeur.controller.layout.NavbarController"
       spacing="0"
-      style="-fx-background-color: #ffffff;
-             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+      style="-fx-background-color: linear-gradient(to right, #0f172a, #1e40af);
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);">
 
     <!-- ============================================ -->
     <!-- NIVEAU 1 : HEADER (Logo + Recherche + Actions) -->
@@ -20,15 +20,15 @@
 
     <HBox spacing="0"
           alignment="CENTER"
-          style="-fx-padding: 12 25; -fx-background-color: #ffffff;">
+          style="-fx-padding: 15 25;">
 
         <!-- LOGO + NOM -->
         <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-            <StackPane style="-fx-background-color: linear-gradient(to bottom right, #3498db, #2980b9);
+            <StackPane style="-fx-background-color: linear-gradient(to bottom right, #3b82f6, #8b5cf6);
                               -fx-background-radius: 10;
                               -fx-pref-width: 45;
                               -fx-pref-height: 45;
-                              -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 8, 0, 0, 2);">
+                              -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 10, 0.5, 0, 3);">
                 <FontIcon iconLiteral="fas-car-side" iconSize="24" iconColor="white"/>
             </StackPane>
 
@@ -36,50 +36,58 @@
                 <Label text="AutoSales Pro"
                        style="-fx-font-size: 18px;
                               -fx-font-weight: bold;
-                              -fx-text-fill: #2c3e50;"/>
+                              -fx-text-fill: white;
+                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0.5, 0, 2);"/>
                 <Label text="Gestion Automobile"
                        style="-fx-font-size: 11px;
-                              -fx-text-fill: #95a5a6;"/>
+                              -fx-text-fill: #cbd5e1;"/>
             </VBox>
         </HBox>
 
         <!-- BARRE DE RECHERCHE CENTRALE -->
         <HBox spacing="0"
               alignment="CENTER"
-              style="-fx-background-color: #f8f9fa;
+              style="-fx-background-color: rgba(15, 23, 42, 0.6);
                      -fx-background-radius: 25;
                      -fx-padding: 10 20;
-                     -fx-border-color: #e0e0e0;
+                     -fx-border-color: #3b82f6;
                      -fx-border-radius: 25;
-                     -fx-border-width: 1;
+                     -fx-border-width: 1.5;
                      -fx-min-width: 450;">
-            <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#95a5a6"/>
+            <FontIcon iconLiteral="fas-search" iconSize="16" iconColor="#94a3b8"/>
             <TextField fx:id="searchField"
                        promptText="Rechercher véhicule, client, commande..."
                        style="-fx-background-color: transparent;
                               -fx-border-width: 0;
                               -fx-pref-width: 380;
                               -fx-padding: 0 12;
-                              -fx-font-size: 14px;"/>
+                              -fx-font-size: 14px;
+                              -fx-text-fill: white;
+                              -fx-prompt-text-fill: #64748b;"/>
             <Button text="Rechercher"
                     onAction="#performSearch"
-                    style="-fx-background-color: #3498db;
+                    style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6);
                            -fx-text-fill: white;
                            -fx-font-size: 12px;
                            -fx-font-weight: 600;
                            -fx-background-radius: 20;
                            -fx-padding: 6 16;
-                           -fx-cursor: hand;"/>
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 8, 0.5, 0, 2);"/>
         </HBox>
 
         <!-- ACTIONS DROITE -->
         <HBox spacing="15" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
             <!-- PANIER -->
             <StackPane style="-fx-cursor: hand;" onMouseClicked="#showCart">
-                <StackPane style="-fx-background-color: transparent;
+                <StackPane style="-fx-background-color: rgba(30, 41, 59, 0.6);
+                                  -fx-background-radius: 50;
                                   -fx-pref-width: 42;
-                                  -fx-pref-height: 42;">
-                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="20" iconColor="#7f8c8d"/>
+                                  -fx-pref-height: 42;
+                                  -fx-border-color: #3b82f6;
+                                  -fx-border-radius: 50;
+                                  -fx-border-width: 1;">
+                    <FontIcon iconLiteral="fas-shopping-cart" iconSize="18" iconColor="white"/>
                 </StackPane>
                 <Label text="2"
                        style="-fx-text-fill: white;
@@ -87,27 +95,28 @@
                               -fx-font-weight: bold;
                               -fx-translate-x: 12;
                               -fx-translate-y: -12;
-                              -fx-background-color: #e74c3c;
+                              -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
                               -fx-background-radius: 10;
                               -fx-padding: 2 6;
                               -fx-min-width: 18;
-                              -fx-alignment: center;"/>
+                              -fx-alignment: center;
+                              -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.6), 6, 0.5, 0, 2);"/>
             </StackPane>
 
-            <!-- NOTIFICATIONS (nouvelle version avec dropdown) -->
+            <!-- NOTIFICATIONS -->
             <StackPane style="-fx-cursor: hand;">
                 <Button fx:id="notificationBtn"
                         onAction="#toggleNotificationDropdown"
-                        style="-fx-background-color: transparent;
-                               -fx-border-width: 0;
-                               -fx-padding: 8;">
+                        style="-fx-background-color: rgba(30, 41, 59, 0.6);
+                               -fx-background-radius: 50;
+                               -fx-border-color: #3b82f6;
+                               -fx-border-radius: 50;
+                               -fx-border-width: 1;
+                               -fx-pref-width: 42;
+                               -fx-pref-height: 42;
+                               -fx-padding: 0;">
                     <graphic>
-                        <StackPane style="
-                                      -fx-background-radius: 50;
-                                      -fx-pref-width: 42;
-                                      -fx-pref-height: 42;">
-                            <FontIcon iconLiteral="far-bell" iconSize="18" iconColor="#7f8c8d"/>
-                        </StackPane>
+                        <FontIcon iconLiteral="far-bell" iconSize="18" iconColor="white"/>
                     </graphic>
                 </Button>
                 <Label fx:id="notificationBadge"
@@ -117,20 +126,25 @@
                               -fx-font-weight: bold;
                               -fx-translate-x: 12;
                               -fx-translate-y: -12;
-                              -fx-background-color: #e74c3c;
+                              -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
                               -fx-background-radius: 10;
                               -fx-padding: 2 6;
                               -fx-min-width: 18;
                               -fx-alignment: center;
-                              -fx-visible: false;"/>
+                              -fx-visible: false;
+                              -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.6), 6, 0.5, 0, 2);"/>
             </StackPane>
 
             <!-- MESSAGES -->
             <StackPane style="-fx-cursor: hand;" onMouseClicked="#showMessages">
-                <StackPane style="-fx-background-radius: 50;
+                <StackPane style="-fx-background-color: rgba(30, 41, 59, 0.6);
+                                  -fx-background-radius: 50;
                                   -fx-pref-width: 42;
-                                  -fx-pref-height: 42;">
-                    <FontIcon iconLiteral="far-envelope" iconSize="18" iconColor="#7f8c8d"/>
+                                  -fx-pref-height: 42;
+                                  -fx-border-color: #3b82f6;
+                                  -fx-border-radius: 50;
+                                  -fx-border-width: 1;">
+                    <FontIcon iconLiteral="far-envelope" iconSize="18" iconColor="white"/>
                 </StackPane>
                 <Label fx:id="messageBadge"
                        text="0"
@@ -140,16 +154,17 @@
                               -fx-font-weight: bold;
                               -fx-translate-x: 12;
                               -fx-translate-y: -12;
-                              -fx-background-color: #3498db;
+                              -fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6);
                               -fx-background-radius: 10;
                               -fx-padding: 2 6;
                               -fx-min-width: 18;
-                              -fx-alignment: center;"/>
+                              -fx-alignment: center;
+                              -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 6, 0.5, 0, 2);"/>
             </StackPane>
 
             <!-- SÉPARATEUR -->
             <Separator orientation="VERTICAL"
-                       style="-fx-pref-height: 35; -fx-background-color: #e0e0e0;"/>
+                       style="-fx-pref-height: 35; -fx-background-color: rgba(148, 163, 184, 0.3);"/>
 
             <!-- PROFIL UTILISATEUR -->
             <MenuButton fx:id="profileMenu"
@@ -159,11 +174,11 @@
                 <graphic>
                     <HBox spacing="12" alignment="CENTER">
                         <!-- Avatar -->
-                        <StackPane style="-fx-background-color: linear-gradient(to bottom right, #3498db, #2980b9);
+                        <StackPane style="-fx-background-color: linear-gradient(to bottom right, #3b82f6, #8b5cf6);
                                           -fx-background-radius: 50;
                                           -fx-pref-width: 42;
                                           -fx-pref-height: 42;
-                                          -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.3), 6, 0, 0, 2);">
+                                          -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 8, 0.5, 0, 3);">
                             <Label text="JD"
                                    style="-fx-text-fill: white;
                                           -fx-font-weight: bold;
@@ -174,29 +189,29 @@
                         <VBox spacing="2" alignment="CENTER_LEFT">
                             <Label fx:id="userNameLabel"
                                    text="John Doe"
-                                   style="-fx-text-fill: #2c3e50;
+                                   style="-fx-text-fill: white;
                                           -fx-font-weight: 600;
                                           -fx-font-size: 14px;"/>
                             <Label fx:id="userRoleLabel"
                                    text="Vendeur"
-                                   style="-fx-text-fill: #95a5a6;
+                                   style="-fx-text-fill: #cbd5e1;
                                           -fx-font-size: 11px;"/>
                         </VBox>
 
-                        <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#95a5a6"/>
+                        <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#cbd5e1"/>
                     </HBox>
                 </graphic>
 
                 <items>
                     <MenuItem text="Mon Profil" onAction="#showUserProfile">
-                        <graphic><FontIcon iconLiteral="fas-user" iconSize="14" iconColor="#3498db"/></graphic>
+                        <graphic><FontIcon iconLiteral="fas-user" iconSize="14" iconColor="#3b82f6"/></graphic>
                     </MenuItem>
                     <MenuItem text="Paramètres" onAction="#showAccountSettings">
-                        <graphic><FontIcon iconLiteral="fas-cog" iconSize="14" iconColor="#7f8c8d"/></graphic>
+                        <graphic><FontIcon iconLiteral="fas-cog" iconSize="14" iconColor="#94a3b8"/></graphic>
                     </MenuItem>
                     <SeparatorMenuItem/>
                     <MenuItem text="Déconnexion" onAction="#handleLogout">
-                        <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" iconColor="#e74c3c"/></graphic>
+                        <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" iconColor="#ef4444"/></graphic>
                     </MenuItem>
                 </items>
             </MenuButton>
@@ -204,14 +219,14 @@
     </HBox>
 
     <!-- SÉPARATEUR -->
-    <Separator style="-fx-background-color: #e8ecef; -fx-pref-height: 1;"/>
+    <Separator style="-fx-background-color: rgba(59, 130, 246, 0.3); -fx-pref-height: 1;"/>
 
     <!-- ============================================ -->
     <!-- NIVEAU 2 : MENU NAVIGATION PRINCIPAL -->
     <!-- ============================================ -->
     <HBox spacing="0"
           alignment="CENTER_LEFT"
-          style="-fx-padding: 0 27; -fx-background-color: #ffffff;">
+          style="-fx-padding: 0 27;">
 
         <!-- Dashboard -->
         <Button fx:id="dashboardBtn"
@@ -224,7 +239,7 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <Label text="Dashboard"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
@@ -239,7 +254,7 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <Label text="Home"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
@@ -254,13 +269,10 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <Label text="Mes ventes"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
-
-        <!-- Ventes -->
-
 
         <!-- Rendez-vous -->
         <Button onAction="#showRendezVous"
@@ -272,7 +284,7 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <Label text="Rendez-vous"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
@@ -287,25 +299,25 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <Label text="Magasins"
-                           style="-fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
             </graphic>
         </Button>
     </HBox>
 
     <!-- LIGNE INFÉRIEURE -->
-    <Separator style="-fx-background-color: #e8ecef; -fx-pref-height: 1;"/>
+    <Separator style="-fx-background-color: rgba(59, 130, 246, 0.3); -fx-pref-height: 1;"/>
 
     <!-- DROPDOWN DES NOTIFICATIONS -->
     <BorderPane fx:id="notificationDropdown"
                 visible="false"
                 managed="false"
-                style="-fx-background-color: white;
-                      -fx-border-color: #e0e0e0;
-                      -fx-border-width: 1;
-                      -fx-background-radius: 8;
-                      -fx-border-radius: 8;
-                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);"
+                style="-fx-background-color: #1e293b;
+                      -fx-border-color: #3b82f6;
+                      -fx-border-width: 2;
+                      -fx-background-radius: 12;
+                      -fx-border-radius: 12;
+                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0.5, 0, 5);"
                 prefWidth="380"
                 prefHeight="500"
                 maxWidth="400"
@@ -315,26 +327,28 @@
                 translateX="-180">
 
         <top>
-            <HBox style="-fx-background-color: #f8f9fa;
-                         -fx-border-width: 0 0 1 0;
-                         -fx-border-color: #e0e0e0;
+            <HBox style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                         -fx-border-width: 0 0 2 0;
+                         -fx-border-color: #3b82f6;
                          -fx-padding: 20;
-                         -fx-border-radius: 8 8 0 0;">
+                         -fx-border-radius: 12 12 0 0;">
                 <Label text="🔔 Notifications"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="btnMarkAllRead" text="Tout lire"
-                        style="-fx-background-color: #3498db;
+                        style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6);
                               -fx-text-fill: white;
                               -fx-padding: 8 20;
                               -fx-font-size: 14px;
-                              -fx-background-radius: 6;"/>
+                              -fx-font-weight: bold;
+                              -fx-background-radius: 6;
+                              -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 8, 0.5, 0, 2);"/>
             </HBox>
         </top>
 
         <center>
             <ScrollPane fx:id="notificationScrollPane"
-                        style="-fx-background: transparent;
+                        style="-fx-background: #0f172a;
                                -fx-border-width: 0;
                                -fx-padding: 0;"
                         fitToWidth="true"
@@ -345,16 +359,16 @@
         </center>
 
         <bottom>
-            <HBox style="-fx-background-color: #f8f9fa;
-                         -fx-border-width: 1 0 0 0;
-                         -fx-border-color: #e0e0e0;
+            <HBox style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                         -fx-border-width: 2 0 0 0;
+                         -fx-border-color: #3b82f6;
                          -fx-padding: 15 20;">
                 <Label fx:id="lblNotificationStatus" text="0 notification(s)"
-                       style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 14px;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="btnSeeAll" text="Voir tout"
                         style="-fx-background-color: transparent;
-                              -fx-text-fill: #3498db;
+                              -fx-text-fill: #3b82f6;
                               -fx-padding: 8 15;
                               -fx-font-size: 14px;
                               -fx-font-weight: 500;"/>

@@ -1,253 +1,212 @@
 package com.example.vehiclegestion.auth.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
-import com.example.vehiclegestion.auth.dao.UtilisateurDAO;
+import com.example.vehiclegestion.auth.AuthentificationService;
 import com.example.vehiclegestion.auth.model.Utilisateur;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.scene.control.Button;
 
 import java.io.IOException;
 
 public class LoginController {
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private Label errorLabel;
+    @FXML private CheckBox rememberCheckbox;
+
+    private AuthentificationService authService;
+
+    public LoginController() {
+        this.authService = new AuthentificationService();
+    }
 
     @FXML
-    private TextField emailField;
+    private void initialize() {
+        System.out.println("✅ LoginController initialisé");
+        errorLabel.setVisible(false);
+        emailField.requestFocus();
+    }
 
     @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private Label errorLabel;
-
-    private UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
-    private SessionManager sessionManager = SessionManager.getInstance();
-
-    /**
-     * Gérer la connexion
-     */
-    @FXML
-    private void handleLogin() {
+    public void handleLogin() {
         String email = emailField.getText().trim();
         String password = passwordField.getText();
 
-        // Validation
+        // Validation des champs
         if (email.isEmpty() || password.isEmpty()) {
-            showError("Veuillez remplir tous les champs");
+            showError("⚠️ Veuillez remplir tous les champs");
             return;
         }
 
         if (!isValidEmail(email)) {
-            showError("Format d'email invalide");
+            showError("⚠️ Format d'email invalide");
             return;
         }
 
-        // Tentative de connexion
-        Utilisateur user = utilisateurDAO.seConnecter(email, password);
-
-        if (user != null) {
-            hideError();
-
-            // ✅ DÉMARRER LA SESSION
-            System.out.println("✅ Connexion réussie pour: " + user.getEmail());
-            System.out.println("🎭 Rôle: " + user.getRole());
-            System.out.println("🆔 ID: " + user.getIdUtilisateur());
-
-            sessionManager.demarrerSession(user);
-
-            // Debug après démarrage session
-            sessionManager.debugSession();
-
-            // Redirection selon le rôle
-            try {
-                switch (user.getRole()) {
-                    case "client":
-                        redirectToClientDashboard(user);
-                        break;
-                    case "vendeur":
-                        redirectToVendeurDashboard(user);
-                        break;
-                    case "admin":
-                        redirectToAdminDashboard(user);
-                        break;
-                    default:
-                        showError("Rôle utilisateur inconnu");
-                }
-            } catch (IOException e) {
-                showError("Erreur lors du chargement du tableau de bord");
-                e.printStackTrace();
-            }
-        } else {
-            showError("Email ou mot de passe incorrect");
-        }
-    }
-
-    /**
-     * Gérer le mot de passe oublié
-     */
-    @FXML
-    private void handleForgotPassword() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/view/auth/ForgotPassword.fxml"));
-            Stage stage = (Stage) emailField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            showError("Fonctionnalité en cours de développement");
+            System.out.println("🔐 Tentative de connexion: " + email);
+            Utilisateur user = authService.seConnecter(email, password);
+
+            if (user != null) {
+                System.out.println("✅ Connexion réussie: " + user.getEmail() + " (Rôle: " + user.getRole() + ")");
+                redirectToDashboard(user);
+            } else {
+                showError("❌ Email ou mot de passe incorrect");
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur connexion: " + e.getMessage());
             e.printStackTrace();
+            showError("❌ Erreur lors de la connexion: " + e.getMessage());
         }
     }
 
     /**
-     * Connexion avec Microsoft
+     * Rediriger vers le dashboard approprié selon le rôle
      */
-    @FXML
-    private void handleMicrosoftLogin() {
-        showError("Connexion Microsoft en cours de développement");
-    }
+    private void redirectToDashboard(Utilisateur user) {
+        try {
+            String fxmlPath = "";
+            String title = "";
 
-    /**
-     * Redirection vers le dashboard client
-     */
-    private void redirectToClientDashboard(Utilisateur user) throws IOException {
-        // ⚠️ VÉRIFICATION AVANT REDIRECTION
-        if (!sessionManager.estConnecte()) {
-            System.out.println("🚨 ERREUR: Session non démarrée avant redirection!");
-            showError("Erreur de session");
-            return;
+            // ✅ CHEMINS CORRECTS SELON VOTRE ARBORESCENCE
+            switch (user.getRole().toLowerCase()) {
+                case "admin":
+                    fxmlPath = "/view/admin/admin-main.fxml";
+                    title = "Admin Panel - Gestion Véhicules";
+                    break;
+
+                case "vendeur":
+                    // ⚠️ VÉRIFIEZ LE NOM EXACT DU FICHIER
+                    // D'après votre arborescence, c'est "VendeurDashboard.fxml"
+                    fxmlPath = "/view/vendeur/layout/vendeur-layout.fxml";
+                    title = "Dashboard Vendeur - Gestion Véhicules";
+                    break;
+
+                case "client":
+                    fxmlPath = "/view/client/main-layout.fxml";
+                    title = "Marketplace - Gestion Véhicules";
+                    break;
+
+                default:
+                    showError("❌ Rôle utilisateur non reconnu: " + user.getRole());
+                    System.err.println("❌ Rôle inconnu: " + user.getRole());
+                    return;
+            }
+
+            // Vérifier que le fichier existe
+            if (getClass().getResource(fxmlPath) == null) {
+                System.err.println("❌ FICHIER FXML NON TROUVÉ: " + fxmlPath);
+                System.err.println("📁 Vérifiez que le fichier existe dans: src/main/resources" + fxmlPath);
+                showError("❌ Page de destination non disponible: " + fxmlPath);
+                return;
+            }
+
+            System.out.println("📂 Chargement de: " + fxmlPath);
+
+            // Charger la vue
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+
+            // Changer de scène
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            Scene scene = new Scene(root, 1400, 800);
+            stage.setScene(scene);
+            stage.setTitle(title);
+            stage.setMaximized(true);
+            stage.centerOnScreen();
+
+            System.out.println("✅ Redirection réussie vers: " + user.getRole());
+
+        } catch (IOException e) {
+            System.err.println("❌ Erreur chargement FXML: " + e.getMessage());
+            e.printStackTrace();
+            showError("❌ Impossible de charger le dashboard: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Erreur redirection: " + e.getMessage());
+            e.printStackTrace();
+            showError("❌ Erreur lors de la redirection");
         }
-
-        // ✅ CORRECTION : CHEMIN CORRECT
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/client/main-layout.fxml"));
-        Parent root = loader.load();
-
-        Stage stage = (Stage) emailField.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Gestion Véhicules - Client");
-        stage.setMaximized(true);
     }
 
-    /**
-     * Redirection vers le dashboard vendeur
-     */
-    private void redirectToVendeurDashboard(Utilisateur user) throws IOException {
-        System.out.println("🔄 Redirection vers dashboard vendeur...");
-
-        // ⚠️ VÉRIFICATION AVANT REDIRECTION
-        if (!sessionManager.estConnecte()) {
-            System.out.println("🚨 ERREUR: Session non démarrée avant redirection!");
-            showError("Erreur de session");
-            return;
-        }
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/layout/vendeur-layout.fxml"));
-        Parent root = loader.load();
-
-        // ⚠️ OPTIONNEL: Injection de la session dans le contrôleur suivant
-        Object controller = loader.getController();
-        System.out.println("🎯 Contrôleur chargé: " + controller.getClass().getSimpleName());
-
-        Stage stage = (Stage) emailField.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Gestion Véhicules - Vendeur");
-        stage.setMaximized(true);
-
-        System.out.println("✅ Redirection vendeur réussie");
-    }
-
-    /**
-     * Redirection vers le dashboard admin
-     */
-    private void redirectToAdminDashboard(Utilisateur user) throws IOException {
-        // TODO: Créer le dashboard admin
-        showError("Dashboard admin en cours de développement");
-    }
-
-    /**
-     * Aller vers la page d'inscription
-     */
     @FXML
     private void handleGoToRegister() {
+        System.out.println("📝 Redirection vers inscription");
         try {
-            // ✅ UTILISEZ UNIQUEMENT LE CHEMIN QUI FONCTIONNE
-            String workingPath = "/view/auth/Register.fxml";
-            System.out.println("🔄 Chargement depuis: " + workingPath);
-
-            Parent root = FXMLLoader.load(getClass().getResource(workingPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/Register.fxml"));
+            Parent root = loader.load();
 
             Stage stage = (Stage) emailField.getScene().getWindow();
             stage.setScene(new Scene(root, 1000, 700));
             stage.setTitle("Inscription - Gestion Véhicules");
+            stage.centerOnScreen();
 
-            System.out.println("✅ Inscription chargée avec succès!");
-
-        } catch (IOException e) {
-            System.err.println("❌ Erreur critique: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Erreur chargement inscription: " + e.getMessage());
             e.printStackTrace();
-            showError("Impossible de charger la page d'inscription. Contactez l'administrateur.");
+            showError("Impossible de charger la page d'inscription");
         }
     }
 
-    /**
-     * Validation email
-     */
-    private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    @FXML
+    private void handleForgotPassword() {
+        System.out.println("🔑 Mot de passe oublié cliqué");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/ForgotPassword.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) emailField.getScene().getWindow();
+            stage.setScene(new Scene(root, 800, 600));
+            stage.setTitle("Mot de passe oublié - Gestion Véhicules");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur chargement mot de passe oublié: " + e.getMessage());
+            e.printStackTrace();
+            showError("Fonctionnalité non disponible");
+        }
+    }
+
+    @FXML
+    private void handleMicrosoftLogin() {
+        System.out.println("🔵 Microsoft login cliqué");
+        showError("Connexion Microsoft non disponible pour le moment");
     }
 
     /**
-     * Afficher une erreur
+     * Afficher un message d'erreur
      */
     private void showError(String message) {
-        errorLabel.setText("⚠️ " + message);
+        System.err.println("⚠️ " + message);
+        errorLabel.setText(message);
         errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
+
+        // Effacer après 5 secondes
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+                javafx.application.Platform.runLater(this::hideError);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
     }
 
     /**
-     * Masquer l'erreur
+     * Masquer le message d'erreur
      */
     private void hideError() {
         errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
     }
 
-    private void debugRegisterPath() {
-        System.out.println("=== DÉBOGAGE CHEMIN REGISTER ===");
-
-        String[] paths = {
-                "/com/example/vehiclegestion/view/auth/Register.fxml",
-                "/view/auth/Register.fxml",
-                "com/example/vehiclegestion/view/auth/Register.fxml",
-                "/auth/Register.fxml",
-                "Register.fxml"
-        };
-
-        for (String path : paths) {
-            try {
-                java.net.URL url = getClass().getResource(path);
-                System.out.println("Test: '" + path + "' → " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
-                if (url != null) {
-                    System.out.println("   URL: " + url);
-                }
-            } catch (Exception e) {
-                System.out.println("   ❌ Erreur: " + e.getMessage());
-            }
-        }
-
-        // Test supplémentaire avec ClassLoader
-        System.out.println("=== TEST CLASSLOADER ===");
-        try {
-            java.net.URL url = getClass().getClassLoader().getResource("/view/auth/Register.fxml");
-            System.out.println("ClassLoader: " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
-            if (url != null) {
-                System.out.println("   URL: " + url);
-            }
-        } catch (Exception e) {
-            System.out.println("   ❌ Erreur: " + e.getMessage());
-        }
+    /**
+     * Valider le format email
+     */
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 }

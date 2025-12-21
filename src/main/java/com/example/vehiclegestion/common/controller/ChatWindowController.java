@@ -8,9 +8,7 @@ import com.example.vehiclegestion.utils.NavigationManager;
 import com.example.vehiclegestion.common.utils.NotificationService;
 import com.example.vehiclegestion.utils.NavigationManager;
 import com.example.vehiclegestion.utils.DataReceiver;
-
-
-
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.input.KeyCode;
@@ -55,7 +53,9 @@ public class ChatWindowController implements Initializable {
     private Conversation currentConversation;
     private Timeline autoRefreshTimeline;
     private int lastMessageCount = 0;
-    private boolean fromVehicleDetails = false; // Nouveau flag
+    private boolean fromVehicleDetails = false;
+    private SessionManager sessionManager;
+
 
     // AJOUTER CET ATTRIBUT
     private NotificationService notificationService;
@@ -66,33 +66,43 @@ public class ChatWindowController implements Initializable {
 
         // AJOUTER CETTE LIGNE - Initialiser NotificationService
         notificationService = NotificationService.getInstance();
+        sessionManager = SessionManager.getInstance();
+        System.out.println("✅ SessionManager hashCode: " + sessionManager.hashCode());
 
         // Récupérer l'utilisateur connecté
         if (SessionManager.getInstance().estConnecte()) {
             currentUserId = SessionManager.getInstance().getUserId();
             currentUserRole = SessionManager.getInstance().getUserRole();
             System.out.println("✅ Utilisateur connecté: ID=" + currentUserId + ", Role=" + currentUserRole);
+
+            // Initialiser l'interface
+            Platform.runLater(() -> {
+                setupMessageInput();
+                setupSearchFilter();
+                updateNotificationBadge();
+
+                // Afficher le placeholder et charger les conversations
+                showPlaceholder();
+                loadConversations();
+
+                // Démarrer l'auto-refresh après un court délai
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000); // Attendre 1 seconde
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Platform.runLater(() -> startAutoRefresh());
+                }).start();
+            });
         } else {
             System.err.println("❌ Aucun utilisateur connecté !");
-            showError("Erreur", "Vous devez être connecté pour accéder au chat");
+            // Utiliser Platform.runLater() pour éviter le conflit avec l'animation
+            Platform.runLater(() -> {
+                showError("Erreur", "Vous devez être connecté pour accéder au chat");
+            });
             return;
         }
-
-        setupMessageInput();
-        setupSearchFilter();
-        startAutoRefresh();
-        updateNotificationBadge();
-
-        // NE PAS charger les conversations ici immédiatement
-        // Elles seront chargées par initializeFromMenu() ou openSpecificConversation()
-
-        // Par défaut, afficher le placeholder
-        Platform.runLater(() -> {
-            showPlaceholder();
-
-            // ✅ CHARGER LES CONVERSATIONS AUTOMATIQUEMENT
-            loadConversations();
-        });
     }
 
     /**
@@ -749,11 +759,19 @@ public class ChatWindowController implements Initializable {
     }
 
     private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+
+            // Utiliser show() au lieu de showAndWait() si possible
+            if (Platform.isFxApplicationThread()) {
+                alert.showAndWait();
+            } else {
+                alert.show();
+            }
+        });
     }
 
     public void cleanup() {
@@ -791,5 +809,53 @@ public class ChatWindowController implements Initializable {
 
         // Charger les conversations
         loadConversations();
+    }
+
+    /**
+     * Recharge l'interface après une connexion
+     */
+    public void reloadAfterLogin() {
+        if (SessionManager.getInstance().estConnecte()) {
+            System.out.println("🔄 Rechargement après connexion");
+
+            // Réinitialiser les données
+            currentUserId = SessionManager.getInstance().getUserId();
+            currentUserRole = SessionManager.getInstance().getUserRole();
+
+            // Réactiver les champs
+            if (searchConversationField != null) {
+                searchConversationField.setDisable(false);
+                searchConversationField.setPromptText("Rechercher une conversation...");
+            }
+
+            if (messageInputField != null) {
+                messageInputField.setDisable(false);
+                messageInputField.setPromptText("Écrivez votre message...");
+            }
+
+            if (sendButton != null) {
+                sendButton.setDisable(messageInputField.getText().trim().isEmpty());
+            }
+
+            // Recharger les conversations
+            loadConversations();
+
+            // Mettre à jour le badge
+            updateNotificationBadge();
+
+            // Redémarrer l'auto-refresh si besoin
+            if (autoRefreshTimeline == null || !autoRefreshTimeline.getStatus().equals(Animation.Status.RUNNING)) {
+                startAutoRefresh();
+            }
+        }
+    }
+    public void setUserInfo(int userId, String userRole) {
+        this.currentUserId = userId;
+        this.currentUserRole = userRole;
+        System.out.println("✅ Chat - Utilisateur défini: ID=" + userId + ", Role=" + userRole);
+
+        if (userId > 0) {
+            loadConversations();
+        }
     }
 }

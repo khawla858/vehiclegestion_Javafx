@@ -6,17 +6,17 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.FormVenteController"
-            style="-fx-background-color: #f5f7fa;">
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);">
 
     <!-- HEADER -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="15"
-              style="-fx-background-color: white; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+              style="-fx-background-color: rgba(30, 41, 59, 0.8); -fx-padding: 20; -fx-border-color: #10b981; -fx-border-width: 0 0 2 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 3);">
             <Label text="💰 Nouvelle Vente"
-                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="✖ Annuler" onAction="#annuler"
-                    style="-fx-background-color: #e5e7eb; -fx-text-fill: #374151; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                    style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
         </HBox>
     </top>
 
@@ -29,79 +29,79 @@
                 <!-- SECTION 1 : RECHERCHE CLIENT -->
                 <!-- ================================ -->
                 <VBox spacing="15"
-                      style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                      style="-fx-background-color: rgba(30, 41, 59, 0.8); -fx-padding: 25; -fx-background-radius: 12; -fx-border-color: #3b82f6; -fx-border-width: 2; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 3);">
 
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <Label text="👤" style="-fx-font-size: 24px;"/>
                         <Label text="Rechercher un Client"
-                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                     </HBox>
 
-                    <Separator style="-fx-background-color: #e2e8f0;"/>
+                    <Separator style="-fx-background-color: #3b82f6;"/>
 
                     <!-- Barre de recherche -->
                     <HBox spacing="12" alignment="CENTER_LEFT">
                         <TextField fx:id="searchClientField"
                                    promptText="🔍 Rechercher par nom, prénom ou email..."
-                                   style="-fx-pref-width: 400; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-font-size: 14px;"/>
+                                   style="-fx-pref-width: 400; -fx-padding: 12; -fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-font-size: 14px;"/>
 
                         <Button text="🔎 Rechercher" onAction="#rechercherClient"
-                                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 12 24; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6); -fx-text-fill: white; -fx-padding: 12 24; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 8, 0.5, 0, 2);"/>
 
                         <Region HBox.hgrow="ALWAYS"/>
 
                         <Button text="➕ Nouveau Client" onAction="#creerNouveauClient"
-                                style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 12 24; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                style="-fx-background-color: linear-gradient(to right, #10b981, #059669); -fx-text-fill: white; -fx-padding: 12 24; -fx-background-radius: 8; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.5), 8, 0.5, 0, 2);"/>
                     </HBox>
 
                     <!-- Résultats de la recherche -->
                     <VBox fx:id="clientResultsContainer" spacing="8" managed="false" visible="false"
-                          style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1;">
+                          style="-fx-background-color: rgba(15, 23, 42, 0.6); -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #475569; -fx-border-radius: 8; -fx-border-width: 1;">
 
                         <Label text="Résultats de recherche :"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 13px;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
 
                         <ListView fx:id="clientListView" prefHeight="180"
-                                  style="-fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;"/>
+                                  style="-fx-background-color: #1e293b; -fx-background-radius: 6; -fx-border-color: #475569; -fx-border-radius: 6;"/>
 
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <Label fx:id="clientCountLabel" text="0 client(s) trouvé(s)"
-                                   style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                                   style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;"/>
                         </HBox>
                     </VBox>
 
                     <!-- Client sélectionné -->
                     <VBox fx:id="selectedClientBox" spacing="12" managed="false" visible="false"
-                          style="-fx-background-color: #dbeafe; -fx-padding: 20; -fx-background-radius: 8; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-border-width: 2;">
+                          style="-fx-background-color: rgba(59, 130, 246, 0.15); -fx-padding: 20; -fx-background-radius: 8; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-border-width: 2;">
 
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label text="✅ Client sélectionné"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #1e40af; -fx-font-size: 14px;"/>
+                                   style="-fx-font-weight: bold; -fx-text-fill: #3b82f6; -fx-font-size: 14px;"/>
                             <Region HBox.hgrow="ALWAYS"/>
                             <Button text="Changer" onAction="#changerClient"
-                                    style="-fx-background-color: white; -fx-text-fill: #3b82f6; -fx-padding: 6 12; -fx-background-radius: 6; -fx-border-color: #3b82f6; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-cursor: hand;"/>
+                                    style="-fx-background-color: rgba(30, 41, 59, 0.8); -fx-text-fill: #3b82f6; -fx-padding: 6 12; -fx-background-radius: 6; -fx-border-color: #3b82f6; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-cursor: hand;"/>
                         </HBox>
 
                         <GridPane hgap="15" vgap="10">
                             <Label text="Nom complet :" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #1e40af; -fx-min-width: 120;"/>
+                                   style="-fx-font-weight: bold; -fx-text-fill: #3b82f6; -fx-min-width: 120;"/>
                             <Label fx:id="clientNomLabel" text="-" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #1e293b;"/>
+                                   style="-fx-text-fill: white;"/>
 
                             <Label text="Email :" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #1e40af;"/>
+                                   style="-fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
                             <Label fx:id="clientEmailLabel" text="-" GridPane.rowIndex="1" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #1e293b;"/>
+                                   style="-fx-text-fill: white;"/>
 
                             <Label text="Téléphone :" GridPane.rowIndex="2" GridPane.columnIndex="0"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #1e40af;"/>
+                                   style="-fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
                             <Label fx:id="clientTelLabel" text="-" GridPane.rowIndex="2" GridPane.columnIndex="1"
-                                   style="-fx-text-fill: #1e293b;"/>
+                                   style="-fx-text-fill: white;"/>
 
                             <Label text="Nb achats :" GridPane.rowIndex="0" GridPane.columnIndex="2"
-                                   style="-fx-font-weight: bold; -fx-text-fill: #1e40af; -fx-min-width: 100;"/>
+                                   style="-fx-font-weight: bold; -fx-text-fill: #3b82f6; -fx-min-width: 100;"/>
                             <Label fx:id="clientNbAchatsLabel" text="0" GridPane.rowIndex="0" GridPane.columnIndex="3"
-                                   style="-fx-text-fill: #1e293b;"/>
+                                   style="-fx-text-fill: white;"/>
                         </GridPane>
                     </VBox>
                 </VBox>
@@ -110,41 +110,41 @@
                 <!-- SECTION 2 : INFORMATIONS VÉHICULE -->
                 <!-- ================================ -->
                 <VBox spacing="15"
-                      style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                      style="-fx-background-color: rgba(30, 41, 59, 0.8); -fx-padding: 25; -fx-background-radius: 12; -fx-border-color: #10b981; -fx-border-width: 2; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 3);">
 
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <Label text="🚗" style="-fx-font-size: 24px;"/>
                         <Label text="Véhicule à vendre"
-                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                     </HBox>
 
-                    <Separator style="-fx-background-color: #e2e8f0;"/>
+                    <Separator style="-fx-background-color: #10b981;"/>
 
                     <GridPane hgap="15" vgap="12">
                         <Label text="Titre :" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-min-width: 120;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1; -fx-min-width: 120;"/>
                         <Label fx:id="vehiculeTitreLabel" text="-" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                               style="-fx-text-fill: #1e293b; -fx-font-size: 15px;"/>
+                               style="-fx-text-fill: white; -fx-font-size: 15px;"/>
 
                         <Label text="Prix :" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
                         <Label fx:id="vehiculePrixLabel" text="0 DH" GridPane.rowIndex="1" GridPane.columnIndex="1"
-                               style="-fx-text-fill: #3b82f6; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                               style="-fx-text-fill: #10b981; -fx-font-size: 18px; -fx-font-weight: bold;"/>
 
                         <Label text="Marque :" GridPane.rowIndex="0" GridPane.columnIndex="2"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-min-width: 100;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1; -fx-min-width: 100;"/>
                         <Label fx:id="vehiculeMarqueLabel" text="-" GridPane.rowIndex="0" GridPane.columnIndex="3"
-                               style="-fx-text-fill: #1e293b;"/>
+                               style="-fx-text-fill: white;"/>
 
                         <Label text="Modèle :" GridPane.rowIndex="1" GridPane.columnIndex="2"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
                         <Label fx:id="vehiculeModeleLabel" text="-" GridPane.rowIndex="1" GridPane.columnIndex="3"
-                               style="-fx-text-fill: #1e293b;"/>
+                               style="-fx-text-fill: white;"/>
 
                         <Label text="Année :" GridPane.rowIndex="2" GridPane.columnIndex="2"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
                         <Label fx:id="vehiculeAnneeLabel" text="-" GridPane.rowIndex="2" GridPane.columnIndex="3"
-                               style="-fx-text-fill: #1e293b;"/>
+                               style="-fx-text-fill: white;"/>
                     </GridPane>
                 </VBox>
 
@@ -152,51 +152,51 @@
                 <!-- SECTION 3 : DÉTAILS DE LA VENTE -->
                 <!-- ================================ -->
                 <VBox spacing="15"
-                      style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+                      style="-fx-background-color: rgba(30, 41, 59, 0.8); -fx-padding: 25; -fx-background-radius: 12; -fx-border-color: #f59e0b; -fx-border-width: 2; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 3);">
 
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <Label text="💳" style="-fx-font-size: 24px;"/>
                         <Label text="Détails de la Vente"
-                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                     </HBox>
 
-                    <Separator style="-fx-background-color: #e2e8f0;"/>
+                    <Separator style="-fx-background-color: #f59e0b;"/>
 
                     <GridPane hgap="20" vgap="15">
                         <!-- Montant Total -->
                         <Label text="Montant Total *" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-min-width: 150;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: white; -fx-min-width: 150;"/>
                         <TextField fx:id="montantField" promptText="Prix du véhicule"
                                    GridPane.rowIndex="0" GridPane.columnIndex="1"
-                                   style="-fx-pref-width: 300; -fx-padding: 10; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
+                                   style="-fx-pref-width: 300; -fx-padding: 10; -fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
 
                         <!-- Moyen de Paiement -->
                         <Label text="Moyen de Paiement *" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: white;"/>
                         <ComboBox fx:id="moyenPaiementCombo" promptText="Sélectionnez..."
                                   GridPane.rowIndex="1" GridPane.columnIndex="1"
-                                  style="-fx-pref-width: 300;"/>
+                                  style="-fx-pref-width: 300; -fx-background-color: white; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;"/>
 
                         <!-- Statut -->
                         <Label text="Statut *" GridPane.rowIndex="2" GridPane.columnIndex="0"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: white;"/>
                         <ComboBox fx:id="statutCombo" GridPane.rowIndex="2" GridPane.columnIndex="1"
-                                  style="-fx-pref-width: 300;"/>
+                                  style="-fx-pref-width: 300; -fx-background-color: white; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;"/>
 
                         <!-- Date de Vente -->
                         <Label text="Date de Vente" GridPane.rowIndex="3" GridPane.columnIndex="0"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: white;"/>
                         <DatePicker fx:id="dateVentePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"
-                                    style="-fx-pref-width: 300;"/>
+                                    style="-fx-pref-width: 300; -fx-background-color: white; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;"/>
                     </GridPane>
 
                     <!-- Notes optionnelles -->
                     <VBox spacing="8">
                         <Label text="Notes / Remarques (optionnel)"
-                               style="-fx-font-weight: bold; -fx-text-fill: #475569;"/>
+                               style="-fx-font-weight: bold; -fx-text-fill: white;"/>
                         <TextArea fx:id="notesArea" promptText="Ajoutez des notes sur cette vente..."
                                   prefHeight="80"
-                                  style="-fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
+                                  style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;"/>
                     </VBox>
                 </VBox>
 
@@ -207,17 +207,17 @@
     <!-- FOOTER : BOUTONS D'ACTION -->
     <bottom>
         <HBox alignment="CENTER_RIGHT" spacing="15"
-              style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
+              style="-fx-background-color: rgba(30, 41, 59, 0.8); -fx-padding: 20; -fx-border-color: #334155; -fx-border-width: 2 0 0 0;">
 
             <Label fx:id="errorLabel" text="" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <Button text="Annuler" onAction="#annuler"
-                    style="-fx-background-color: #e5e7eb; -fx-text-fill: #374151; -fx-padding: 12 30; -fx-background-radius: 6; -fx-font-size: 14px; -fx-cursor: hand;"/>
+                    style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-padding: 12 30; -fx-background-radius: 6; -fx-font-size: 14px; -fx-cursor: hand;"/>
 
             <Button text="💾 Enregistrer la Vente" onAction="#enregistrerVente"
-                    style="-fx-background-color: linear-gradient(to bottom, #10b981, #059669); -fx-text-fill: white; -fx-padding: 12 30; -fx-background-radius: 6; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                    style="-fx-background-color: linear-gradient(to right, #10b981, #059669); -fx-text-fill: white; -fx-padding: 12 30; -fx-background-radius: 6; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.5), 8, 0.5, 0, 2);"/>
         </HBox>
     </bottom>
 
