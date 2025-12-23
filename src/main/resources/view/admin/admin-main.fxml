@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.admin.controller.AdminMainController"
+            stylesheets="@../../css/admin-style.css">
+
+    <!-- MENU LATERAL GAUCHE -->
+    <left>
+        <VBox spacing="0" styleClass="sidebar" prefWidth="250"
+              style="-fx-background-color: #2c3e50;">
+            <padding>
+                <Insets top="20" right="0" bottom="20" left="0"/>
+            </padding>
+
+            <!-- LOGO / TITRE -->
+            <VBox spacing="10" alignment="CENTER">
+                <padding>
+                    <Insets top="10" right="20" bottom="20" left="20"/>
+                </padding>
+                <Label text="⚙️ ADMIN PANEL" styleClass="sidebar-title"
+                       style="-fx-text-fill: white; -fx-font-weight: bold;">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+                <Label fx:id="adminNameLabel" text="Admin"
+                       style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <Separator style="-fx-background-color: #34495e;"/>
+
+            <!-- MENU DE NAVIGATION -->
+            <VBox spacing="5" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="20" right="10" bottom="10" left="10"/>
+                </padding>
+
+                <Button fx:id="dashboardBtn" text="📊 Dashboard"
+                        onAction="#showDashboard"
+                        styleClass="menu-button"
+                        prefWidth="230" prefHeight="45"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white;
+                               -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;
+                               -fx-padding: 10px 20px;"/>
+
+                <Button fx:id="usersBtn" text="👥 Gestion Utilisateurs"
+                        onAction="#showUsers"
+                        styleClass="menu-button"
+                        prefWidth="230" prefHeight="45"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                               -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;
+                               -fx-padding: 10px 20px; -fx-border-color: transparent;
+                               -fx-cursor: hand;"/>
+
+                <Button fx:id="magasinsBtn" text="🏪 Gestion Magasins"
+                        onAction="#showMagasins"
+                        styleClass="menu-button"
+                        prefWidth="230" prefHeight="45"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                               -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;
+                               -fx-padding: 10px 20px; -fx-border-color: transparent;
+                               -fx-cursor: hand;"/>
+
+
+                <Button fx:id="logsBtn" text="📋 Logs Système" onAction="#showLogs"
+                        style="-fx-background-color: transparent;
+               -fx-text-fill: white;
+               -fx-font-size: 14px;
+               -fx-alignment: CENTER_LEFT;
+               -fx-padding: 10px 20px;
+               -fx-cursor: hand;"/>
+
+                <Separator style="-fx-background-color: #34495e;">
+                    <VBox.margin>
+                        <Insets top="20" bottom="20"/>
+                    </VBox.margin>
+                </Separator>
+
+                <Button text="⚙️ Paramètres"
+                        onAction="#showSettings"
+                        styleClass="menu-button"
+                        prefWidth="230" prefHeight="45"
+                        style="-fx-background-color: transparent; -fx-text-fill: white;
+                               -fx-font-size: 14px; -fx-alignment: CENTER_LEFT;
+                               -fx-padding: 10px 20px; -fx-border-color: transparent;
+                               -fx-cursor: hand;"/>
+
+            </VBox>
+
+            <!-- BOUTON DÉCONNEXION EN BAS -->
+            <VBox spacing="10" alignment="CENTER">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                <Separator style="-fx-background-color: #34495e;"/>
+                <Button text="🚪 Déconnexion"
+                        onAction="#handleLogout"
+                        prefWidth="210" prefHeight="40"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                               -fx-font-size: 14px; -fx-font-weight: bold;
+                               -fx-background-radius: 5px;"/>
+            </VBox>
+
+        </VBox>
+    </left>
+
+    <!-- ZONE DE CONTENU PRINCIPAL (pages chargées dynamiquement) -->
+    <center>
+        <BorderPane fx:id="contentArea" style="-fx-background-color: #ecf0f1;"/>
+    </center>
+
+    <!-- BARRE DU HAUT (optionnelle) -->
+    <top>
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-padding: 15px 30px;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label fx:id="pageTitle" text="Dashboard"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+            <HBox HBox.hgrow="ALWAYS"/>
+
+            <Label fx:id="dateTimeLabel" text="Date/Heure"
+                   style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+        </HBox>
+    </top>
+
+</BorderPane>

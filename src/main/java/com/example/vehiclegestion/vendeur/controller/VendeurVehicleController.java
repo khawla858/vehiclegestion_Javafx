@@ -1,7 +1,7 @@
 package com.example.vehiclegestion.vendeur.controller;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.utils.NavigationManager;
 
-import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.ArticleDAO;
 import com.example.vehiclegestion.vendeur.model.Article;
 import javafx.fxml.FXML;
@@ -169,17 +169,56 @@ public class VendeurVehicleController {
 
     private void loadVehicles() {
         try {
-            // ✅ CORRECTION : Charger uniquement les articles du vendeur connecté
-            System.out.println("📦 Chargement des articles pour vendeur ID: " + vendeurIdConnecte);
-            allArticles = articleDAO.getArticlesByVendeur(vendeurIdConnecte);
+            // ✅ VÉRIFIER si un magasin est sélectionné dans la session
+            Integer magasinId = sessionManager.getCurrentMagasinId();
+            String magasinNom = sessionManager.getCurrentMagasinNom();
+
+            if (magasinId != null) {
+                // ✅ CAS 1: Charger uniquement les véhicules du magasin sélectionné
+                System.out.println("🔍 Chargement des véhicules pour magasin ID: " + magasinId);
+                allArticles = articleDAO.getArticlesByMagasin(magasinId);
+
+                // Mettre à jour le label des résultats
+                if (resultsLabel != null) {
+                    resultsLabel.setText("Véhicules du magasin: " + magasinNom + " (" + allArticles.size() + " trouvés)");
+                }
+
+                // ✅ Afficher un badge ou indicateur du filtre actif
+                showMagasinFilterBadge(magasinNom);
+
+            } else {
+                // ✅ CAS 2: Charger tous les véhicules du vendeur
+                System.out.println("🔍 Chargement de tous les véhicules du vendeur ID: " + vendeurIdConnecte);
+                allArticles = articleDAO.getArticlesByVendeur(vendeurIdConnecte);
+                updateResultsLabel(allArticles.size());
+
+                // Cacher le badge de filtre
+                hideMagasinFilterBadge();
+            }
+
             displayVehicles(allArticles);
-            updateResultsLabel(allArticles.size());
-            System.out.println("✅ " + allArticles.size() + " article(s) chargé(s)");
+
         } catch (SQLException e) {
             e.printStackTrace();
             showError("Erreur de chargement des véhicules: " + e.getMessage());
         }
     }
+    private void showMagasinFilterBadge(String magasinNom) {
+        // Ajouter un badge visuel si nécessaire
+        System.out.println("🏷️ Filtre actif - Magasin: " + magasinNom);
+
+        // Optionnel: Ajouter un bouton pour effacer le filtre
+        if (searchField != null) {
+            searchField.setPromptText("Rechercher dans le magasin: " + magasinNom);
+        }
+    }
+
+    private void hideMagasinFilterBadge() {
+        if (searchField != null) {
+            searchField.setPromptText("Rechercher parmi tous les véhicules...");
+        }
+    }
+
 
     private void displayVehicles(List<Article> articles) {
         cardsContainer.getChildren().clear();
@@ -203,6 +242,7 @@ public class VendeurVehicleController {
 
         cardsContainer.getChildren().add(flowPane);
         cardsContainer.setAlignment(Pos.TOP_CENTER);
+
     }
 
     private VBox createVehicleCard(Article article) {
@@ -373,8 +413,34 @@ public class VendeurVehicleController {
     }
 
     private void editVehicle(Article article) {
-        System.out.println("✏️ Modifier: " + article.getTitre());
-        // TODO: Implémenter la modification
+        System.out.println("✏️ Ouverture modification: " + article.getTitre());
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/vendeur/edit-vehicle-form.fxml"));
+            // Remplacez VBox par BorderPane
+            BorderPane form = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Modifier le véhicule - " + article.getTitre());
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+
+            Scene scene = new Scene(form);
+            dialogStage.setScene(scene);
+
+            EditVehicleFormController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+
+            // Passer l'article à modifier au contrôleur du formulaire
+            controller.setArticle(article);
+
+            // Recharger la liste après modification
+            dialogStage.setOnHidden(e -> loadVehicles());
+            dialogStage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture du formulaire: " + e.getMessage());
+        }
     }
 
     private void deleteVehicle(Article article) {
@@ -399,4 +465,5 @@ public class VendeurVehicleController {
             showError("Erreur lors de la suppression: " + ex.getMessage());
         }
     }
+
 }

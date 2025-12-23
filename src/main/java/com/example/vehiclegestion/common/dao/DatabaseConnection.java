@@ -42,5 +42,8 @@ public class DatabaseConnection {
             System.err.println("❌ Test de connexion échoué: " + e.getMessage());
         }
         return false;
+
+
+
     }
 }

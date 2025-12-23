@@ -2,90 +2,360 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.paint.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox fx:id="mainContainer" spacing="0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.vehiclegestion.client.controller.RendezVousFormController">
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.client.controller.RendezVousFormController"
+            style="-fx-background: linear-gradient(to bottom right, #0f172a, #1e293b);
+                   -fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);"
+            fitToWidth="true">
 
-    <!-- En-tête avec fond coloré -->
-    <VBox style="-fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2); -fx-padding: 15; -fx-alignment: center;">
-        <Label text="📅" style="-fx-font-size: 32px; -fx-text-fill: white;"/>
-        <Label fx:id="titleLabel" text="Prendre un Rendez-vous" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white; -fx-alignment: center;"/>
-        <Label fx:id="vehicleInfoLabel" text="Véhicule sélectionné" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.9); -fx-alignment: center; -fx-padding: 8 0 0 0;"/>
-    </VBox>
+    <VBox fx:id="mainContainer" spacing="0" style="-fx-background-color: transparent;">
 
-    <!-- Contenu du formulaire -->
-    <VBox spacing="15" style="-fx-background-color: #f8f9fa; -fx-padding: 20;">
+        <!-- =============================================== -->
+        <!-- CONTENU PRINCIPAL DU FORMULAIRE -->
+        <!-- =============================================== -->
+        <VBox spacing="30" style="-fx-padding: 40 60;">
 
-        <!-- Carte du formulaire -->
-        <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3); -fx-padding: 20;">
+            <!-- Label caché pour le titre (requis par le contrôleur) -->
+            <Label fx:id="titleLabel" visible="false" managed="false"/>
 
-            <Label text="Détails du rendez-vous" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;"/>
+            <!-- Label caché pour vehicleInfo (requis par le contrôleur) -->
+            <Label fx:id="vehicleInfoLabel" visible="false" managed="false"/>
 
-            <GridPane hgap="15" vgap="12">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="120" prefWidth="120" />
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="200" prefWidth="200" />
-                </columnConstraints>
+            <!-- =============================================== -->
+            <!-- CARTE PRINCIPALE : FORMULAIRE -->
+            <!-- =============================================== -->
+            <VBox spacing="25" style="-fx-background-color: rgba(30, 41, 59, 0.95);
+                                     -fx-background-radius: 25;
+                                     -fx-border-color: linear-gradient(to right, #334155, #475569, #334155);
+                                     -fx-border-width: 1;
+                                     -fx-border-radius: 25;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 20, 0.6, 0, 5);
+                                     -fx-padding: 40;">
 
-                <rowConstraints>
-                    <RowConstraints minHeight="35" prefHeight="35" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="35" prefHeight="35" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="35" prefHeight="35" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="35" prefHeight="35" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="80" prefHeight="80" vgrow="SOMETIMES" />
-                </rowConstraints>
-
-                <!-- Date -->
-                <Label text="📅 Date du rendez-vous *" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 13px;" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                <DatePicker fx:id="datePicker" style="-fx-background-color: #f8f9fa; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 13px;" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-
-                <!-- Heure -->
-                <Label text="🕒 Heure *" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 13px;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <ComboBox fx:id="timeComboBox" style="-fx-background-color: #f8f9fa; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 13px;" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-
-                <!-- Durée -->
-                <Label text="⏱️ Durée estimée *" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 13px;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                <ComboBox fx:id="durationComboBox" style="-fx-background-color: #f8f9fa; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 13px;" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-
-                <!-- Type de rendez-vous -->
-                <Label text="🎯 Type de rendez-vous *" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 13px;" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-                <ComboBox fx:id="typeRdvComboBox" style="-fx-background-color: #f8f9fa; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 13px;" GridPane.rowIndex="3" GridPane.columnIndex="1" />
-
-                <!-- Description -->
-                <Label text="📝 Notes supplémentaires" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 13px;" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-                <TextArea fx:id="descriptionTextArea" style="-fx-background-color: #f8f9fa; -fx-border-color: #e9ecef; -fx-border-radius: 6; -fx-padding: 8; -fx-font-size: 13px; -fx-pref-height: 70;" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-            </GridPane>
-
-            <!-- Informations importantes -->
-            <VBox style="-fx-background-color: #e3f2fd; -fx-background-radius: 6; -fx-padding: 12; -fx-spacing: 6; -fx-margin: 15 0 0 0;">
-                <HBox spacing="8" alignment="CENTER_LEFT">
-                    <Label text="💡" style="-fx-font-size: 14px;"/>
-                    <Label text="Informations importantes" style="-fx-font-weight: bold; -fx-text-fill: #1565c0; -fx-font-size: 13px;"/>
+                <!-- En-tête de section -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <StackPane style="-fx-background-color: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+                                      -fx-background-radius: 12;
+                                      -fx-pref-width: 55;
+                                      -fx-pref-height: 55;
+                                      -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 12, 0.6, 0, 2);">
+                        <FontIcon iconLiteral="fas-clipboard-list" iconSize="26" iconColor="#f1f5f9"/>
+                    </StackPane>
+                    <VBox spacing="3">
+                        <Label text="Informations du rendez-vous"
+                               style="-fx-font-size: 24px;
+                                      -fx-font-weight: bold;
+                                      -fx-text-fill: #f1f5f9;
+                                      -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
+                        <Label text="Complétez les informations ci-dessous pour planifier votre visite"
+                               style="-fx-font-size: 14px;
+                                      -fx-text-fill: #94a3b8;"/>
+                    </VBox>
                 </HBox>
-                <Label text="• Veuillez arriver 5 minutes avant l'heure prévue\n• Apportez votre permis de conduire pour les essais routiers\n• Le vendeur vous confirmera le rendez-vous par email"
-                       style="-fx-text-fill: #1976d2; -fx-font-size: 12px; -fx-line-spacing: 1.2;"
-                       wrapText="true" />
+
+                <Separator style="-fx-background-color: linear-gradient(to right, #334155, transparent, #334155);
+                                  -fx-pref-height: 2;"/>
+
+                <!-- Grille du formulaire -->
+                <GridPane hgap="25" vgap="22">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="150" prefWidth="150" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="350" prefWidth="450" />
+                    </columnConstraints>
+
+                    <!-- DATE -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 8;
+                                          -fx-pref-width: 36;
+                                          -fx-pref-height: 36;">
+                            <FontIcon iconLiteral="fas-calendar-alt" iconSize="18" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Date *"
+                               style="-fx-font-weight: bold;
+                                      -fx-text-fill: #f1f5f9;
+                                      -fx-font-size: 15px;
+                                      -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
+                    </HBox>
+                    <DatePicker fx:id="datePicker"
+                                GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                       -fx-border-color: #3b82f6;
+                                       -fx-border-width: 2;
+                                       -fx-border-radius: 12;
+                                       -fx-background-radius: 12;
+                                       -fx-padding: 14;
+                                       -fx-font-size: 15px;
+                                       -fx-text-fill: #f1f5f9;
+                                       -fx-prompt-text-fill: #64748b;
+                                       -fx-pref-width: 450;"/>
+
+                    <!-- HEURE -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="0">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 8;
+                                          -fx-pref-width: 36;
+                                          -fx-pref-height: 36;">
+                            <FontIcon iconLiteral="fas-clock" iconSize="18" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Heure *"
+                               style="-fx-font-weight: bold;
+                                      -fx-text-fill: #f1f5f9;
+                                      -fx-font-size: 15px;"/>
+                    </HBox>
+                    <ComboBox fx:id="timeComboBox"
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"
+                              style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                     -fx-border-color: #3b82f6;
+                                     -fx-border-width: 2;
+                                     -fx-border-radius: 12;
+                                     -fx-background-radius: 12;
+                                     -fx-padding: 14;
+                                     -fx-font-size: 15px;
+                                     -fx-text-fill: #f1f5f9;
+                                     -fx-pref-width: 450;"/>
+
+                    <!-- DURÉE -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="2" GridPane.columnIndex="0">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 8;
+                                          -fx-pref-width: 36;
+                                          -fx-pref-height: 36;">
+                            <FontIcon iconLiteral="fas-hourglass-half" iconSize="18" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Durée *"
+                               style="-fx-font-weight: bold;
+                                      -fx-text-fill: #f1f5f9;
+                                      -fx-font-size: 15px;"/>
+                    </HBox>
+                    <ComboBox fx:id="durationComboBox"
+                              GridPane.rowIndex="2" GridPane.columnIndex="1"
+                              style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                     -fx-border-color: #3b82f6;
+                                     -fx-border-width: 2;
+                                     -fx-border-radius: 12;
+                                     -fx-background-radius: 12;
+                                     -fx-padding: 14;
+                                     -fx-font-size: 15px;
+                                     -fx-pref-width: 450;"/>
+
+                    <!-- TYPE DE RENDEZ-VOUS -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="3" GridPane.columnIndex="0">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 8;
+                                          -fx-pref-width: 36;
+                                          -fx-pref-height: 36;">
+                            <FontIcon iconLiteral="fas-tasks" iconSize="18" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Type *"
+                               style="-fx-font-weight: bold;
+                                      -fx-text-fill: #f1f5f9;
+                                      -fx-font-size: 15px;"/>
+                    </HBox>
+                    <ComboBox fx:id="typeRdvComboBox"
+                              GridPane.rowIndex="3" GridPane.columnIndex="1"
+                              style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                     -fx-border-color: #3b82f6;
+                                     -fx-border-width: 2;
+                                     -fx-border-radius: 12;
+                                     -fx-background-radius: 12;
+                                     -fx-padding: 14;
+                                     -fx-font-size: 15px;
+                                     -fx-pref-width: 450;"/>
+
+                    <!-- DESCRIPTION -->
+                    <HBox spacing="10" alignment="TOP_LEFT" GridPane.rowIndex="4" GridPane.columnIndex="0">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 8;
+                                          -fx-pref-width: 36;
+                                          -fx-pref-height: 36;">
+                            <FontIcon iconLiteral="fas-comment-dots" iconSize="18" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Notes"
+                               style="-fx-font-weight: bold;
+                                      -fx-text-fill: #f1f5f9;
+                                      -fx-font-size: 15px;"/>
+                    </HBox>
+                    <TextArea fx:id="descriptionTextArea"
+                              GridPane.rowIndex="4" GridPane.columnIndex="1"
+                              style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                     -fx-border-color: #3b82f6;
+                                     -fx-border-width: 2;
+                                     -fx-border-radius: 12;
+                                     -fx-background-radius: 12;
+                                     -fx-padding: 14;
+                                     -fx-font-size: 15px;
+                                     -fx-text-fill: #f1f5f9;
+                                     -fx-prompt-text-fill: #64748b;
+                                     -fx-pref-height: 120;
+                                     -fx-pref-width: 450;"/>
+                </GridPane>
             </VBox>
+
+            <!-- =============================================== -->
+            <!-- CARTE D'INFORMATIONS IMPORTANTES -->
+            <!-- =============================================== -->
+            <VBox spacing="18" style="-fx-background-color: rgba(59, 130, 246, 0.12);
+                                     -fx-background-radius: 20;
+                                     -fx-border-color: rgba(59, 130, 246, 0.4);
+                                     -fx-border-width: 2;
+                                     -fx-border-radius: 20;
+                                     -fx-padding: 30;
+                                     -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.25), 12, 0.6, 0, 3);">
+
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <StackPane style="-fx-background-color: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+                                      -fx-background-radius: 12;
+                                      -fx-pref-width: 48;
+                                      -fx-pref-height: 48;
+                                      -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 10, 0.6, 0, 2);">
+                        <FontIcon iconLiteral="fas-info-circle" iconSize="24" iconColor="#f1f5f9"/>
+                    </StackPane>
+                    <Label text="Informations importantes"
+                           style="-fx-font-weight: bold;
+                                  -fx-text-fill: #3b82f6;
+                                  -fx-font-size: 18px;"/>
+                </HBox>
+
+                <VBox spacing="14">
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 6;
+                                          -fx-pref-width: 28;
+                                          -fx-pref-height: 28;">
+                            <FontIcon iconLiteral="fas-check-circle" iconSize="14" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Veuillez arriver 5 minutes avant l'heure prévue"
+                               style="-fx-text-fill: #cbd5e1;
+                                      -fx-font-size: 14px;
+                                      -fx-line-spacing: 1.5;"
+                               wrapText="true"/>
+                    </HBox>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 6;
+                                          -fx-pref-width: 28;
+                                          -fx-pref-height: 28;">
+                            <FontIcon iconLiteral="fas-check-circle" iconSize="14" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Apportez votre permis de conduire pour les essais routiers"
+                               style="-fx-text-fill: #cbd5e1;
+                                      -fx-font-size: 14px;
+                                      -fx-line-spacing: 1.5;"
+                               wrapText="true"/>
+                    </HBox>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <StackPane style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                          -fx-background-radius: 6;
+                                          -fx-pref-width: 28;
+                                          -fx-pref-height: 28;">
+                            <FontIcon iconLiteral="fas-check-circle" iconSize="14" iconColor="#3b82f6"/>
+                        </StackPane>
+                        <Label text="Le vendeur vous confirmera le rendez-vous par email"
+                               style="-fx-text-fill: #cbd5e1;
+                                      -fx-font-size: 14px;
+                                      -fx-line-spacing: 1.5;"
+                               wrapText="true"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- =============================================== -->
+            <!-- BOUTONS D'ACTION -->
+            <!-- =============================================== -->
+            <HBox spacing="20" alignment="CENTER" style="-fx-padding: 15 0 30 0;">
+                <Button fx:id="cancelBtn" text="Annuler"
+                        style="-fx-background-color: rgba(100, 116, 139, 0.25);
+                               -fx-text-fill: #cbd5e1;
+                               -fx-font-weight: bold;
+                               -fx-font-size: 16px;
+                               -fx-padding: 18 50;
+                               -fx-background-radius: 14;
+                               -fx-border-color: #64748b;
+                               -fx-border-width: 2;
+                               -fx-border-radius: 14;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0.5, 0, 2);">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-times-circle" iconSize="18" iconColor="#cbd5e1"/>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="submitBtn" text="Confirmer le Rendez-vous"
+                        style="-fx-background-color: linear-gradient(to right, #ec4899, #8b5cf6);
+                               -fx-text-fill: #f1f5f9;
+                               -fx-font-weight: bold;
+                               -fx-font-size: 16px;
+                               -fx-padding: 18 50;
+                               -fx-background-radius: 14;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(236, 72, 153, 0.6), 18, 0.7, 0, 4);">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-check-circle" iconSize="18" iconColor="#f1f5f9"/>
+                    </graphic>
+                </Button>
+            </HBox>
+
         </VBox>
 
-        <!-- Boutons d'action -->
-        <HBox spacing="12" alignment="CENTER">
-            <Button fx:id="cancelBtn" text="Annuler" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 10 25; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);"/>
-            <Button fx:id="submitBtn" text="Confirmer le Rendez-vous" style="-fx-background-color: linear-gradient(to bottom right, #28a745, #20c997); -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 10 25; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.3), 6, 0, 0, 2);"/>
-        </HBox>
+        <!-- =============================================== -->
+        <!-- MESSAGE DE SUCCÈS (CACHÉ PAR DÉFAUT) -->
+        <!-- =============================================== -->
+        <VBox fx:id="successMessage"
+              spacing="30"
+              alignment="CENTER"
+              managed="false"
+              visible="false"
+              style="-fx-background-color: rgba(15, 23, 42, 0.98);
+                     -fx-padding: 80;
+                     -fx-min-height: 600;">
+
+            <!-- Icône de succès -->
+            <StackPane style="-fx-background-color: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                              -fx-background-radius: 60;
+                              -fx-pref-width: 140;
+                              -fx-pref-height: 140;
+                              -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 25, 0.7, 0, 6);">
+                <FontIcon iconLiteral="fas-check" iconSize="70" iconColor="#f1f5f9"/>
+            </StackPane>
+
+            <!-- Message -->
+            <VBox spacing="15" alignment="CENTER" style="-fx-max-width: 500;">
+                <Label text="Rendez-vous Confirmé !"
+                       style="-fx-font-size: 38px;
+                              -fx-font-weight: bold;
+                              -fx-text-fill: #10b981;
+                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0.5, 0, 1);"/>
+                <Label text="Votre rendez-vous a été planifié avec succès. Vous recevrez un email de confirmation dans les plus brefs délais."
+                       style="-fx-text-fill: #cbd5e1;
+                              -fx-text-alignment: center;
+                              -fx-font-size: 16px;
+                              -fx-line-spacing: 1.6;"
+                       wrapText="true"/>
+            </VBox>
+
+            <!-- Bouton -->
+            <Button text="Fermer"
+                    onAction="#closeForm"
+                    style="-fx-background-color: linear-gradient(to right, #10b981, #059669);
+                           -fx-text-fill: #f1f5f9;
+                           -fx-font-weight: bold;
+                           -fx-font-size: 16px;
+                           -fx-padding: 18 60;
+                           -fx-background-radius: 14;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.6), 18, 0.7, 0, 4);">
+                <graphic>
+                    <FontIcon iconLiteral="fas-times" iconSize="18" iconColor="#f1f5f9"/>
+                </graphic>
+            </Button>
+
+        </VBox>
+
     </VBox>
 
-    <!-- Message de succès (caché par défaut) -->
-    <VBox fx:id="successMessage" spacing="15" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: linear-gradient(to bottom right, #d4edda, #c3e6cb); -fx-padding: 30; -fx-alignment: center;">
-        <Label text="✅" style="-fx-font-size: 48px;"/>
-        <VBox spacing="8" alignment="CENTER">
-            <Label text="Rendez-vous Confirmé !" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #155724;"/>
-            <Label text="Votre rendez-vous a été planifié avec succès. Vous recevrez un email de confirmation dans les plus brefs délais."
-                   style="-fx-text-fill: #155724; -fx-text-alignment: center; -fx-font-size: 13px; -fx-line-spacing: 1.3;"
-                   wrapText="true" />
-        </VBox>
-        <Button text="Fermer" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);"/>
-    </VBox>
-</VBox>
+</ScrollPane>

@@ -1,6 +1,7 @@
 package com.example.vehiclegestion.client.model;
 
 import java.time.LocalDateTime;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 
 public class Favorite {
     private int id;

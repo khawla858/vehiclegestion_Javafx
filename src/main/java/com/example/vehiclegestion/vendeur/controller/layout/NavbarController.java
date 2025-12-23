@@ -705,37 +705,15 @@ public class NavbarController implements NotificationManager.NotificationListene
 
     @FXML
     private void showMessages() {
-        System.out.println("💬 Ouverture de la fenêtre de chat...");
+        System.out.println("💬 Navigation vers la page de chat");
 
-        if (!session.estConnecte()) {
-            showAlert("Erreur", "Vous devez être connecté pour accéder au chat", Alert.AlertType.ERROR);
-            return;
-        }
+        // ✅ Utiliser NavigationManager pour naviguer vers la page de chat
+        // Cela affichera le chat dans la zone de contenu principale
+        nav.showMessages();
 
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/view/common/ChatWindow.fxml")
-            );
-            Parent root = loader.load();
-
-            Stage chatStage = new Stage();
-            chatStage.setTitle("💬 Messages - AutoSales Pro");
-            chatStage.setScene(new Scene(root, 900, 600));
-            chatStage.show();
-
-            System.out.println("✅ Fenêtre de chat ouverte");
-            updateMessageBadge();
-
-        } catch (Exception e) {
-            System.err.println("❌ Erreur ouverture chat: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Erreur",
-                    "Impossible d'ouvrir la fenêtre de chat.\n" +
-                            "Erreur: " + e.getMessage(),
-                    Alert.AlertType.ERROR);
-        }
+        // Mettre à jour le badge après navigation
+        updateMessageBadge();
     }
-
     // ========================================
     // 👤 PROFIL UTILISATEUR
     // ========================================
@@ -840,4 +818,7 @@ public class NavbarController implements NotificationManager.NotificationListene
                         "-fx-padding: 15;"
         );
     }
+
+
+
 }

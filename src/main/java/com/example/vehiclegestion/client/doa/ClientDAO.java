@@ -2,11 +2,11 @@ package com.example.vehiclegestion.client.doa;
 
 import com.example.vehiclegestion.client.model.Client;
 import com.example.vehiclegestion.client.model.Vehicle;
-import com.example.vehiclegestion.utils.DatabaseConnection;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 
 public class ClientDAO {
 

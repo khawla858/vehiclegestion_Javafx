@@ -1,3 +1,4 @@
+
 package com.example.vehiclegestion.vendeur.dao;
 
 import com.example.vehiclegestion.vendeur.model.Vente;
@@ -253,21 +254,202 @@ public class VenteDAO {
     // -----------------------------------------------------------
     // 7️⃣ Mise à jour statut
     // -----------------------------------------------------------
-    public boolean updateStatutVente(int idVente, String statut) {
-        String sql = "UPDATE Vente SET statut_vente = ? WHERE id_vente = ?";
+    public boolean creerVente(Vente vente) throws SQLException {
+        String sql = "INSERT INTO Vente (id_client, id_vendeur, id_article, date_vente, montant_total, moyen_paiement, statut_vente) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet generatedKeys = null;
 
-            stmt.setString(1, statut);
-            stmt.setInt(2, idVente);
-            return stmt.executeUpdate() > 0;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // Transaction
+
+            // 1️⃣ Insérer la vente
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            stmt.setInt(1, vente.getIdClient());
+            stmt.setInt(2, vente.getIdVendeur());
+            stmt.setInt(3, vente.getIdArticle());
+
+            // Convertir LocalDate en Timestamp pour date_vente
+            if (vente.getDateVente() != null) {
+                stmt.setTimestamp(4, Timestamp.valueOf(vente.getDateVente()));
+            } else {
+                stmt.setTimestamp(4, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            }
+
+            stmt.setDouble(5, vente.getMontantTotal());
+            stmt.setString(6, vente.getMoyenPaiement());
+            stmt.setString(7, vente.getStatutVente());
+
+            int rowsInserted = stmt.executeUpdate();
+
+            if (rowsInserted == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            // 2️⃣ Récupérer l'ID généré
+            generatedKeys = stmt.getGeneratedKeys();
+            int idVenteGeneree = 0;
+            if (generatedKeys.next()) {
+                idVenteGeneree = generatedKeys.getInt(1);
+                vente.setIdVente(idVenteGeneree);
+            }
+
+            // 3️⃣ Mettre à jour le statut de l'article selon le statut de la vente
+            String statutArticle = "disponible";
+            if ("terminée".equalsIgnoreCase(vente.getStatutVente()) ||
+                    "terminee".equalsIgnoreCase(vente.getStatutVente())) {
+                statutArticle = "vendu";
+            } else if ("en cours".equalsIgnoreCase(vente.getStatutVente())) {
+                statutArticle = "reserve";
+            }
+
+            String sqlUpdateArticle = "UPDATE Article SET statut_vehicule = ? WHERE id_article = ?";
+            try (PreparedStatement stmtArticle = conn.prepareStatement(sqlUpdateArticle)) {
+                stmtArticle.setString(1, statutArticle);
+                stmtArticle.setInt(2, vente.getIdArticle());
+                stmtArticle.executeUpdate();
+            }
+
+            // 4️⃣ Vérifier si le client existe dans la table Client
+            String checkClient = "SELECT COUNT(*) FROM Client WHERE id_client = ?";
+            try (PreparedStatement stmtCheck = conn.prepareStatement(checkClient)) {
+                stmtCheck.setInt(1, vente.getIdClient());
+                ResultSet rs = stmtCheck.executeQuery();
+                if (rs.next() && rs.getInt(1) == 0) {
+                    // Le client n'existe pas, l'insérer
+                    String insertClient = "INSERT INTO Client (id_client, statut_client) VALUES (?, 'actif')";
+                    try (PreparedStatement stmtInsert = conn.prepareStatement(insertClient)) {
+                        stmtInsert.setInt(1, vente.getIdClient());
+                        stmtInsert.executeUpdate();
+                    }
+                }
+            }
+
+            conn.commit(); // Valider la transaction
+
+            System.out.println("✅ Vente créée avec succès ! ID: " + idVenteGeneree);
+            System.out.println("   - Client: " + vente.getIdClient());
+            System.out.println("   - Article: " + vente.getIdArticle());
+            System.out.println("   - Montant: " + vente.getMontantTotal());
+            System.out.println("   - Statut article: " + statutArticle);
+
+            return true;
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la création de la vente: " + e.getMessage());
             e.printStackTrace();
-            return false;
+
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+
+        } finally {
+            if (generatedKeys != null) generatedKeys.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
         }
     }
+    // -----------------------------------------------------------
+// 7️⃣ Mise à jour statut avec gestion automatique de l'article
+// -----------------------------------------------------------
+    public boolean updateStatutVente(int idVente, String statut) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false); // ✅ Transaction
+
+            // 1️⃣ Mettre à jour le statut de la vente
+            String sqlVente = "UPDATE Vente SET statut_vente = ? WHERE id_vente = ?";
+            try (PreparedStatement stmtVente = conn.prepareStatement(sqlVente)) {
+                stmtVente.setString(1, statut);
+                stmtVente.setInt(2, idVente);
+
+                int rowsUpdated = stmtVente.executeUpdate();
+                if (rowsUpdated == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            // 2️⃣ Récupérer l'ID de l'article concerné
+            String sqlGetArticle = "SELECT id_article FROM Vente WHERE id_vente = ?";
+            int idArticle = 0;
+            try (PreparedStatement stmtGet = conn.prepareStatement(sqlGetArticle)) {
+                stmtGet.setInt(1, idVente);
+                try (ResultSet rs = stmtGet.executeQuery()) {
+                    if (rs.next()) {
+                        idArticle = rs.getInt("id_article");
+                    }
+                }
+            }
+
+            // 3️⃣ Mettre à jour SEULEMENT statut_vehicule
+            if (idArticle > 0) {
+                String sqlArticle = "UPDATE Article SET statut_vehicule = ? WHERE id_article = ?";
+                try (PreparedStatement stmtArticle = conn.prepareStatement(sqlArticle)) {
+
+                    if (statut.equalsIgnoreCase("terminée") || statut.equalsIgnoreCase("terminee")) {
+                        // ✅ Vente terminée → Article VENDU
+                        stmtArticle.setString(1, "vendu");
+                        System.out.println("✅ Article #" + idArticle + " marqué comme VENDU");
+
+                    } else if (statut.equalsIgnoreCase("annulée") || statut.equalsIgnoreCase("annulee")) {
+                        // 🔄 Vente annulée → Article DISPONIBLE
+                        stmtArticle.setString(1, "disponible");
+                        System.out.println("🔄 Article #" + idArticle + " remis DISPONIBLE");
+
+                    } else if (statut.equalsIgnoreCase("en cours")) {
+                        // ⏳ Vente en cours → Article RÉSERVÉ
+                        stmtArticle.setString(1, "reserve");
+                        System.out.println("⏳ Article #" + idArticle + " mis en RÉSERVÉ");
+                    }
+
+                    stmtArticle.setInt(2, idArticle);
+                    stmtArticle.executeUpdate();
+                }
+            }
+
+            conn.commit(); // Valider transaction
+            System.out.println("✅ Statut vente #" + idVente + " mis à jour : " + statut);
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la mise à jour du statut: " + e.getMessage());
+            e.printStackTrace();
+
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            return false;
+
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     // -----------------------------------------------------------
     // 8️⃣ Supprimer une vente
@@ -312,4 +494,5 @@ public class VenteDAO {
 
         return v;
     }
+
 }

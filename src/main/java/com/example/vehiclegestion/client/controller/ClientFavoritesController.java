@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
@@ -31,7 +32,7 @@ public class ClientFavoritesController implements Initializable {
 
     @FXML private GridPane favoritesGrid;
     @FXML private VBox emptyState;
-    @FXML private Label favoriteCountLabel;
+    @FXML private Label countLabel;
     @FXML private ScrollPane scrollPane;
     @FXML private Button clearAllButton;
 
@@ -43,16 +44,14 @@ public class ClientFavoritesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("✅ Initialisation de ClientFavoritesController...");
+        System.out.println("🎯 Initialisation de ClientFavoritesController...");
 
-        // Vérifier la session avec votre SessionManager
         if (!sessionManager.estConnecte()) {
-            showAlert("Erreur", "Veuillez vous connecter pour accéder aux favoris");
+            showAlert("🔒 Connexion requise", "Veuillez vous connecter pour accéder à vos favoris");
             redirectToLogin();
             return;
         }
 
-        // Récupérer l'ID de l'utilisateur connecté
         Utilisateur currentUser = sessionManager.getUtilisateurConnecte();
         currentClientId = currentUser.getIdUtilisateur();
 
@@ -60,40 +59,56 @@ public class ClientFavoritesController implements Initializable {
                 currentUser.getPrenom() + " " + currentUser.getNom() +
                 " (ID: " + currentClientId + ")");
 
+        // Mise en style initiale
+        setupInitialStyles();
         loadFavorites();
         setupEventHandlers();
     }
 
+    private void setupInitialStyles() {
+        if (scrollPane != null) {
+            scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        }
+
+        if (favoritesGrid != null) {
+            favoritesGrid.setStyle("-fx-background-color: transparent;");
+        }
+    }
+
     private void setupEventHandlers() {
-        // Vérifier que le bouton existe avant d'ajouter l'event handler
         if (clearAllButton != null) {
             clearAllButton.setOnAction(e -> clearAllFavorites());
-        } else {
-            System.err.println("❌ clearAllButton est null dans setupEventHandlers");
+            clearAllButton.setStyle(
+                    "-fx-background-color: linear-gradient(to right, #ef4444, #dc2626); " +
+                            "-fx-text-fill: white; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-font-size: 13px; " +
+                            "-fx-padding: 10 20; " +
+                            "-fx-background-radius: 8; " +
+                            "-fx-cursor: hand; " +
+                            "-fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 10, 0.5, 0, 3);"
+            );
         }
     }
 
     private void loadFavorites() {
         try {
-            // Mettre à jour les réservations expirées
             reservationDAO.updateExpiredReservations();
-
             List<Vehicle> favoriteVehicles = favoriteDAO.getFavoriteVehicles(currentClientId);
             displayFavorites(favoriteVehicles);
             updateFavoriteCount(favoriteVehicles.size());
 
-            System.out.println("✅ " + favoriteVehicles.size() + " favoris chargés pour l'utilisateur ID: " + currentClientId);
+            System.out.println("📊 " + favoriteVehicles.size() + " favoris chargés pour l'utilisateur ID: " + currentClientId);
         } catch (Exception e) {
             System.err.println("❌ Erreur chargement favoris: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Erreur", "Impossible de charger vos favoris");
+            showAlert("❌ Erreur", "Impossible de charger vos favoris");
         }
     }
 
     private void displayFavorites(List<Vehicle> favorites) {
-        // Vérifier que favoritesGrid n'est pas null
         if (favoritesGrid == null) {
-            System.err.println("❌ ERREUR: favoritesGrid est null dans displayFavorites");
+            System.err.println("❌ ERREUR: favoritesGrid est null");
             return;
         }
 
@@ -102,13 +117,13 @@ public class ClientFavoritesController implements Initializable {
         if (favorites.isEmpty()) {
             emptyState.setVisible(true);
             emptyState.setManaged(true);
-            scrollPane.setVisible(false);
+            if (scrollPane != null) scrollPane.setVisible(false);
             return;
         }
 
         emptyState.setVisible(false);
         emptyState.setManaged(false);
-        scrollPane.setVisible(true);
+        if (scrollPane != null) scrollPane.setVisible(true);
 
         int column = 0;
         int row = 0;
@@ -116,7 +131,7 @@ public class ClientFavoritesController implements Initializable {
 
         for (Vehicle vehicle : favorites) {
             try {
-                VBox vehicleCard = createFavoriteVehicleCard(vehicle);
+                VBox vehicleCard = createModernFavoriteVehicleCard(vehicle);
                 favoritesGrid.add(vehicleCard, column, row);
 
                 column++;
@@ -131,34 +146,50 @@ public class ClientFavoritesController implements Initializable {
         }
     }
 
-    private VBox createFavoriteVehicleCard(Vehicle vehicle) {
+    private VBox createModernFavoriteVehicleCard(Vehicle vehicle) {
         VBox card = new VBox(0);
-        card.setStyle("-fx-background-color: white; -fx-border-color: #e8e8e8; -fx-border-radius: 8; " +
-                "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
-        card.setPrefWidth(280);
-        card.setMaxWidth(280);
+        card.setStyle(
+                "-fx-background-color: rgba(30, 41, 59, 0.8); " +
+                        "-fx-border-color: linear-gradient(to bottom, #ec4899, #8b5cf6); " +
+                        "-fx-border-radius: 15; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);"
+        );
+        card.setPrefWidth(300);
+        card.setMaxWidth(300);
         card.setCursor(javafx.scene.Cursor.HAND);
 
         // Header avec info vendeur
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-padding: 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;");
+        header.setStyle(
+                "-fx-padding: 15 20; " +
+                        "-fx-border-color: linear-gradient(to right, #334155, transparent); " +
+                        "-fx-border-width: 0 0 1 0;"
+        );
 
         StackPane avatar = new StackPane();
-        avatar.setStyle("-fx-background-color: " + getRandomColor() + "; -fx-background-radius: 20; -fx-min-width: 35; " +
-                "-fx-min-height: 35; -fx-max-width: 35; -fx-max-height: 35;");
+        avatar.setStyle(
+                "-fx-background-color: " + getRandomColor() + "; " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-min-width: 40; " +
+                        "-fx-min-height: 40; " +
+                        "-fx-max-width: 40; " +
+                        "-fx-max-height: 40;"
+        );
 
         String sellerInitials = getInitials(vehicle.getSellerName());
         Label avatarText = new Label(sellerInitials);
-        avatarText.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 12;");
+        avatarText.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;");
         avatar.getChildren().add(avatarText);
 
         VBox vendorInfo = new VBox(2);
         Label vendorName = new Label(vehicle.getSellerName() != null ? vehicle.getSellerName() : "Vendeur");
-        vendorName.setStyle("-fx-font-weight: bold; -fx-font-size: 13; -fx-text-fill: #333;");
+        vendorName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #f1f5f9;");
 
         Label timeAgo = new Label("il y a " + getTimeAgo(vehicle.getDateAdded()));
-        timeAgo.setStyle("-fx-text-fill: #999; -fx-font-size: 11;");
+        timeAgo.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 12;");
 
         vendorInfo.getChildren().addAll(vendorName, timeAgo);
 
@@ -166,103 +197,127 @@ public class ClientFavoritesController implements Initializable {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // Badge "Favori"
-        Label favoriteBadge = new Label("❤️ Favori");
-        favoriteBadge.setStyle("-fx-background-color: #FFEBEE; -fx-text-fill: #FF0000; -fx-padding: 4 8; " +
-                "-fx-background-radius: 4; -fx-font-size: 11; -fx-font-weight: bold;");
+        Label favoriteBadge = new Label("❤️ FAVORI");
+        favoriteBadge.setStyle(
+                "-fx-background-color: linear-gradient(to right, #ec4899, #8b5cf6); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-padding: 6 12; " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-font-size: 11; " +
+                        "-fx-font-weight: bold;"
+        );
 
         header.getChildren().addAll(avatar, vendorInfo, spacer, favoriteBadge);
 
         // Image du véhicule
         StackPane imageContainer = new StackPane();
-        imageContainer.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 8;");
-        imageContainer.setPrefHeight(180);
-        imageContainer.setMaxHeight(180);
+        imageContainer.setStyle(
+                "-fx-background-color: rgba(15, 23, 42, 0.6); " +
+                        "-fx-background-radius: 13 13 0 0;"
+        );
+        imageContainer.setPrefHeight(200);
+        imageContainer.setMaxHeight(200);
 
         loadVehicleImage(vehicle, imageContainer);
 
         Label photoCount = new Label("📷 " + getRandomPhotoCount());
-        photoCount.setStyle("-fx-background-color: rgba(0,0,0,0.6); -fx-text-fill: white; -fx-padding: 5 10; " +
-                "-fx-background-radius: 15; -fx-font-size: 11;");
+        photoCount.setStyle(
+                "-fx-background-color: rgba(0,0,0,0.7); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-padding: 6 12; " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-font-size: 11;"
+        );
         StackPane.setAlignment(photoCount, Pos.BOTTOM_LEFT);
         StackPane.setMargin(photoCount, new Insets(10));
         imageContainer.getChildren().add(photoCount);
 
         // Contenu de la carte
-        VBox content = new VBox(10);
-        content.setStyle("-fx-padding: 15;");
+        VBox content = new VBox(12);
+        content.setStyle("-fx-padding: 20;");
 
-        HBox locationBox = new HBox(5);
+        HBox locationBox = new HBox(8);
         locationBox.setAlignment(Pos.CENTER_LEFT);
         Label locationIcon = new Label("📍");
         Label location = new Label(getRandomCity());
-        location.setStyle("-fx-text-fill: #666; -fx-font-size: 11;");
+        location.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 12;");
         locationBox.getChildren().addAll(locationIcon, location);
 
         Label title = new Label(vehicle.getTitle());
-        title.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #333;");
+        title.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #f1f5f9;");
         title.setWrapText(true);
-        title.setMaxWidth(250);
+        title.setMaxWidth(260);
 
         String descriptionText = vehicle.getDescription() != null ?
                 truncateDescription(vehicle.getDescription()) : "Aucune description disponible";
         Label description = new Label(descriptionText);
-        description.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
+        description.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 13;");
         description.setWrapText(true);
-        description.setMaxWidth(250);
+        description.setMaxWidth(260);
 
         HBox specs = new HBox(15);
         specs.setAlignment(Pos.CENTER_LEFT);
 
         Label year = new Label("📅 " + extractYearFromTitle(vehicle.getTitle()));
-        year.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
+        year.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 12;");
 
         Label transmission = new Label("⚙️ " + getRandomTransmission());
-        transmission.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
+        transmission.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 12;");
 
         Label fuel = new Label("⛽ " + getRandomFuel());
-        fuel.setStyle("-fx-text-fill: #666; -fx-font-size: 12;");
+        fuel.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 12;");
 
         specs.getChildren().addAll(year, transmission, fuel);
 
-        // Footer avec prix, bouton réservation et bouton suppression
+        // Footer avec prix et boutons
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER_LEFT);
-        footer.setStyle("-fx-padding: 15 15 12 15; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;");
+        footer.setStyle(
+                "-fx-padding: 15 20; " +
+                        "-fx-border-color: linear-gradient(to right, transparent, #334155, transparent); " +
+                        "-fx-border-width: 1 0 0 0;"
+        );
 
         VBox priceBox = new VBox(2);
         Label price = new Label(String.format("%,.0f DH", vehicle.getPrice()));
-        price.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #0066FF;");
+        price.setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #3b82f6;");
 
         double monthlyPrice = vehicle.getPrice() / 48;
         Label pricePerMonth = new Label("~" + String.format("%,.0f DH / mois", monthlyPrice));
-        pricePerMonth.setStyle("-fx-text-fill: #999; -fx-font-size: 11;");
+        pricePerMonth.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 12;");
 
         priceBox.getChildren().addAll(price, pricePerMonth);
 
         Region priceSpacer = new Region();
         HBox.setHgrow(priceSpacer, Priority.ALWAYS);
 
-        // Bouton de réservation
-        Button reserveButton = createAvailabilityButton(vehicle);
-        // Bouton pour retirer des favoris
-        Button removeFavoriteBtn = new Button("❌");
-        removeFavoriteBtn.setStyle(
-                "-fx-background-color: #FFEBEE; " +
-                        "-fx-text-fill: #FF0000; " +
-                        "-fx-font-size: 16; -fx-padding: 8 12; " +
-                        "-fx-background-radius: 20; -fx-cursor: hand; -fx-border-width: 0;"
-        );
+        // Bouton de disponibilité
+        Button availabilityBtn = createAvailabilityButton(vehicle);
 
+        // Bouton pour retirer des favoris
+        Button removeFavoriteBtn = new Button("🗑️");
+        removeFavoriteBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #ef4444, #dc2626); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 14; " +
+                        "-fx-padding: 8 10; " +
+                        "-fx-background-radius: 8; " +
+                        "-fx-cursor: hand; " +
+                        "-fx-min-width: 40; " +
+                        "-fx-min-height: 40;"
+        );
         removeFavoriteBtn.setOnAction(e -> removeFromFavorites(vehicle, card));
 
-        footer.getChildren().addAll(priceBox, priceSpacer, reserveButton, removeFavoriteBtn);
-        footer.setSpacing(10);
+        HBox buttonsContainer = new HBox(10);
+        buttonsContainer.setAlignment(Pos.CENTER_RIGHT);
+        buttonsContainer.getChildren().addAll(availabilityBtn, removeFavoriteBtn);
 
+        footer.getChildren().addAll(priceBox, priceSpacer, buttonsContainer);
         content.getChildren().addAll(locationBox, title, description, specs);
         card.getChildren().addAll(header, imageContainer, content, footer);
 
         card.setOnMouseClicked(e -> {
-            if (e.getTarget() != removeFavoriteBtn && e.getTarget() != reserveButton) {
+            if (e.getTarget() != removeFavoriteBtn && e.getTarget() != availabilityBtn) {
                 viewVehicleDetails(vehicle);
             }
         });
@@ -271,49 +326,42 @@ public class ClientFavoritesController implements Initializable {
 
         return card;
     }
+
     private Button createAvailabilityButton(Vehicle vehicle) {
         Button availabilityBtn = new Button();
 
-        // Récupérer le statut réel depuis la base de données
         String statut = vehicle.getStatutVehicule() != null ? vehicle.getStatutVehicule().toLowerCase() : "disponible";
         boolean estReserve = reservationDAO.isVehiculeReserved(vehicle.getId());
         boolean estReserveParMoi = reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId());
 
-        // Logique d'affichage basée sur le statut réel
         switch (statut) {
             case "vendu":
                 availabilityBtn.setText("⛔ VENDU");
                 availabilityBtn.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #D32F2F, #B71C1C); " +
+                        "-fx-background-color: linear-gradient(to right, #dc2626, #b91c1c); " +
                                 "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
-                                "-fx-padding: 8 12; -fx-background-radius: 15; " +
-                                "-fx-border-radius: 15; " +
-                                "-fx-effect: dropshadow(gaussian, rgba(211,47,47,0.3), 4, 0, 0, 2); " +
-                                "-fx-cursor: default; -fx-border-color: #C62828; -fx-border-width: 1;"
+                                "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                "-fx-cursor: default;"
                 );
                 break;
 
             case "reserve":
             case "réservé":
                 if (estReserveParMoi) {
-                    availabilityBtn.setText("⭐ VOTRE RÉSERVATION");
+                    availabilityBtn.setText("⭐ VOTRE");
                     availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #FFD54F, #FFB300); " +
-                                    "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
-                                    "-fx-padding: 8 10; -fx-background-radius: 15; " +
-                                    "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(255,183,0,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #FFA000; -fx-border-width: 1;"
+                            "-fx-background-color: linear-gradient(to right, #f59e0b, #d97706); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                    "-fx-cursor: default;"
                     );
                 } else {
                     availabilityBtn.setText("🔒 RÉSERVÉ");
                     availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #FFB74D, #FF9800); " +
+                            "-fx-background-color: linear-gradient(to right, #f59e0b, #d97706); " +
                                     "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
-                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
-                                    "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(255,152,0,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #F57C00; -fx-border-width: 1;"
+                                    "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                    "-fx-cursor: default;"
                     );
                 }
                 break;
@@ -321,24 +369,20 @@ public class ClientFavoritesController implements Initializable {
             case "en attente":
                 availabilityBtn.setText("⏳ EN ATTENTE");
                 availabilityBtn.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #FFCC80, #FFA726); " +
-                                "-fx-text-fill: #5D4037; -fx-font-weight: bold; -fx-font-size: 10; " +
-                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
-                                "-fx-border-radius: 15; " +
-                                "-fx-effect: dropshadow(gaussian, rgba(255,167,38,0.3), 4, 0, 0, 2); " +
-                                "-fx-cursor: default; -fx-border-color: #FF9800; -fx-border-width: 1;"
+                        "-fx-background-color: linear-gradient(to right, #f59e0b, #d97706); " +
+                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                "-fx-cursor: default;"
                 );
                 break;
 
             case "indisponible":
                 availabilityBtn.setText("🚫 INDISPONIBLE");
                 availabilityBtn.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #90A4AE, #78909C); " +
-                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
-                                "-fx-padding: 8 10; -fx-background-radius: 15; " +
-                                "-fx-border-radius: 15; " +
-                                "-fx-effect: dropshadow(gaussian, rgba(120,144,156,0.3), 4, 0, 0, 2); " +
-                                "-fx-cursor: default; -fx-border-color: #607D8B; -fx-border-width: 1;"
+                        "-fx-background-color: linear-gradient(to right, #64748b, #475569); " +
+                                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                "-fx-cursor: default;"
                 );
                 break;
 
@@ -348,22 +392,18 @@ public class ClientFavoritesController implements Initializable {
                 if (estReserve) {
                     availabilityBtn.setText("📝 EN COURS");
                     availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #81C784, #4CAF50); " +
-                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10; " +
-                                    "-fx-padding: 8 10; -fx-background-radius: 15; " +
-                                    "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(76,175,80,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #388E3C; -fx-border-width: 1;"
+                            "-fx-background-color: linear-gradient(to right, #10b981, #059669); " +
+                                    "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
+                                    "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                    "-fx-cursor: default;"
                     );
                 } else {
                     availabilityBtn.setText("✅ DISPONIBLE");
                     availabilityBtn.setStyle(
-                            "-fx-background-color: linear-gradient(to bottom, #66BB6A, #43A047); " +
+                            "-fx-background-color: linear-gradient(to right, #10b981, #059669); " +
                                     "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; " +
-                                    "-fx-padding: 8 12; -fx-background-radius: 15; " +
-                                    "-fx-border-radius: 15; " +
-                                    "-fx-effect: dropshadow(gaussian, rgba(67,160,71,0.3), 4, 0, 0, 2); " +
-                                    "-fx-cursor: default; -fx-border-color: #2E7D32; -fx-border-width: 1;"
+                                    "-fx-padding: 8 12; -fx-background-radius: 8; " +
+                                    "-fx-cursor: default;"
                     );
                 }
                 break;
@@ -372,76 +412,28 @@ public class ClientFavoritesController implements Initializable {
         availabilityBtn.setDisable(true);
         return availabilityBtn;
     }
-    private void handleReservation(Vehicle vehicle, Button reserveButton) {
-        // Vérifier à nouveau si le véhicule est disponible
-        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
-            showAlert("Réservation impossible", "❌ Ce véhicule a déjà été réservé par un autre client.");
-            updateReservationButton(reserveButton, vehicle);
-            return;
-        }
-
-        // Vérifier si l'utilisateur a déjà réservé ce véhicule
-        if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
-            showAlert("Réservation existante", "ℹ️ Vous avez déjà réservé ce véhicule.");
-            updateReservationButton(reserveButton, vehicle);
-            return;
-        }
-
-        // Demander confirmation
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Confirmation de réservation");
-        confirmation.setHeaderText("Confirmer la réservation");
-        confirmation.setContentText("Voulez-vous réserver le véhicule : " + vehicle.getTitle() + " ?\n\n" +
-                "Prix: " + String.format("%,.0f DH", vehicle.getPrice()) + "\n" +
-                "La réservation sera valable pendant 24 heures.");
-
-        if (confirmation.showAndWait().get() == ButtonType.OK) {
-            boolean success = reservationDAO.createReservation(currentClientId, vehicle.getId());
-            if (success) {
-                showAlert("Réservation confirmée", "✅ Véhicule réservé avec succès!\n\n" +
-                        "Vous avez 24 heures pour finaliser votre achat.\n" +
-                        "Véhicule: " + vehicle.getTitle());
-                updateReservationButton(reserveButton, vehicle);
-            } else {
-                showAlert("Erreur", "❌ Impossible de réserver le véhicule. Veuillez réessayer.");
-            }
-        }
-    }
-
-    private void updateReservationButton(Button reserveButton, Vehicle vehicle) {
-        if (reservationDAO.isVehiculeReserved(vehicle.getId())) {
-            if (reservationDAO.hasClientReservedVehicule(currentClientId, vehicle.getId())) {
-                reserveButton.setText("✅ Déjà réservé");
-                reserveButton.setStyle(
-                        "-fx-background-color: #E8F5E8; " +
-                                "-fx-text-fill: #2E7D32; " +
-                                "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 12; " +
-                                "-fx-background-radius: 15; -fx-cursor: default;"
-                );
-                reserveButton.setDisable(true);
-            } else {
-                reserveButton.setText("⛔ Déjà réservé");
-                reserveButton.setStyle(
-                        "-fx-background-color: #FFEBEE; " +
-                                "-fx-text-fill: #C62828; " +
-                                "-fx-font-size: 12; -fx-font-weight: bold; -fx-padding: 8 12; " +
-                                "-fx-background-radius: 15; -fx-cursor: default;"
-                );
-                reserveButton.setDisable(true);
-            }
-        }
-    }
 
     private void removeFromFavorites(Vehicle vehicle, VBox card) {
-        boolean success = favoriteDAO.removeFavorite(currentClientId, vehicle.getId());
-        if (success) {
-            // Retirer la carte de la grille
-            favoritesGrid.getChildren().remove(card);
-            // Recharger pour mettre à jour le compteur
-            loadFavorites();
-            showAlert("Succès", "✅ Véhicule retiré des favoris: " + vehicle.getTitle());
-        } else {
-            showAlert("Erreur", "❌ Impossible de retirer le véhicule des favoris");
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirmation");
+        confirmation.setHeaderText("Retirer des favoris");
+        confirmation.setContentText("Êtes-vous sûr de vouloir retirer ce véhicule de vos favoris ?");
+
+        confirmation.getDialogPane().setStyle(
+                "-fx-background-color: rgba(30, 41, 59, 0.9); " +
+                        "-fx-border-color: linear-gradient(to right, #3b82f6, #1e40af); " +
+                        "-fx-border-width: 2;"
+        );
+
+        if (confirmation.showAndWait().get() == ButtonType.OK) {
+            boolean success = favoriteDAO.removeFavorite(currentClientId, vehicle.getId());
+            if (success) {
+                favoritesGrid.getChildren().remove(card);
+                loadFavorites();
+                showAlert("✅ Succès", "Véhicule retiré des favoris: " + vehicle.getTitle());
+            } else {
+                showAlert("❌ Erreur", "Impossible de retirer le véhicule des favoris");
+            }
         }
     }
 
@@ -450,15 +442,21 @@ public class ClientFavoritesController implements Initializable {
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("Confirmation");
         confirmation.setHeaderText("Supprimer tous les favoris");
-        confirmation.setContentText("Êtes-vous sûr de vouloir supprimer tous vos véhicules favoris ?");
+        confirmation.setContentText("Êtes-vous sûr de vouloir supprimer tous vos véhicules favoris ?\nCette action est irréversible.");
+
+        confirmation.getDialogPane().setStyle(
+                "-fx-background-color: rgba(30, 41, 59, 0.9); " +
+                        "-fx-border-color: linear-gradient(to right, #ef4444, #dc2626); " +
+                        "-fx-border-width: 2;"
+        );
 
         if (confirmation.showAndWait().get() == ButtonType.OK) {
             boolean success = favoriteDAO.clearAllFavorites(currentClientId);
             if (success) {
                 loadFavorites();
-                showAlert("Succès", "✅ Tous les favoris ont été supprimés");
+                showAlert("✅ Succès", "Tous les favoris ont été supprimés");
             } else {
-                showAlert("Erreur", "❌ Impossible de supprimer tous les favoris");
+                showAlert("❌ Erreur", "Impossible de supprimer tous les favoris");
             }
         }
     }
@@ -466,37 +464,85 @@ public class ClientFavoritesController implements Initializable {
     @FXML
     private void goToVehicles() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/client/ClientVehiclesView.fxml"));
-            Stage stage = (Stage) favoritesGrid.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            String[] possiblePaths = {
+                    "/com/example/vehiclegestion/view/client/ClientVehiclesView.fxml",
+                    "/view/client/ClientVehiclesView.fxml",
+                    "/ClientVehiclesView.fxml"
+            };
+
+            FXMLLoader loader = null;
+            Parent root = null;
+
+            for (String path : possiblePaths) {
+                try {
+                    URL url = getClass().getResource(path);
+                    if (url != null) {
+                        loader = new FXMLLoader(url);
+                        root = loader.load();
+                        System.out.println("✅ FXML chargé: " + path);
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Échec pour: " + path);
+                }
+            }
+
+            if (root != null) {
+                Stage stage = (Stage) (favoritesGrid != null ? favoritesGrid.getScene().getWindow() : null);
+                if (stage != null) {
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("Marketplace - Gestion Véhicules");
+                    stage.show();
+                }
+            }
         } catch (Exception e) {
             System.err.println("❌ Erreur navigation vers véhicules: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible de naviguer vers la page des véhicules");
+            showAlert("❌ Erreur", "Impossible de naviguer vers la page des véhicules");
         }
     }
 
     private void updateFavoriteCount(int count) {
-        favoriteCountLabel.setText(count + " véhicule(s) favori(s)");
+        if (countLabel != null) {
+            countLabel.setText(count + " véhicule" + (count > 1 ? "s" : "") + " sauvegardé" + (count > 1 ? "s" : ""));
+        }
     }
 
     private void redirectToLogin() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/vehiclegestion/view/auth/login.fxml"));
-            Stage stage = (Stage) favoritesGrid.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Connexion - Gestion Véhicules");
-            stage.setMaximized(false);
-            stage.setWidth(1000);
-            stage.setHeight(700);
-            stage.centerOnScreen();
+            String[] possiblePaths = {
+                    "/com/example/vehiclegestion/view/auth/login.fxml",
+                    "/view/auth/login.fxml",
+                    "/login.fxml"
+            };
+
+            FXMLLoader loader = null;
+            Parent root = null;
+
+            for (String path : possiblePaths) {
+                try {
+                    URL url = getClass().getResource(path);
+                    if (url != null) {
+                        loader = new FXMLLoader(url);
+                        root = loader.load();
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Échec pour: " + path);
+                }
+            }
+
+            if (root != null) {
+                Stage stage = (Stage) (favoritesGrid != null ? favoritesGrid.getScene().getWindow() : null);
+                if (stage != null) {
+                    stage.setScene(new Scene(root, 1000, 700));
+                    stage.setTitle("Connexion - Gestion Véhicules");
+                    stage.centerOnScreen();
+                }
+            }
         } catch (Exception e) {
             System.err.println("❌ Erreur redirection login: " + e.getMessage());
         }
     }
-
-    // Méthodes utilitaires (reprises de ClientVehiclesController)
 
     private void loadVehicleImage(Vehicle vehicle, StackPane container) {
         if (vehicle.getImage() != null && !vehicle.getImage().trim().isEmpty()) {
@@ -507,10 +553,15 @@ public class ClientFavoritesController implements Initializable {
                 if (imageFile.exists()) {
                     Image image = new Image(imageFile.toURI().toString(), true);
                     ImageView imageView = new ImageView(image);
-                    imageView.setFitWidth(280);
-                    imageView.setFitHeight(180);
+                    imageView.setFitWidth(300);
+                    imageView.setFitHeight(200);
                     imageView.setPreserveRatio(true);
                     imageView.setSmooth(true);
+
+                    imageView.setStyle(
+                            "-fx-background-radius: 13 13 0 0; " +
+                                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0, 3);"
+                    );
 
                     image.errorProperty().addListener((obs, oldVal, newVal) -> {
                         if (newVal) {
@@ -532,17 +583,20 @@ public class ClientFavoritesController implements Initializable {
 
     private void showDefaultImage(StackPane container) {
         container.getChildren().clear();
-        container.setStyle("-fx-background-color: " + getRandomLightColor() + "; -fx-background-radius: 8;");
+        container.setStyle(
+                "-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%); " +
+                        "-fx-background-radius: 13 13 0 0;"
+        );
 
         VBox placeholder = new VBox(5);
         placeholder.setAlignment(Pos.CENTER);
-        placeholder.setStyle("-fx-padding: 20;");
+        placeholder.setStyle("-fx-padding: 30;");
 
         Label carIcon = new Label("🚗");
-        carIcon.setStyle("-fx-font-size: 48;");
+        carIcon.setStyle("-fx-font-size: 48px; -fx-text-fill: white;");
 
-        Label noImageText = new Label("Aucune image");
-        noImageText.setStyle("-fx-text-fill: #999; -fx-font-size: 12;");
+        Label noImageText = new Label("Image non disponible");
+        noImageText.setStyle("-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12px;");
 
         placeholder.getChildren().addAll(carIcon, noImageText);
         container.getChildren().add(placeholder);
@@ -550,104 +604,121 @@ public class ClientFavoritesController implements Initializable {
 
     private void setupCardHoverEffects(VBox card) {
         card.setOnMouseEntered(e ->
-                card.setStyle("-fx-background-color: white; -fx-border-color: #0066FF; -fx-border-radius: 8; " +
-                        "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,102,255,0.2), 12, 0, 0, 4);"));
-        card.setOnMouseExited(e ->
-                card.setStyle("-fx-background-color: white; -fx-border-color: #e8e8e8; -fx-border-radius: 8; " +
-                        "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"));
-    }
+                card.setStyle(
+                        "-fx-background-color: rgba(30, 41, 59, 0.95); " +
+                                "-fx-border-color: linear-gradient(to bottom, #3b82f6, #1e40af); " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-border-width: 2; " +
+                                "-fx-background-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.4), 20, 0.5, 0, 5);"
+                )
+        );
 
+        card.setOnMouseExited(e ->
+                card.setStyle(
+                        "-fx-background-color: rgba(30, 41, 59, 0.8); " +
+                                "-fx-border-color: linear-gradient(to bottom, #ec4899, #8b5cf6); " +
+                                "-fx-border-radius: 15; " +
+                                "-fx-border-width: 2; " +
+                                "-fx-background-radius: 15; " +
+                                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);"
+                )
+        );
+    }
 
     private void viewVehicleDetails(Vehicle vehicle) {
         System.out.println("🎯 DEBUT viewVehicleDetails pour: " + vehicle.getTitle());
 
         try {
-            String fxmlPath = "/view/client/Vehicle-Detail.fxml";
-            System.out.println("🔍 Chemin FXML testé: " + fxmlPath);
+            String[] possiblePaths = {
+                    "/com/example/vehiclegestion/view/client/Vehicle-Detail.fxml",
+                    "/view/client/Vehicle-Detail.fxml",
+                    "/client/Vehicle-Detail.fxml",
+                    "Vehicle-Detail.fxml"
+            };
 
-            URL url = getClass().getResource(fxmlPath);
-            System.out.println("📁 URL trouvée: " + (url != null ? "✅ OUI" : "❌ NON"));
+            FXMLLoader loader = null;
+            Parent root = null;
+            URL url = null;
 
-            if (url == null) {
-                String[] testPaths = {
-                        "/com/example/vehiclegestion/view/client/Vehicle-Detail.fxml",
-                        "/view/client/Vehicle-Detail.fxml",
-                        "/client/Vehicle-Detail.fxml",
-                        "Vehicle-Detail.fxml"
-                };
-
-                for (String path : testPaths) {
-                    url = getClass().getResource(path);
-                    System.out.println("Test '" + path + "' → " + (url != null ? "✅ TROUVÉ" : "❌ NON TROUVÉ"));
-                    if (url != null) {
-                        fxmlPath = path;
-                        break;
-                    }
+            for (String path : possiblePaths) {
+                url = getClass().getResource(path);
+                if (url != null) {
+                    System.out.println("✅ FXML trouvé: " + path);
+                    break;
                 }
             }
 
             if (url == null) {
-                throw new IOException("Fichier FXML introuvable: Vehicle-detail.fxml");
+                throw new IOException("Fichier FXML introuvable: Vehicle-Detail.fxml");
             }
 
-            System.out.println("✅ Chargement FXML depuis: " + fxmlPath);
-
-            FXMLLoader loader = new FXMLLoader(url);
-            Parent root = loader.load();
-            System.out.println("✅ FXML chargé avec succès");
+            loader = new FXMLLoader(url);
+            root = loader.load();
 
             VehiDetaiCo controller = loader.getController();
-            System.out.println("✅ Contrôleur récupéré: " + controller.getClass().getSimpleName());
-
             Article article = convertVehicleToArticle(vehicle);
-            System.out.println("✅ Article converti: " + article.getTitre());
-
             controller.receiveData(article);
-            System.out.println("✅ Données transmises au contrôleur");
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 1200, 800));
             stage.setTitle("Détails du véhicule - " + vehicle.getTitle());
-
-            System.out.println("✅ Nouvelle fenêtre créée");
-
             stage.show();
+
             System.out.println("🎉 Fenêtre de détails affichée avec succès!");
 
         } catch (Exception e) {
             System.err.println("❌ ERREUR CRITIQUE dans viewVehicleDetails: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Erreur", "Impossible d'ouvrir les détails du véhicule: " + e.getMessage());
+            showAlert("❌ Erreur", "Impossible d'ouvrir les détails du véhicule: " + e.getMessage());
         }
     }
 
     private Article convertVehicleToArticle(Vehicle vehicle) {
-        System.out.println("🔄 === CONVERSION VEHICLE → ARTICLE ===");
-        System.out.println("   Vehicle ID: " + vehicle.getId());
+        System.out.println("🔄 Conversion VEHICLE → ARTICLE - ID: " + vehicle.getId());
 
         Article article = new Article();
-
-        // ✅ CORRECTION CRITIQUE: Définir l'ID de l'article
-        article.setId(vehicle.getId()); // ⭐⭐ CETTE LIGNE MANQUE !
-
+        article.setId(vehicle.getId());
+        article.setIdVendeur(vehicle.getSellerId()); // Important pour les rendez-vous
         article.setTitre(vehicle.getTitle());
         article.setPrix(vehicle.getPrice());
         article.setDescription(vehicle.getDescription());
         article.setImage(vehicle.getImage());
         article.setCategorie(vehicle.getCategory());
 
+        // Valeurs par défaut pour le développement
         article.setAnnee(2023);
         article.setKilometrage(50000);
         article.setTransmission("Manuelle");
         article.setCarburant("Essence");
-        //article.setMarque(extractBrandFromTitle(vehicle.getTitle()));
+        article.setMarque(extractBrandFromTitle(vehicle.getTitle()));
         article.setModele(vehicle.getTitle());
         article.setPuissance(120);
         article.setEtat("Excellent");
 
-        System.out.println("✅ Article converti - ID: " + article.getId() + ", Titre: " + article.getTitre());
+        System.out.println("✅ Article converti - ID: " + article.getId() +
+                ", Titre: " + article.getTitre() +
+                ", Vendeur: " + article.getIdVendeur());
 
         return article;
+    }
+
+    private String extractBrandFromTitle(String title) {
+        if (title == null || title.isEmpty()) return "Autre";
+
+        String[] knownBrands = {"Toyota", "Renault", "Peugeot", "BMW", "Mercedes", "Audi",
+                "Volkswagen", "Ford", "Nissan", "Hyundai", "Dacia", "Kia",
+                "Chevrolet", "Citroën", "Opel", "Fiat", "Seat", "Skoda",
+                "Mazda", "Mitsubishi", "Honda", "Suzuki", "Volvo", "Jeep"};
+
+        for (String brand : knownBrands) {
+            if (title.toLowerCase().contains(brand.toLowerCase())) {
+                return brand;
+            }
+        }
+
+        String[] words = title.split(" ");
+        return words.length > 0 ? words[0] : "Autre";
     }
 
     private void showAlert(String title, String message) {
@@ -655,6 +726,33 @@ public class ClientFavoritesController implements Initializable {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+
+        // Style de l'alerte pour correspondre au thème
+        alert.getDialogPane().setStyle(
+                "-fx-background-color: rgba(30, 41, 59, 0.95); " +
+                        "-fx-border-color: linear-gradient(to right, #3b82f6, #1e40af); " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 8; " +
+                        "-fx-background-radius: 8;"
+        );
+
+        // Style du texte
+        alert.getDialogPane().lookup(".content.label").setStyle(
+                "-fx-text-fill: #e2e8f0; -fx-font-size: 14px;"
+        );
+
+        // Style des boutons
+        Button okButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.setStyle(
+                    "-fx-background-color: linear-gradient(to right, #3b82f6, #1e40af); " +
+                            "-fx-text-fill: white; " +
+                            "-fx-font-weight: bold; " +
+                            "-fx-padding: 8 20; " +
+                            "-fx-background-radius: 6;"
+            );
+        }
+
         alert.showAndWait();
     }
 
@@ -705,12 +803,7 @@ public class ClientFavoritesController implements Initializable {
     }
 
     private String getRandomColor() {
-        String[] colors = {"#FF6B35", "#0066FF", "#00C853", "#FF4081", "#9C27B0", "#FF9800"};
-        return colors[(int)(Math.random() * colors.length)];
-    }
-
-    private String getRandomLightColor() {
-        String[] colors = {"#E3F2FD", "#F3E5F5", "#E8F5E8", "#FFF3E0", "#FCE4EC", "#E0F2F1"};
+        String[] colors = {"#3b82f6", "#8b5cf6", "#ec4899", "#10b981", "#f59e0b", "#ef4444"};
         return colors[(int)(Math.random() * colors.length)];
     }
 

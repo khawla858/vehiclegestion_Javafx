@@ -1,39 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<ScrollPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.vendeur.controller.MagasinListController"
             fitToWidth="true"
-            style="-fx-background-color: #f8f9fa;"
-            vbarPolicy="ALWAYS">
+            style="-fx-background-color: #f8fafc;"
+            vbarPolicy="AS_NEEDED">
 
-    <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #f8f9fa;">
+    <VBox spacing="30" style="-fx-padding: 30; -fx-background-color: #f8fafc;">
 
-        <!-- HEADER SECTION -->
-        <VBox spacing="10">
-            <HBox spacing="15" alignment="CENTER_LEFT">
+        <!-- ============================================ -->
+        <!-- HEADER AVEC TITRE ET STATISTIQUES -->
+        <!-- ============================================ -->
+        <VBox spacing="20">
+            <!-- Titre principal -->
+            <HBox alignment="CENTER_LEFT" spacing="15">
                 <Label text="🏪 Mes Magasins"
-                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnAjouterMagasin" text="➕ Créer un magasin"
-                        style="-fx-font-size: 15px; -fx-background-color: #ff2d55; -fx-text-fill: white;
-                               -fx-padding: 12 25; -fx-background-radius: 10; -fx-font-weight: bold;
-                               -fx-effect: dropshadow(gaussian, rgba(255,45,85,0.3), 10, 0, 0, 3);
-                               -fx-cursor: hand;"/>
+
+                <!-- Badge avec nombre total -->
+                <Label fx:id="totalMagasinsLabel" text="0 magasin"
+                       style="-fx-background-color: #dbeafe;
+                              -fx-text-fill: #1e40af;
+                              -fx-padding: 8 16;
+                              -fx-background-radius: 20;
+                              -fx-font-size: 14px;
+                              -fx-font-weight: bold;"/>
+
+                <!-- Bouton principal d'ajout -->
+                <Button fx:id="btnAjouterMagasin" text="➕ Nouveau Magasin"/>
             </HBox>
-            <Label text="Gérez vos points de vente et leur catalogue"
-                   style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+
+            <!-- Sous-titre -->
+            <Label text="Gérez tous vos magasins et points de vente en un seul endroit"
+                   style="-fx-font-size: 14px; -fx-text-fill: #64748b;"/>
         </VBox>
 
-        <!-- STATISTIQUES RAPIDES (optionnel) -->
 
 
-        <!-- CONTENEUR DES CARTES DE MAGASINS -->
-        <VBox fx:id="magasinContainer" spacing="20">
-            <!-- Les cartes seront ajoutées dynamiquement depuis le controller -->
+        <!-- ============================================ -->
+        <!-- BARRE DE RECHERCHE ET FILTRES -->
+        <!-- ============================================ -->
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-background-color: white;
+                     -fx-padding: 20;
+                     -fx-background-radius: 12;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);">
+
+            <!-- Recherche -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-pref-width: 400;">
+                <Label text="🔍" style="-fx-font-size: 18px;"/>
+                <TextField fx:id="searchField"
+                           promptText="Rechercher un magasin par nom..."
+                           style="-fx-pref-width: 350;
+                                  -fx-padding: 12;
+                                  -fx-background-radius: 8;
+                                  -fx-border-color: #cbd5e1;
+                                  -fx-border-radius: 8;
+                                  -fx-border-width: 1.5;
+                                  -fx-font-size: 13px;"/>
+            </HBox>
+
+            <Separator orientation="VERTICAL" style="-fx-pref-height: 40;"/>
+
+            <!-- Filtres -->
+            <VBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="Filtrer par:"
+                       style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="filterComboBox"
+                          promptText="📊 Tous les magasins"
+                          style="-fx-pref-width: 200;
+                                 -fx-background-radius: 8;
+                                 -fx-border-radius: 8;"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Actions rapides -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button text="📊 Statistiques"
+                        style="-fx-background-color: #f1f5f9;
+                               -fx-text-fill: #475569;
+                               -fx-padding: 10 18;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 13px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;"/>
+
+                <Button text="📤 Exporter"
+                        style="-fx-background-color: #f1f5f9;
+                               -fx-text-fill: #475569;
+                               -fx-padding: 10 18;
+                               -fx-background-radius: 8;
+                               -fx-font-size: 13px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;"/>
+            </HBox>
+        </HBox>
+
+        <!-- ============================================ -->
+        <!-- STATISTIQUES RAPIDES (CARDS) -->
+        <!-- ============================================ -->
+
+        <!-- ============================================ -->
+        <!-- GRILLE DE MAGASINS (FLOWPANE) -->
+        <!-- ============================================ -->
+        <VBox spacing="15">
+            <Label text="📋 Tous vos magasins"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+
+            <!-- FlowPane pour afficher les cartes en grille responsive -->
+            <FlowPane fx:id="magasinContainer"
+                      hgap="20" vgap="20"
+                      style="-fx-padding: 0;">
+                <!-- Les cartes de magasins seront ajoutées ici dynamiquement -->
+            </FlowPane>
         </VBox>
 
     </VBox>

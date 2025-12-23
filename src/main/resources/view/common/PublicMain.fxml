@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane xmlns="http://javafx.com/javafx/"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.vehiclegestion.client.controller.MainController"
+           stylesheets="/com/example/vehiclegestion/css/notification-dropdown.css">
+
+    <!-- CONTENU PRINCIPAL -->
+    <BorderPane fx:id="mainBorderPane">
+
+        <top>
+            <VBox spacing="0" style="-fx-background-color: rgba(15, 23, 42, 0.95);">
+
+                <!-- NIVEAU 1 : HEADER PRINCIPAL -->
+                <HBox spacing="0" alignment="CENTER"
+                      style="-fx-padding: 15 40;
+                             -fx-background-color: transparent;
+                             -fx-border-width: 0 0 1 0;
+                             -fx-border-color: linear-gradient(to right, #334155, #475569, #334155);">
+
+                    <!-- LOGO -->
+                    <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <StackPane style="-fx-background-color: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+                                          -fx-background-radius: 10;
+                                          -fx-pref-width: 44;
+                                          -fx-pref-height: 44;
+                                          -fx-effect: dropshadow(gaussian, rgba(236, 72, 153, 0.4), 10, 0.5, 0, 2);">
+                            <FontIcon iconLiteral="fas-car-side" iconSize="22" iconColor="white"/>
+                        </StackPane>
+                        <VBox spacing="2">
+                            <Label text="AutoSales Pro"
+                                   style="-fx-font-size: 24px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #f1f5f9;
+                                          -fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0.5, 0, 1);"/>
+                            <Label text="Premium Vehicle Marketplace"
+                                   style="-fx-font-size: 11px;
+                                          -fx-text-fill: #94a3b8;
+                                          -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- BARRE DE RECHERCHE CENTRALE -->
+                    <HBox spacing="0" alignment="CENTER"
+                          style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                 -fx-background-radius: 25;
+                                 -fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                                 -fx-border-width: 1;
+                                 -fx-border-radius: 25;
+                                 -fx-padding: 10 20;
+                                 -fx-min-width: 500;
+                                 -fx-max-width: 500;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.5, 0, 1);">
+                        <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#cbd5e1"/>
+                        <TextField fx:id="searchField"
+                                   promptText="Rechercher par marque, modèle, année..."
+                                   style="-fx-background-color: transparent;
+                                          -fx-border-width: 0;
+                                          -fx-pref-width: 420;
+                                          -fx-padding: 0 15;
+                                          -fx-font-size: 14px;
+                                          -fx-text-fill: #f1f5f9;
+                                          -fx-prompt-text-fill: #94a3b8;
+                                          -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
+                    </HBox>
+
+                    <!-- BOUTONS DE CONNEXION/INSCRIPTION (pour utilisateurs non connectés) -->
+                    <HBox spacing="15" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+
+                        <!-- Bouton Se connecter -->
+                        <Button fx:id="loginBtn" text="Se connecter" onAction="#redirectToLogin"
+                                style="-fx-background-color: linear-gradient(to right, #3b82f6, #1e40af);
+                                       -fx-text-fill: #f1f5f9;
+                                       -fx-font-weight: bold;
+                                       -fx-padding: 8 20;
+                                       -fx-background-radius: 20;
+                                       -fx-cursor: hand;
+                                       -fx-font-size: 14px;
+                                       -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 5, 0.5, 0, 2);"/>
+
+                        <!-- Bouton S'inscrire -->
+                        <Button fx:id="registerBtn" text="S'inscrire" onAction="#redirectToRegister"
+                                style="-fx-background-color: transparent;
+                                       -fx-text-fill: #3b82f6;
+                                       -fx-font-weight: bold;
+                                       -fx-padding: 8 20;
+                                       -fx-background-radius: 20;
+                                       -fx-cursor: hand;
+                                       -fx-font-size: 14px;
+                                       -fx-border-color: #3b82f6;
+                                       -fx-border-width: 1;
+                                       -fx-border-radius: 20;"/>
+                    </HBox>
+                </HBox>
+
+                <!-- NIVEAU 2 : MENU NAVIGATION SIMPLIFIÉ (pour non connectés) -->
+                <HBox spacing="0" alignment="CENTER"
+                      style="-fx-padding: 0 40; -fx-background-color: rgba(30, 41, 59, 0.8);">
+
+                    <Button fx:id="vehiclesBtn"
+                            onAction="#showVehicles"
+                            text="🚗 Véhicules"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #3b82f6;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 600;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: #3b82f6;"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button fx:id="aboutBtn"
+                            onAction="#showAbout"
+                            text="ℹ️ À propos"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #cbd5e1;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 500;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: transparent;"/>
+
+                    <Button fx:id="contactBtn"
+                            onAction="#showContact"
+                            text="📞 Contact"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #cbd5e1;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 500;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: transparent;"/>
+                </HBox>
+
+                <!-- Ligne de séparation finale -->
+                <Separator style="-fx-background-color: linear-gradient(to right, #334155, #475569, #334155);
+                                 -fx-pref-height: 1;"/>
+            </VBox>
+        </top>
+
+        <!-- CONTENU DYNAMIQUE -->
+        <center>
+            <!-- Le contenu sera chargé dynamiquement ici -->
+        </center>
+    </BorderPane>
+
+</StackPane>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.vehiclegestion.admin.controller.AdminMagasinsController"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);">
+
+    <!-- HEADER -->
+    <top>
+        <VBox style="-fx-background-color: linear-gradient(to right, #0f172a, #1e40af);
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);"
+              spacing="10">
+            <padding>
+                <Insets top="25" right="25" bottom="25" left="25"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Rectangle width="4" height="40" arcWidth="10" arcHeight="10"
+                               style="-fx-fill: linear-gradient(to bottom, #3b82f6, #8b5cf6);"/>
+
+                    <VBox spacing="2">
+                        <Label text="🏪 GESTION DES MAGASINS"
+                               style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28px;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0.5, 0, 2);"/>
+                        <Label text="Administration • Gestion des Concessionnaires"
+                               style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </VBox>
+                </HBox>
+
+                <HBox HBox.hgrow="ALWAYS"/>
+
+                <HBox spacing="12">
+                    <Button fx:id="addMagasinButton" text="➕ Nouveau Magasin" onAction="#handleAddMagasin"
+                            style="-fx-background-color: linear-gradient(to right, #10b981, #059669);
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-font-size: 14px;
+                                   -fx-padding: 12 24;
+                                   -fx-background-radius: 8;
+                                   -fx-cursor: hand;
+                                   -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.5), 10, 0.5, 0, 3);"/>
+
+                    <Button fx:id="refreshButton" text="🔄 Rafraîchir" onAction="#handleRefresh"
+                            style="-fx-background-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-font-size: 14px;
+                                   -fx-padding: 12 24;
+                                   -fx-background-radius: 8;
+                                   -fx-cursor: hand;
+                                   -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 10, 0.5, 0, 3);"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- MAIN CONTENT AVEC SCROLLPANE -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background: transparent; -fx-background-color: transparent;"
+                    hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+
+            <VBox spacing="20" style="-fx-background-color: transparent;">
+                <padding>
+                    <Insets top="25" right="25" bottom="25" left="25"/>
+                </padding>
+
+                <!-- FILTRES ET RECHERCHE -->
+                <VBox spacing="15" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text="🔍 RECHERCHE ET FILTRES"
+                           style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label text="Rechercher:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                        <TextField fx:id="searchField" promptText="Nom, adresse ou localisation..."
+                                   prefWidth="350"
+                                   style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                          -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #64748b;
+                                          -fx-background-radius: 8;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 8;
+                                          -fx-font-size: 13px;
+                                          -fx-padding: 10;"/>
+
+                        <Label text="Catégorie:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                        <ComboBox fx:id="categorieFilterCombo" prefWidth="200"
+                                  style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                         -fx-text-fill: white;
+                                         -fx-border-color: #334155;
+                                         -fx-border-radius: 8;
+                                         -fx-background-radius: 8;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- TABLE DES MAGASINS -->
+                <VBox spacing="15" VBox.vgrow="ALWAYS"
+                      style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                             -fx-background-radius: 12;
+                             -fx-border-color: #334155;
+                             -fx-border-width: 1;
+                             -fx-border-radius: 12;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label fx:id="totalMagasinsLabel" text="Total: 0 magasin(s)"
+                               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="selectedMagasinLabel" text="Aucun magasin sélectionné"
+                               style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;"/>
+                    </HBox>
+
+                    <TableView fx:id="magasinsTable" VBox.vgrow="ALWAYS"
+                               style="-fx-background-color: #1e293b; -fx-border-color: #475569;
+                                      -fx-border-radius: 8px; -fx-background-radius: 8px;">
+                        <columns>
+                            <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+                            <TableColumn fx:id="nomColumn" text="Nom du Magasin" prefWidth="180" />
+                            <TableColumn fx:id="adresseColumn" text="Adresse" prefWidth="200" />
+                            <TableColumn fx:id="localisationColumn" text="Localisation GPS" prefWidth="150" />
+                            <TableColumn fx:id="categorieColumn" text="Catégorie" prefWidth="150" />
+                            <TableColumn fx:id="telephoneColumn" text="Téléphone" prefWidth="120" />
+                            <TableColumn fx:id="emailColumn" text="Email" prefWidth="180" />
+                            <TableColumn fx:id="vendeurColumn" text="ID Vendeur" prefWidth="90" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
+                    </TableView>
+
+                    <!-- BOUTONS D'ACTION -->
+                    <HBox spacing="12" alignment="CENTER">
+                        <Button fx:id="viewDetailsButton" text="👁️ Voir Détails" onAction="#handleViewDetails"
+                                style="-fx-background-color: linear-gradient(to right, #3b82f6, #2563eb);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;
+                                       -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.4), 8, 0.5, 0, 2);"/>
+
+                        <Button fx:id="editButton" text="✏️ Modifier" onAction="#handleEdit"
+                                style="-fx-background-color: linear-gradient(to right, #f59e0b, #d97706);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;
+                                       -fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.4), 8, 0.5, 0, 2);"/>
+
+                        <Button fx:id="deleteButton" text="🗑️ Supprimer" onAction="#handleDelete"
+                                style="-fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;
+                                       -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 8, 0.5, 0, 2);"/>
+                    </HBox>
+
+                    <!-- LÉGENDE -->
+                    <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10px 0 0 0;">
+                        <Label text="💡 Astuce: Double-cliquez sur une ligne pour voir les détails"
+                               style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-style: italic;"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

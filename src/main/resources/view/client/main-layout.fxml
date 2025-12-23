@@ -3,307 +3,299 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.shape.Rectangle?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.vehiclegestion.client.controller.MainController"
-            style="-fx-background-color: #ffffff;">
+<StackPane xmlns="http://javafx.com/javafx/"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.vehiclegestion.client.controller.MainController"
+           stylesheets="/com/example/vehiclegestion/css/notification-dropdown.css">
 
-    <top>
-        <VBox spacing="0" style="-fx-background-color: #ffffff;">
+    <!-- CONTENU PRINCIPAL -->
+    <BorderPane fx:id="mainBorderPane">
 
-            <!-- NIVEAU 1 : HEADER PRINCIPAL -->
-            <HBox spacing="0" alignment="CENTER"
-                  style="-fx-padding: 12 40; -fx-background-color: #ffffff; -fx-border-width: 0 0 1 0; -fx-border-color: #e8e8e8;">
+        <top>
+            <VBox spacing="0" style="-fx-background-color: rgba(15, 23, 42, 0.95);">
 
-                <!-- LOGO -->
-                <HBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                    <StackPane style="-fx-background-color: #1a1a1a;
-                                      -fx-background-radius: 8;
-                                      -fx-pref-width: 40;
-                                      -fx-pref-height: 40;">
-                        <FontIcon iconLiteral="fas-car-side" iconSize="20" iconColor="white"/>
-                    </StackPane>
-                    <Label text="AutoSales Pro"
-                           style="-fx-font-size: 22px;
-                                  -fx-font-weight: bold;
-                                  -fx-text-fill: #1a1a1a;
-                                  -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
-                </HBox>
-
-                <!-- BARRE DE RECHERCHE CENTRALE -->
+                <!-- NIVEAU 1 : HEADER PRINCIPAL -->
                 <HBox spacing="0" alignment="CENTER"
-                      style="-fx-background-color: #f5f5f5;
-                             -fx-background-radius: 25;
-                             -fx-padding: 8 20;
-                             -fx-min-width: 500;
-                             -fx-max-width: 500;">
-                    <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#7a7a7a"/>
-                    <TextField fx:id="searchField"
-                               promptText="Rechercher par marque, modèle, année..."
-                               style="-fx-background-color: transparent;
-                                      -fx-border-width: 0;
-                                      -fx-pref-width: 420;
-                                      -fx-padding: 0 15;
-                                      -fx-font-size: 14px;
-                                      -fx-text-fill: #1a1a1a;
-                                      -fx-prompt-text-fill: #999999;"/>
-                </HBox>
+                      style="-fx-padding: 15 40;
+                             -fx-background-color: transparent;
+                             -fx-border-width: 0 0 1 0;
+                             -fx-border-color: linear-gradient(to right, #334155, #475569, #334155);">
 
-                <!-- ACTIONS DROITE -->
-                <HBox spacing="25" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-
-                    <!-- Messages (icône enveloppe) -->
-                    <StackPane style="-fx-cursor: hand;">
-                        <Button onAction="#openChatFromMenu"
-                                style="-fx-background-color: transparent;
-                                       -fx-border-width: 0;
-                                       -fx-cursor: hand;
-                                       -fx-padding: 8;">
-                            <graphic>
-                                <FontIcon iconLiteral="far-envelope" iconSize="20" iconColor="#1a1a1a"/>
-                            </graphic>
-                        </Button>
-                        <Label text="3"
-                               style="-fx-text-fill: white;
-                                      -fx-font-size: 10px;
-                                      -fx-font-weight: bold;
-                                      -fx-translate-x: 10;
-                                      -fx-translate-y: -8;
-                                      -fx-background-color: #dc3545;
-                                      -fx-background-radius: 10;
-                                      -fx-padding: 2 6;
-                                      -fx-min-width: 18;
-                                      -fx-alignment: center;"/>
-                    </StackPane>
-
-                    <!-- Favoris (icône cœur) -->
-                    <StackPane style="-fx-cursor: hand;">
-                        <Button onAction="#showFavorites"
-                                style="-fx-background-color: transparent;
-                                       -fx-border-width: 0;
-                                       -fx-cursor: hand;
-                                       -fx-padding: 8;">
-                            <graphic>
-                                <FontIcon iconLiteral="far-heart" iconSize="20" iconColor="#1a1a1a"/>
-                            </graphic>
-                        </Button>
-                        <Label text="5"
-                               style="-fx-text-fill: white;
-                                      -fx-font-size: 10px;
-                                      -fx-font-weight: bold;
-                                      -fx-translate-x: 10;
-                                      -fx-translate-y: -8;
-                                      -fx-background-color: #dc3545;
-                                      -fx-background-radius: 10;
-                                      -fx-padding: 2 6;
-                                      -fx-min-width: 18;
-                                      -fx-alignment: center;"/>
-                    </StackPane>
-
-                    <!-- NOTIFICATIONS AVEC DROPDOWN -->
-                    <StackPane style="-fx-cursor: hand;">
-                        <Button fx:id="notificationBtn"
-                                onAction="#toggleNotificationDropdown"
-                                style="-fx-background-color: transparent;
-                                       -fx-border-width: 0;
-                                       -fx-cursor: hand;
-                                       -fx-padding: 8;">
-                            <graphic>
-                                <FontIcon iconLiteral="far-bell" iconSize="20" iconColor="#1a1a1a"/>
-                            </graphic>
-                        </Button>
-                        <Label fx:id="notificationBadge"
-                               text="0"
-                               style="-fx-text-fill: white;
-                                      -fx-font-size: 10px;
-                                      -fx-font-weight: bold;
-                                      -fx-translate-x: 10;
-                                      -fx-translate-y: -8;
-                                      -fx-background-color: #dc3545;
-                                      -fx-background-radius: 10;
-                                      -fx-padding: 2 6;
-                                      -fx-min-width: 18;
-                                      -fx-alignment: center;
-                                      -fx-visible: false;"/>
-                    </StackPane>
-
-                    <!-- Profil Utilisateur -->
-                    <HBox spacing="10" alignment="CENTER" style="-fx-cursor: hand;">
-                        <StackPane style="-fx-background-color: #1a1a1a;
-                                          -fx-background-radius: 50;
-                                          -fx-pref-width: 36;
-                                          -fx-pref-height: 36;">
-                            <Label text="JD"
-                                   style="-fx-text-fill: white;
-                                          -fx-font-weight: bold;
-                                          -fx-font-size: 13px;"/>
+                    <!-- LOGO -->
+                    <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <StackPane style="-fx-background-color: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+                                          -fx-background-radius: 10;
+                                          -fx-pref-width: 44;
+                                          -fx-pref-height: 44;
+                                          -fx-effect: dropshadow(gaussian, rgba(236, 72, 153, 0.4), 10, 0.5, 0, 2);">
+                            <FontIcon iconLiteral="fas-car-side" iconSize="22" iconColor="white"/>
                         </StackPane>
-                        <Label fx:id="userNameLabel"
-                               text="John Doe"
-                               style="-fx-text-fill: #1a1a1a;
-                                      -fx-font-size: 14px;
-                                      -fx-font-weight: 500;"/>
-                        <FontIcon iconLiteral="fas-chevron-down" iconSize="10" iconColor="#7a7a7a"/>
+                        <VBox spacing="2">
+                            <Label text="AutoSales Pro"
+                                   style="-fx-font-size: 24px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #f1f5f9;
+                                          -fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0.5, 0, 1);"/>
+                            <Label text="Premium Vehicle Marketplace"
+                                   style="-fx-font-size: 11px;
+                                          -fx-text-fill: #94a3b8;
+                                          -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- BARRE DE RECHERCHE CENTRALE -->
+                    <HBox spacing="0" alignment="CENTER"
+                          style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                 -fx-background-radius: 25;
+                                 -fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                                 -fx-border-width: 1;
+                                 -fx-border-radius: 25;
+                                 -fx-padding: 10 20;
+                                 -fx-min-width: 500;
+                                 -fx-max-width: 500;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.5, 0, 1);">
+                        <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="#cbd5e1"/>
+                        <TextField fx:id="searchField"
+                                   promptText="Rechercher par marque, modèle, année..."
+                                   style="-fx-background-color: transparent;
+                                          -fx-border-width: 0;
+                                          -fx-pref-width: 420;
+                                          -fx-padding: 0 15;
+                                          -fx-font-size: 14px;
+                                          -fx-text-fill: #f1f5f9;
+                                          -fx-prompt-text-fill: #94a3b8;
+                                          -fx-font-family: 'Segoe UI', 'Arial', sans-serif;"/>
+                    </HBox>
+
+                    <!-- ACTIONS DROITE -->
+                    <HBox spacing="20" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+
+                        <!-- Messages (icône enveloppe) -->
+                        <StackPane style="-fx-cursor: hand;">
+                            <Button fx:id="messagesIconBtn"
+                                    onAction="#openChatFromMenu"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-width: 0;
+                                           -fx-cursor: hand;
+                                           -fx-padding: 8;">
+                                <graphic>
+                                    <StackPane style="-fx-padding: 8;">
+                                        <FontIcon iconLiteral="far-envelope" iconSize="20" iconColor="#cbd5e1"/>
+                                    </StackPane>
+                                </graphic>
+                            </Button>
+                            <Label fx:id="messagesBadge"
+                                   text="3"
+                                   style="-fx-text-fill: white;
+                                          -fx-font-size: 10px;
+                                          -fx-font-weight: bold;
+                                          -fx-translate-x: 12;
+                                          -fx-translate-y: -10;
+                                          -fx-background-color: linear-gradient(to right, #ef4444, #dc2626);
+                                          -fx-background-radius: 10;
+                                          -fx-padding: 2 6;
+                                          -fx-min-width: 18;
+                                          -fx-alignment: center;
+                                          -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 5, 0.5, 0, 1);"/>
+                        </StackPane>
+
+                        <!-- Favoris (icône cœur) -->
+                        <StackPane style="-fx-cursor: hand;">
+                            <Button onAction="#showFavorites"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-width: 0;
+                                           -fx-cursor: hand;
+                                           -fx-padding: 8;">
+                                <graphic>
+                                    <StackPane style="-fx-padding: 8;">
+                                        <FontIcon iconLiteral="fas-heart" iconSize="20" iconColor="#ec4899"/>
+                                    </StackPane>
+                                </graphic>
+                            </Button>
+                            <Label text="5"
+                                   style="-fx-text-fill: white;
+                                          -fx-font-size: 10px;
+                                          -fx-font-weight: bold;
+                                          -fx-translate-x: 12;
+                                          -fx-translate-y: -10;
+                                          -fx-background-color: linear-gradient(to right, #ec4899, #8b5cf6);
+                                          -fx-background-radius: 10;
+                                          -fx-padding: 2 6;
+                                          -fx-min-width: 18;
+                                          -fx-alignment: center;
+                                          -fx-effect: dropshadow(gaussian, rgba(236, 72, 153, 0.4), 5, 0.5, 0, 1);"/>
+                        </StackPane>
+
+                        <!-- NOTIFICATIONS AVEC DROPDOWN -->
+                        <StackPane style="-fx-cursor: hand;">
+                            <Button fx:id="notificationBtn"
+                                    onAction="#toggleNotificationDropdown"
+                                    style="-fx-background-color: transparent;
+                                           -fx-border-width: 0;
+                                           -fx-cursor: hand;
+                                           -fx-padding: 8;">
+                                <graphic>
+                                    <StackPane style="-fx-padding: 8;">
+                                        <FontIcon iconLiteral="far-bell" iconSize="20" iconColor="#cbd5e1"/>
+                                    </StackPane>
+                                </graphic>
+                            </Button>
+                            <Label fx:id="notificationBadge"
+                                   text="0"
+                                   style="-fx-text-fill: white;
+                                          -fx-font-size: 10px;
+                                          -fx-font-weight: bold;
+                                          -fx-translate-x: 12;
+                                          -fx-translate-y: -10;
+                                          -fx-background-color: linear-gradient(to right, #3b82f6, #1e40af);
+                                          -fx-background-radius: 10;
+                                          -fx-padding: 2 6;
+                                          -fx-min-width: 18;
+                                          -fx-alignment: center;
+                                          -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.4), 5, 0.5, 0, 1);
+                                          -fx-visible: false;"/>
+                        </StackPane>
+
+                        <!-- Profil Utilisateur -->
+                        <HBox spacing="10" alignment="CENTER" style="-fx-cursor: hand;">
+                            <StackPane style="-fx-background-color: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+                                              -fx-background-radius: 50;
+                                              -fx-pref-width: 40;
+                                              -fx-pref-height: 40;
+                                              -fx-effect: dropshadow(gaussian, rgba(236, 72, 153, 0.4), 8, 0.5, 0, 2);">
+                                <Label text="JD"
+                                       style="-fx-text-fill: white;
+                                              -fx-font-weight: bold;
+                                              -fx-font-size: 14px;"/>
+                            </StackPane>
+                            <VBox spacing="1">
+                                <Label fx:id="userNameLabel"
+                                       text="John Doe"
+                                       style="-fx-text-fill: #f1f5f9;
+                                              -fx-font-size: 14px;
+                                              -fx-font-weight: 600;"/>
+                                <Label text="Client Premium"
+                                       style="-fx-text-fill: #94a3b8;
+                                              -fx-font-size: 11px;"/>
+                            </VBox>
+                            <FontIcon iconLiteral="fas-chevron-down" iconSize="12" iconColor="#94a3b8"/>
+                        </HBox>
                     </HBox>
                 </HBox>
-            </HBox>
 
-            <!-- NIVEAU 2 : MENU NAVIGATION COMPLET -->
-            <HBox spacing="0" alignment="CENTER"
-                  style="-fx-padding: 0 40; -fx-background-color: #ffffff;">
+                <!-- NIVEAU 2 : MENU NAVIGATION COMPLET -->
+                <HBox spacing="0" alignment="CENTER"
+                      style="-fx-padding: 0 40; -fx-background-color: rgba(30, 41, 59, 0.8);">
 
-                <Button fx:id="vehiclesBtn"
-                        onAction="#showVehicles"
-                        text="Véhicules"
-                        style="-fx-background-color: transparent;
-                               -fx-text-fill: #3498db;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: 600;
-                               -fx-padding: 18 20;
-                               -fx-cursor: hand;
-                               -fx-border-width: 0 0 2 0;
-                               -fx-border-color: #3498db;"/>
+                    <Button fx:id="vehiclesBtn"
+                            onAction="#showVehicles"
+                            text="🚗 Véhicules"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #3b82f6;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 600;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: #3b82f6;"/>
 
-                <Button fx:id="messagesBtn"
-                        onAction="#openChatFromMenu"
-                        text="Messages"
-                        style="-fx-background-color: transparent;
-                               -fx-text-fill: #2c3e50;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: 500;
-                               -fx-padding: 18 20;
-                               -fx-cursor: hand;
-                               -fx-border-width: 0 0 2 0;
-                               -fx-border-color: transparent;"/>
+                    <Button fx:id="messagesBtn"
+                            onAction="#openChatFromMenu"
+                            text="💬 Messages"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #cbd5e1;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 500;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: transparent;"/>
 
-                <Button fx:id="favoritesBtn"
-                        onAction="#showFavorites"
-                        text="Favoris"
-                        style="-fx-background-color: transparent;
-                               -fx-text-fill: #2c3e50;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: 500;
-                               -fx-padding: 18 20;
-                               -fx-cursor: hand;
-                               -fx-border-width: 0 0 2 0;
-                               -fx-border-color: transparent;"/>
+                    <Button fx:id="favoritesBtn"
+                            onAction="#showFavorites"
+                            text="❤️ Favoris"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #cbd5e1;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 500;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: transparent;"/>
 
-                <Button fx:id="historyBtn"
-                        onAction="#showHistory"
-                        text="Historique"
-                        style="-fx-background-color: transparent;
-                               -fx-text-fill: #2c3e50;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: 500;
-                               -fx-padding: 18 20;
-                               -fx-cursor: hand;
-                               -fx-border-width: 0 0 2 0;
-                               -fx-border-color: transparent;"/>
+                    <Button fx:id="historyBtn"
+                            onAction="#showHistory"
+                            text="📊 Historique"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #cbd5e1;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 500;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: transparent;"/>
 
-                <Button fx:id="profileBtn"
-                        onAction="#showProfile"
-                        text="Profil"
-                        style="-fx-background-color: transparent;
-                               -fx-text-fill: #2c3e50;
-                               -fx-font-size: 14px;
-                               -fx-font-weight: 500;
-                               -fx-padding: 18 20;
-                               -fx-cursor: hand;
-                               -fx-border-width: 0 0 2 0;
-                               -fx-border-color: transparent;"/>
+                    <Button fx:id="profileBtn"
+                            onAction="#showProfile"
+                            text="👤 Profil"
+                            style="-fx-background-color: transparent;
+                                   -fx-text-fill: #cbd5e1;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 500;
+                                   -fx-padding: 20 25;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 0 0 2 0;
+                                   -fx-border-color: transparent;"/>
 
-                <Region HBox.hgrow="ALWAYS"/>
+                    <Region HBox.hgrow="ALWAYS"/>
 
-                <Button fx:id="logoutBtn"
-                        onAction="#logout"
-                        text="Déconnexion"
-                        style="-fx-background-color: transparent;
-                               -fx-text-fill: #666666;
-                               -fx-font-size: 14px;
-                               -fx-cursor: hand;
-                               -fx-border-width: 0;
-                               -fx-padding: 18 20;"/>
-            </HBox>
+                    <Button fx:id="logoutBtn"
+                            onAction="#logout"
+                            text="🚪 Déconnexion"
+                            style="-fx-background-color: linear-gradient(to right, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+                                   -fx-text-fill: #ef4444;
+                                   -fx-font-size: 13px;
+                                   -fx-font-weight: 500;
+                                   -fx-cursor: hand;
+                                   -fx-border-width: 1;
+                                   -fx-border-color: rgba(239, 68, 68, 0.3);
+                                   -fx-border-radius: 8;
+                                   -fx-background-radius: 8;
+                                   -fx-padding: 10 20;
+                                   -fx-margin: 10 0;"/>
+                </HBox>
 
-            <!-- Ligne de séparation finale -->
-            <Separator style="-fx-background-color: #e8e8e8; -fx-pref-height: 1;"/>
-        </VBox>
-    </top>
+                <!-- Ligne de séparation finale -->
+                <Separator style="-fx-background-color: linear-gradient(to right, #334155, #475569, #334155);
+                                 -fx-pref-height: 1;"/>
+            </VBox>
+        </top>
 
-    <!-- CONTENU DYNAMIQUE -->
-    <center>
-        <BorderPane fx:id="mainBorderPane" style="-fx-background-color: #f5f5f5;"/>
-    </center>
+        <!-- CONTENU DYNAMIQUE -->
+        <center>
+            <!-- Le contenu sera chargé dynamiquement ici -->
+        </center>
+    </BorderPane>
 
-    <!-- DROPDOWN DES NOTIFICATIONS - HAUTEUR AUGMENTÉE -->
+    <!-- DROPDOWN DES NOTIFICATIONS - AU PREMIER PLAN -->
     <BorderPane fx:id="notificationDropdown"
                 visible="false"
                 managed="false"
-                style="-fx-background-color: white;
-                      -fx-border-color: #e0e0e0;
-                      -fx-border-width: 1;
-                      -fx-background-radius: 8;
-                      -fx-border-radius: 8;
-                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);"
-                prefWidth="380"
-                prefHeight="700"
-                maxWidth="450"
-                maxHeight="800"
-                minHeight="500"
-                translateY="65"
-                translateX="-180">
-
-        <top>
-            <HBox style="-fx-background-color: #f8f9fa;
-                         -fx-border-width: 0 0 1 0;
-                         -fx-border-color: #e0e0e0;
-                         -fx-padding: 20;
-                         -fx-border-radius: 8 8 0 0;
-                         -fx-pref-height: 60;">
-                <Label text="🔔 Notifications"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnMarkAllRead" text="Tout lire"
-                        style="-fx-background-color: #3498db;
-                              -fx-text-fill: white;
-                              -fx-padding: 8 20;
-                              -fx-font-size: 14px;
-                              -fx-background-radius: 6;"/>
-            </HBox>
-        </top>
-
-        <center>
-            <ScrollPane fx:id="notificationScrollPane"
-                        style="-fx-background: transparent;
-                               -fx-border-width: 0;
-                               -fx-padding: 0;"
-                        fitToWidth="true"
-                        prefViewportHeight="580"
-                        vbarPolicy="AS_NEEDED"
-                        hbarPolicy="NEVER">
-                <VBox fx:id="notificationItemsContainer" spacing="0"/>
-            </ScrollPane>
-        </center>
-
-        <bottom>
-            <HBox style="-fx-background-color: #f8f9fa;
-                         -fx-border-width: 1 0 0 0;
-                         -fx-border-color: #e0e0e0;
-                         -fx-padding: 15 20;
-                         -fx-border-radius: 0 0 8 8;
-                         -fx-pref-height: 50;">
-                <Label fx:id="lblNotificationStatus" text="0 notification(s)"
-                       style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnSeeAll" text="Voir tout"
-                        style="-fx-background-color: transparent;
-                              -fx-text-fill: #3498db;
-                              -fx-padding: 8 15;
-                              -fx-font-size: 14px;
-                              -fx-font-weight: 500;"/>
-            </HBox>
-        </bottom>
+                pickOnBounds="false"
+                StackPane.alignment="TOP_RIGHT"
+                style="-fx-background-color: #1e293b;
+                   -fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+                   -fx-border-width: 2;
+                   -fx-background-radius: 12;
+                   -fx-border-radius: 12;
+                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 20, 0.6, 0, 5);"
+                prefWidth="420"
+                prefHeight="600"
+                maxWidth="450">
+        <!-- Supprimer translateY et translateX -->
     </BorderPane>
 
-</BorderPane>
+</StackPane>

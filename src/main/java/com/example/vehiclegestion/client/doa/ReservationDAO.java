@@ -7,6 +7,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 
 public class ReservationDAO {
     private Connection connection;

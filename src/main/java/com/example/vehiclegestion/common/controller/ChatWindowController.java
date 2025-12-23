@@ -4,25 +4,27 @@ import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.common.dao.ChatDAO;
 import com.example.vehiclegestion.common.model.Conversation;
 import com.example.vehiclegestion.common.model.Message;
-// AJOUTER CET IMPORT
 import com.example.vehiclegestion.common.utils.NotificationService;
+import com.example.vehiclegestion.client.controller.MainController;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.input.KeyCode;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -44,6 +46,7 @@ public class ChatWindowController implements Initializable {
     @FXML private HBox messageInputArea;
     @FXML private TextField messageInputField;
     @FXML private Button sendButton;
+    @FXML private Button backToDetailsBtn;
 
     private ChatDAO chatDAO = new ChatDAO();
     private int currentUserId;
@@ -51,16 +54,14 @@ public class ChatWindowController implements Initializable {
     private Conversation currentConversation;
     private Timeline autoRefreshTimeline;
     private int lastMessageCount = 0;
-    private boolean fromVehicleDetails = false; // Nouveau flag
-
-    // AJOUTER CET ATTRIBUT
+    private boolean fromVehicleDetails = false;
     private NotificationService notificationService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("\n🚀 === INITIALISATION CHAT WINDOW ===");
 
-        // AJOUTER CETTE LIGNE - Initialiser NotificationService
+        // Initialiser NotificationService
         notificationService = NotificationService.getInstance();
 
         // Récupérer l'utilisateur connecté
@@ -79,9 +80,6 @@ public class ChatWindowController implements Initializable {
         startAutoRefresh();
         updateNotificationBadge();
 
-        // NE PAS charger les conversations ici immédiatement
-        // Elles seront chargées par initializeFromMenu() ou openSpecificConversation()
-
         // Par défaut, afficher le placeholder
         Platform.runLater(() -> {
             showPlaceholder();
@@ -89,10 +87,10 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Affiche le placeholder (quand on vient du menu)
+     * Affiche le placeholder (quand aucune conversation sélectionnée)
      */
     public void showPlaceholder() {
-        System.out.println("📭 Affichage du placeholder (mode menu)");
+        System.out.println("📭 Affichage du placeholder");
         placeholderView.setVisible(true);
         placeholderView.setManaged(true);
         chatContainer.setVisible(false);
@@ -179,7 +177,7 @@ public class ChatWindowController implements Initializable {
         item.setPadding(new Insets(12, 15, 12, 15));
         item.setStyle("-fx-background-color: white; -fx-cursor: hand;");
 
-        // STOCKER L'ID DE LA CONVERSATION
+        // Stocker l'ID de la conversation
         item.setUserData(conv.getIdConversation());
 
         // Ajouter l'événement de clic
@@ -196,9 +194,9 @@ public class ChatWindowController implements Initializable {
         avatar.setStyle("-fx-background-color: #0084ff; -fx-background-radius: 25;");
 
         String initiales = getInitiales(conv.getInterlocuteurComplet());
-        Label avatarLabel = new Label(initiales);
-        avatarLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
-        avatar.getChildren().add(avatarLabel);
+        Label avatarText = new Label(initiales);
+        avatarText.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        avatar.getChildren().add(avatarText);
 
         // Contenu
         VBox content = new VBox(4);
@@ -251,7 +249,6 @@ public class ChatWindowController implements Initializable {
             if (node instanceof HBox) {
                 HBox hbox = (HBox) node;
                 if (hbox.getUserData() != null && hbox.getUserData().equals(idConversation)) {
-                    // Style de sélection
                     hbox.setStyle("-fx-background-color: #e7f3ff; -fx-border-color: #0084ff; -fx-border-width: 0 0 0 3; -fx-cursor: hand;");
                 } else {
                     hbox.setStyle("-fx-background-color: white; -fx-border-width: 0; -fx-cursor: hand;");
@@ -267,7 +264,7 @@ public class ChatWindowController implements Initializable {
         Integer selectedId = currentConversation != null ? currentConversation.getIdConversation() : null;
 
         // Sauvegarder les items sélectionnés
-        List<Object> selectedItems = new java.util.ArrayList<>();
+        List<Object> selectedItems = new ArrayList<>();
         for (javafx.scene.Node node : conversationsListContainer.getChildren()) {
             if (node instanceof HBox) {
                 HBox hbox = (HBox) node;
@@ -295,9 +292,6 @@ public class ChatWindowController implements Initializable {
         System.out.println("========================================");
         System.out.println("ID Conversation: " + conv.getIdConversation());
         System.out.println("Interlocuteur: " + conv.getInterlocuteurComplet());
-        System.out.println("ID Vendeur: " + conv.getIdVendeur());
-        System.out.println("ID Client: " + conv.getIdClient());
-        System.out.println("Utilisateur actuel: ID=" + currentUserId + ", Role=" + currentUserRole);
         System.out.println("========================================\n");
 
         currentConversation = conv;
@@ -386,7 +380,6 @@ public class ChatWindowController implements Initializable {
         bubble.setMaxWidth(400);
 
         if (isMyMessage) {
-            // Message envoyé (droite, bleu)
             bubble.setStyle(
                     "-fx-background-color: #0084ff; " +
                             "-fx-background-radius: 18 18 4 18; " +
@@ -394,7 +387,6 @@ public class ChatWindowController implements Initializable {
             );
             container.setAlignment(Pos.CENTER_RIGHT);
         } else {
-            // Message reçu (gauche, gris)
             bubble.setStyle(
                     "-fx-background-color: #e4e6eb; " +
                             "-fx-background-radius: 18 18 18 4; " +
@@ -402,7 +394,6 @@ public class ChatWindowController implements Initializable {
             );
             container.setAlignment(Pos.CENTER_LEFT);
 
-            // Ajouter le nom de l'expéditeur pour les messages reçus
             if (msg.getPrenomExpediteur() != null) {
                 Label senderLabel = new Label(msg.getPrenomExpediteur() + " " + msg.getNomExpediteur());
                 senderLabel.setStyle(
@@ -454,7 +445,6 @@ public class ChatWindowController implements Initializable {
         }
 
         try {
-            // Désactiver temporairement le champ de saisie
             messageInputField.setDisable(true);
 
             boolean success = chatDAO.sendMessage(
@@ -465,33 +455,19 @@ public class ChatWindowController implements Initializable {
             );
 
             if (success) {
-                System.out.println("\n✅ === MESSAGE ENVOYÉ DANS L'INTERFACE ===");
-                System.out.println("   Contenu: " + contenu);
+                System.out.println("\n✅ Message envoyé: " + contenu);
 
-                // ================================================
-                // AJOUTER CE CODE POUR LA NOTIFICATION
-                // ================================================
+                // Envoyer notification
                 try {
-                    // Déterminer qui est le destinataire
-                    int destinataireId;
+                    int destinataireId = currentUserRole.equals("client")
+                            ? currentConversation.getIdVendeur()
+                            : currentConversation.getIdClient();
 
-                    if (currentUserRole.equals("client")) {
-                        // Si le client envoie, le destinataire est le vendeur
-                        destinataireId = currentConversation.getIdVendeur();
-                        System.out.println("📤 Client → Vendeur (ID: " + destinataireId + ")");
-                    } else {
-                        // Si le vendeur envoie, le destinataire est le client
-                        destinataireId = currentConversation.getIdClient();
-                        System.out.println("📤 Vendeur → Client (ID: " + destinataireId + ")");
-                    }
-
-                    // Obtenir le nom de l'expéditeur
                     String nomExpediteur = SessionManager.getInstance().getUserFullName();
                     if (nomExpediteur == null || nomExpediteur.isEmpty()) {
                         nomExpediteur = "Utilisateur";
                     }
 
-                    // Créer la notification
                     if (destinataireId > 0) {
                         notificationService.notifierNouveauMessage(
                                 destinataireId,
@@ -501,21 +477,13 @@ public class ChatWindowController implements Initializable {
                         System.out.println("📨 Notification envoyée à l'utilisateur ID: " + destinataireId);
                     }
                 } catch (Exception e) {
-                    System.err.println("⚠️ Erreur lors de l'envoi de la notification: " + e.getMessage());
+                    System.err.println("⚠️ Erreur notification: " + e.getMessage());
                 }
-                // ================================================
 
-                // Vider le champ
                 messageInputField.clear();
-
-                // Recharger les messages immédiatement
                 lastMessageCount = 0;
                 loadMessages(currentConversation.getIdConversation());
-
-                // Rafraîchir la liste des conversations
                 refreshConversationsListKeepingSelection();
-
-                // Feedback visuel
                 showSuccessNotification("Message envoyé ✓");
             } else {
                 showError("Erreur", "Impossible d'envoyer le message");
@@ -526,14 +494,79 @@ public class ChatWindowController implements Initializable {
             e.printStackTrace();
             showError("Erreur", "Erreur lors de l'envoi: " + e.getMessage());
         } finally {
-            // Réactiver le champ de saisie
             messageInputField.setDisable(false);
             messageInputField.requestFocus();
         }
     }
 
     /**
-     * Affiche une notification de succès temporaire
+     * Retourne à la page précédente
+     */
+    @FXML
+    private void goBackToDetails() {
+        System.out.println("🔙 Retour depuis le chat");
+
+        try {
+            if (autoRefreshTimeline != null) {
+                autoRefreshTimeline.stop();
+            }
+
+            MainController mainController = findMainControllerFromChat();
+
+            if (mainController != null) {
+                System.out.println("↩️ Retour à la liste des véhicules");
+                mainController.loadContent("/view/client/vehicles-view.fxml");
+                System.out.println("✅ Retour effectué via MainController");
+                return;
+            }
+
+            // Fallback: fermer la fenêtre
+            if (messagesScrollPane != null && messagesScrollPane.getScene() != null) {
+                Stage stage = (Stage) messagesScrollPane.getScene().getWindow();
+                stage.close();
+                System.out.println("✅ Fenêtre de chat fermée");
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors du retour: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Trouve le MainController parent
+     */
+    private MainController findMainControllerFromChat() {
+        try {
+            if (messagesScrollPane != null && messagesScrollPane.getScene() != null) {
+                Parent root = messagesScrollPane.getScene().getRoot();
+
+                Parent current = root;
+                while (current != null) {
+                    if (current instanceof BorderPane) {
+                        BorderPane bp = (BorderPane) current;
+                        Object userData = bp.getUserData();
+                        if (userData instanceof MainController) {
+                            System.out.println("✅ MainController trouvé");
+                            return (MainController) userData;
+                        }
+                    }
+                    if (current.getParent() != null) {
+                        current = current.getParent();
+                    } else {
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Erreur recherche MainController: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Affiche une notification de succès
      */
     private void showSuccessNotification(String message) {
         Label notification = new Label(message);
@@ -546,10 +579,8 @@ public class ChatWindowController implements Initializable {
                         "-fx-font-weight: bold;"
         );
 
-        // Ajouter au conteneur de messages temporairement
         messagesContainer.getChildren().add(notification);
 
-        // Supprimer après 2 secondes
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), e -> {
             messagesContainer.getChildren().remove(notification);
         }));
@@ -557,7 +588,7 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Filtre de recherche dans les conversations
+     * Filtre de recherche
      */
     private void setupSearchFilter() {
         searchConversationField.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -608,17 +639,14 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Actualisation automatique toutes les 3 secondes
+     * Actualisation automatique
      */
     private void startAutoRefresh() {
         autoRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> {
             if (currentConversation != null) {
-                // Charger les nouveaux messages
                 loadMessages(currentConversation.getIdConversation());
             }
             updateNotificationBadge();
-
-            // Rafraîchir la liste
             refreshConversationsListKeepingSelection();
         }));
         autoRefreshTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -626,48 +654,40 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Ouvre une conversation spécifique par son ID
+     * Ouvre une conversation spécifique
      */
     public void openSpecificConversation(int idConversation) {
-        System.out.println("\n🎯 === OUVERTURE AUTOMATIQUE CONVERSATION ===");
-        System.out.println("   ID Conversation: " + idConversation);
+        System.out.println("\n🎯 Ouverture automatique conversation: " + idConversation);
 
         try {
-            // 1. Recharger TOUTES les conversations d'abord
             loadConversations();
 
-            // 2. Récupérer la conversation spécifique
             Conversation conversation = chatDAO.getConversationById(idConversation);
 
             if (conversation != null) {
                 System.out.println("✅ Conversation trouvée: " + conversation.getInterlocuteurComplet());
 
-                // 3. Vérifier si la conversation est déjà dans la liste
                 boolean conversationInList = false;
                 for (javafx.scene.Node node : conversationsListContainer.getChildren()) {
                     if (node instanceof HBox) {
                         HBox hbox = (HBox) node;
-                        if (hbox.getUserData() != null &&
-                                hbox.getUserData().equals(idConversation)) {
+                        if (hbox.getUserData() != null && hbox.getUserData().equals(idConversation)) {
                             conversationInList = true;
                             break;
                         }
                     }
                 }
 
-                // 4. Si pas dans la liste, l'ajouter
                 if (!conversationInList) {
-                    System.out.println("📌 Conversation absente de la liste, ajout...");
+                    System.out.println("📌 Ajout de la conversation à la liste");
                     HBox newItem = createConversationItem(conversation);
                     conversationsListContainer.getChildren().add(0, newItem);
                 }
 
-                // 5. Ouvrir la conversation
                 openConversation(conversation);
-
-                System.out.println("✅ Conversation " + idConversation + " ouverte automatiquement");
+                System.out.println("✅ Conversation ouverte automatiquement");
             } else {
-                System.err.println("❌ Conversation " + idConversation + " introuvable");
+                System.err.println("❌ Conversation introuvable");
                 showError("Erreur", "La conversation n'a pas pu être chargée");
             }
 
@@ -678,11 +698,11 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Définit le mode "depuis les détails du véhicule"
+     * Définit le mode "depuis détails véhicule"
      */
     public void setFromVehicleDetails(boolean fromVehicleDetails) {
         this.fromVehicleDetails = fromVehicleDetails;
-        System.out.println("🎯 Mode: " + (fromVehicleDetails ? "Depuis détails véhicule" : "Depuis menu"));
+        System.out.println("🎯 Mode: " + (fromVehicleDetails ? "Depuis détails" : "Depuis menu"));
     }
 
     /**
@@ -690,13 +710,11 @@ public class ChatWindowController implements Initializable {
      */
     @FXML
     private void attachFile() {
-        System.out.println("📎 Joindre un fichier (à implémenter)");
         showAlert("Fonction en développement", "L'envoi de fichiers sera bientôt disponible.");
     }
 
     @FXML
     private void showEmojiPicker() {
-        System.out.println("😊 Sélecteur d'emoji (à implémenter)");
         String currentText = messageInputField.getText();
         messageInputField.setText(currentText + "😊");
         messageInputField.positionCaret(messageInputField.getText().length());
@@ -704,7 +722,6 @@ public class ChatWindowController implements Initializable {
 
     @FXML
     private void callInterlocuteur() {
-        System.out.println("📞 Appel (à implémenter)");
         showAlert("Fonction en développement", "Les appels vocaux seront bientôt disponibles.");
     }
 
@@ -714,10 +731,7 @@ public class ChatWindowController implements Initializable {
             showAlert("Informations sur la conversation",
                     "Conversation ID: " + currentConversation.getIdConversation() + "\n" +
                             "Type: " + currentConversation.getTypeConversationLabel() + "\n" +
-                            "Interlocuteur: " + currentConversation.getInterlocuteurComplet() + "\n" +
-                            "Statut: " + currentConversation.getStatut() + "\n" +
-                            "Date création: " + (currentConversation.getDateCreation() != null ?
-                            currentConversation.getDateCreation().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A"));
+                            "Interlocuteur: " + currentConversation.getInterlocuteurComplet());
         }
     }
 
@@ -756,13 +770,11 @@ public class ChatWindowController implements Initializable {
     }
 
     /**
-     * Initialise le chat en mode "depuis le menu"
-     * (appelé quand on ouvre depuis le menu Messages)
+     * Initialise en mode menu
      */
     public void initializeFromMenu() {
-        System.out.println("\n📭 === MODE MENU ACTIVÉ ===");
+        System.out.println("\n📭 Mode menu activé");
 
-        // Par défaut, montrer le placeholder (pas de conversation ouverte)
         Platform.runLater(() -> {
             placeholderView.setVisible(true);
             placeholderView.setManaged(true);
@@ -770,11 +782,10 @@ public class ChatWindowController implements Initializable {
             chatContainer.setManaged(false);
             currentConversation = null;
 
-            // Désactiver le champ de message
             if (messageInputField != null) {
                 messageInputField.setDisable(true);
                 messageInputField.clear();
-                messageInputField.setPromptText("Sélectionnez une conversation pour envoyer un message");
+                messageInputField.setPromptText("Sélectionnez une conversation");
             }
 
             if (sendButton != null) {
@@ -782,7 +793,17 @@ public class ChatWindowController implements Initializable {
             }
         });
 
-        // Charger les conversations
         loadConversations();
+    }
+
+
+    public void setUserInfo(int userId, String userRole) {
+        this.currentUserId = userId;
+        this.currentUserRole = userRole;
+        System.out.println("✅ Chat - Utilisateur défini: ID=" + userId + ", Role=" + userRole);
+
+        if (userId > 0) {
+            loadConversations();
+        }
     }
 }

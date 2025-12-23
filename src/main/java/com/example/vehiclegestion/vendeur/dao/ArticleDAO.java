@@ -109,9 +109,9 @@ public class ArticleDAO {
         System.out.println("\n💾 === ArticleDAO.addArticle ===");
         System.out.println("   - Titre: " + article.getTitre());
         System.out.println("   - Prix: " + article.getPrix() + " DH");
-        System.out.println("   - Utilisateur ID reçu: " + utilisateurId);
+        System.out.println("   - Magasin ID: " + article.getIdMagasin());
 
-        // ✅ CORRECTION : Récupérer id_vendeur depuis la table Vendeur
+        // ✅ CORRECTION: Récupérer id_vendeur depuis la table Vendeur
         int vendeurId = 0;
         String getVendeurId = "SELECT id_vendeur FROM Vendeur WHERE id_vendeur = ?";
 
@@ -122,22 +122,17 @@ public class ArticleDAO {
                     vendeurId = rs.getInt("id_vendeur");
                     System.out.println("   ✅ ID Vendeur trouvé: " + vendeurId);
                 } else {
-                    System.err.println("   ❌ ERREUR: Aucun vendeur trouvé avec id_vendeur = " + utilisateurId);
-                    System.err.println("   ⚠️ Vérifiez que l'utilisateur existe dans la table Vendeur");
+                    System.err.println("   ❌ Aucun vendeur trouvé avec id_vendeur = " + utilisateurId);
                     return false;
                 }
             }
         }
 
-        if (vendeurId == 0) {
-            System.err.println("   ❌ Impossible d'ajouter l'article : vendeurId invalide");
-            return false;
-        }
-
+        // ✅ CORRECTION: Requête SQL complète et correcte
         String sql = "INSERT INTO Article " +
-                "(titre, description, prix, prix_promo, reduction, categorie, etat, image, id_vendeur, " +
-                "marque, modele, annee, kilometrage, transmission, carburant, puissance, couleur) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "(titre, description, prix, prix_promo, reduction, categorie, etat, image, " +
+                "id_vendeur, marque, modele, annee, kilometrage, transmission, carburant, puissance, couleur, id_magasin) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, article.getTitre());
@@ -148,7 +143,7 @@ public class ArticleDAO {
             stmt.setString(6, article.getCategorie());
             stmt.setString(7, article.getEtat());
             stmt.setString(8, article.getImage());
-            stmt.setInt(9, vendeurId);  // ✅ Utilise le vendeurId vérifié
+            stmt.setInt(9, vendeurId); // ✅ id_vendeur
             stmt.setString(10, article.getMarque());
             stmt.setString(11, article.getModele());
             stmt.setInt(12, article.getAnnee());
@@ -157,33 +152,29 @@ public class ArticleDAO {
             stmt.setString(15, article.getCarburant());
             stmt.setInt(16, article.getPuissance());
             stmt.setString(17, article.getCouleur());
+            stmt.setObject(18, article.getIdMagasin()); // ✅ id_magasin
 
             System.out.println("   - Exécution de l'insertion...");
             int rowsInserted = stmt.executeUpdate();
 
             if (rowsInserted > 0) {
-                // Récupérer l'ID généré
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int newId = generatedKeys.getInt(1);
                         System.out.println("   ✅ Article inséré avec succès!");
                         System.out.println("   - ID article généré: " + newId);
                         System.out.println("   - ID vendeur: " + vendeurId);
+                        System.out.println("   - ID magasin: " + article.getIdMagasin());
                     }
                 }
-
-                System.out.println("💾 === Fin addArticle - SUCCÈS ===\n");
                 return true;
             } else {
                 System.out.println("   ❌ Aucune ligne insérée!");
-                System.out.println("💾 === Fin addArticle - ÉCHEC ===\n");
                 return false;
             }
 
         } catch (SQLException e) {
             System.err.println("   ❌ Erreur SQL: " + e.getMessage());
-            System.err.println("   - Code erreur: " + e.getErrorCode());
-            System.err.println("   - État SQL: " + e.getSQLState());
             e.printStackTrace();
             throw e;
         }
@@ -242,4 +233,63 @@ public class ArticleDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+    public List<Article> getArticlesByMagasin(int idMagasin) throws SQLException {
+        System.out.println("\n🔍 === ArticleDAO.getArticlesByMagasin ===");
+        System.out.println("   - Magasin ID: " + idMagasin);
+
+        List<Article> articles = new ArrayList<>();
+
+        // ✅ REQUÊTE: Récupérer les articles du magasin spécifique
+        String query = "SELECT * FROM Article WHERE id_magasin = ? ORDER BY date_ajout DESC";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, idMagasin);
+
+            System.out.println("   - Requête SQL: " + query);
+            System.out.println("   - Paramètre: id_magasin = " + idMagasin);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                    Article article = new Article(
+                            rs.getInt("id_article"),
+                            rs.getString("titre"),
+                            rs.getString("description"),
+                            rs.getDouble("prix"),
+                            rs.getDouble("prix_promo"),
+                            rs.getInt("reduction"),
+                            rs.getString("categorie"),
+                            rs.getString("etat"),
+                            rs.getString("image"),
+                            rs.getInt("id_vendeur"),
+                            rs.getString("marque"),
+                            rs.getString("modele"),
+                            rs.getInt("annee"),
+                            rs.getInt("kilometrage"),
+                            rs.getString("transmission"),
+                            rs.getString("carburant"),
+                            rs.getInt("puissance"),
+                            rs.getString("couleur")
+                    );
+                    // ✅ SET MAGASIN ID
+                    article.setIdMagasin(rs.getInt("id_magasin"));
+                    articles.add(article);
+
+                    if (count <= 3) {
+                        System.out.println("   ✅ Article #" + count + ": " + article.getTitre() +
+                                " (Magasin ID: " + article.getIdMagasin() + ")");
+                    }
+                }
+                System.out.println("   - Total articles trouvés: " + count);
+            }
+        } catch (SQLException e) {
+            System.err.println("   ❌ Erreur SQL: " + e.getMessage());
+            throw e;
+        }
+
+        System.out.println("🔍 === Fin getArticlesByMagasin ===\n");
+        return articles;
+    }
+
 }

@@ -2,13 +2,12 @@ package com.example.vehiclegestion.vendeur.controller;
 
 import com.example.vehiclegestion.vendeur.dao.ReservationDAO;
 import com.example.vehiclegestion.vendeur.model.Reservation;
-import com.example.vehiclegestion.auth.SessionManager; // ← AJOUT IMPORT
-import com.example.vehiclegestion.vendeur.model.Utilisateur; // ← AJOUT IMPORT
+import com.example.vehiclegestion.auth.model.Utilisateur;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 

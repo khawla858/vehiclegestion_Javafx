@@ -76,7 +76,6 @@ public class HistoriqueController implements Initializable {
     @FXML private TableColumn<HistoriqueItem, String> comDateCol;
     @FXML private TableColumn<HistoriqueItem, String> comArticleCol;
     @FXML private TableColumn<HistoriqueItem, Integer> comNoteCol;
-    // Dans HistoriqueController.java, ajoutez cette variable
     @FXML private VBox historiqueContent;
     @FXML private TableColumn<HistoriqueItem, String> comTitreCol;
     @FXML private TableColumn<HistoriqueItem, String> comTexteCol;
@@ -101,18 +100,27 @@ public class HistoriqueController implements Initializable {
     private ObservableList<HistoriqueItem> ventesTableData = FXCollections.observableArrayList();
     private ObservableList<HistoriqueItem> commentairesTableData = FXCollections.observableArrayList();
 
-    // Couleurs
-    private static final String COLOR_PRIMARY = "#3498db";
-    private static final String COLOR_SUCCESS = "#2ecc71";
-    private static final String COLOR_WARNING = "#f39c12";
-    private static final String COLOR_DANGER = "#e74c3c";
-    private static final String COLOR_INFO = "#9b59b6";
-    private static final String COLOR_DARK = "#2c3e50";
-    private static final String COLOR_LIGHT = "#ecf0f1";
+    // Nouvelles couleurs basées sur le thème de la navbar
+    private static final String COLOR_PRIMARY = "#3b82f6";
+    private static final String COLOR_PRIMARY_GRADIENT = "linear-gradient(to right, #3b82f6, #1d4ed8)";
+    private static final String COLOR_SUCCESS = "#10b981";
+    private static final String COLOR_SUCCESS_GRADIENT = "linear-gradient(to right, #10b981, #059669)";
+    private static final String COLOR_WARNING = "#f59e0b";
+    private static final String COLOR_DANGER = "#ef4444";
+    private static final String COLOR_DANGER_GRADIENT = "linear-gradient(to right, #ef4444, #dc2626)";
+    private static final String COLOR_INFO = "#8b5cf6";
+    private static final String COLOR_INFO_GRADIENT = "linear-gradient(to right, #8b5cf6, #7c3aed)";
+    private static final String COLOR_DARK = "#0f172a";
+    private static final String COLOR_DARK_LIGHT = "#1e293b";
+    private static final String COLOR_TEXT_PRIMARY = "#f1f5f9";
+    private static final String COLOR_TEXT_SECONDARY = "#94a3b8";
+    private static final String COLOR_BORDER = "#334155";
+    private static final String COLOR_CARD_BG = "rgba(30, 41, 59, 0.8)";
+    private static final String COLOR_PINK_PURPLE = "linear-gradient(to right, #ec4899, #8b5cf6)";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("🚀 Initialisation HistoriqueController");
+        System.out.println("🚀 Initialisation HistoriqueController avec thème moderne");
 
         sessionManager = SessionManager.getInstance();
         historiqueService = new HistoriqueService();
@@ -130,7 +138,6 @@ public class HistoriqueController implements Initializable {
         loadInitialData();
         setupAutoRefresh();
 
-
         mainContainer.heightProperty().addListener((obs, oldVal, newVal) -> {
             if (tableSection.isVisible()) {
                 adjustTableHeight();
@@ -139,37 +146,45 @@ public class HistoriqueController implements Initializable {
     }
 
     private void setupUI() {
-        // Configuration des filtres
+        // Configuration des filtres avec style moderne
         periodeCombo.setItems(FXCollections.observableArrayList(
                 "Toutes périodes", "Aujourd'hui", "Cette semaine",
                 "Ce mois", "3 derniers mois", "6 derniers mois", "Cette année"
         ));
         periodeCombo.setValue(currentPeriode);
+        applyComboBoxStyle(periodeCombo);
 
         typeCombo.setItems(FXCollections.observableArrayList(
                 "Tous", "rendez_vous", "vente", "commentaire"
         ));
         typeCombo.setValue(currentType);
+        applyComboBoxStyle(typeCombo);
 
-        // Boutons
-        btnRefresh.setStyle(getButtonStyle(COLOR_PRIMARY));
-        btnExport.setStyle(getButtonStyle(COLOR_SUCCESS));
-
-        // Bouton masquer tableau
         // Bouton masquer tableau
         btnHideTable.setOnAction(e -> {
             hideTable();
             typeCombo.setValue("Tous");
         });
+
         // Champ de recherche
         searchField.setPromptText("Rechercher...");
 
         // Container historique
         historiqueContainer.setSpacing(15);
-        historiqueContainer.setPadding(new Insets(20));
+        historiqueContainer.setPadding(new Insets(25));
 
         // ScrollPane
         scrollContainer.setFitToWidth(true);
+    }
+
+    private void applyComboBoxStyle(ComboBox<String> comboBox) {
+        comboBox.setStyle("-fx-background-color: " + COLOR_CARD_BG + "; " +
+                "-fx-background-radius: 6; " +
+                "-fx-border-color: " + COLOR_BORDER + "; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 6; " +
+                "-fx-text-fill: " + COLOR_TEXT_PRIMARY + "; " +
+                "-fx-font-size: 13px;");
     }
 
     private void setupTableData() {
@@ -462,30 +477,34 @@ public class HistoriqueController implements Initializable {
         }
     }
 
+    private void showTable() {
+        // Masquer l'historique
+        historiqueContent.setVisible(false);
+        historiqueContent.setManaged(false);
 
+        // Afficher le tableau
+        tableSection.setVisible(true);
+        tableSection.setManaged(true);
 
+        // Le tableau prend tout l'espace
+        tableSection.prefHeightProperty().bind(mainContainer.heightProperty().subtract(150));
 
+        // Ajuster la hauteur du tableau
+        adjustTableHeight();
 
+        // Animation d'apparition
+        FadeTransition fade = new FadeTransition(Duration.millis(300), tableSection);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        // Forcer le rafraîchissement du layout
+        Platform.runLater(() -> {
+            rdvTableView.refresh();
+            ventesTableView.refresh();
+            commentairesTableView.refresh();
+        });
+    }
 
     private void hideTable() {
         // Animation de disparition
@@ -507,7 +526,6 @@ public class HistoriqueController implements Initializable {
         });
         fade.play();
     }
-
 
     private void loadStatistics() {
         new Thread(() -> {
@@ -535,10 +553,11 @@ public class HistoriqueController implements Initializable {
         VBox dateSection = new VBox(10);
         dateSection.setPadding(new Insets(0, 0, 20, 0));
 
-        // Titre de section
+        // Titre de section avec style moderne
         Label sectionTitle = new Label(date);
         sectionTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; " +
-                "-fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;");
+                "-fx-text-fill: " + COLOR_TEXT_PRIMARY + "; " +
+                "-fx-padding: 0 0 10 0;");
 
         dateSection.getChildren().add(sectionTitle);
 
@@ -552,63 +571,63 @@ public class HistoriqueController implements Initializable {
 
     private Pane createHistoriqueCard(HistoriqueItem item) {
         VBox card = new VBox(0);
-        card.setStyle("-fx-background-color: white; " +
+        card.setStyle("-fx-background-color: " + COLOR_CARD_BG + "; " +
                 "-fx-background-radius: 10; " +
-                "-fx-border-color: #e0e0e0; " +
+                "-fx-border-color: " + COLOR_BORDER + "; " +
                 "-fx-border-width: 1; " +
                 "-fx-border-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2);");
 
-        // En-tête de la carte légèrement plus compacte
-        HBox header = new HBox(12); // Espacement réduit de 15 à 12
-        header.setPadding(new Insets(15, 18, 12, 18)); // Padding réduit
+        // En-tête de la carte
+        HBox header = new HBox(12);
+        header.setPadding(new Insets(18, 20, 15, 20));
         header.setAlignment(Pos.CENTER_LEFT);
 
-        // Icône légèrement plus petite
+        // Icône avec fond dégradé
         StackPane iconContainer = new StackPane();
         iconContainer.setStyle(
-                "-fx-background-color: " + item.getCouleur() + "15; " +
-                        "-fx-background-radius: 8; " +
-                        "-fx-pref-width: 45; " +    // Réduit de 50 à 45
-                        "-fx-pref-height: 45;"      // Réduit de 50 à 45
+                "-fx-background-color: " + getIconGradientColor(item.getTypeAction()) + "; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-pref-width: 50; " +
+                        "-fx-pref-height: 50; " +
+                        "-fx-effect: dropshadow(gaussian, " + getIconShadowColor(item.getTypeAction()) + ", 10, 0.5, 0, 2);"
         );
 
         Label iconLabel = new Label(item.getIcone());
-        iconLabel.setStyle("-fx-font-size: 22px;"); // Réduit de 24 à 22
+        iconLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
         iconContainer.getChildren().add(iconLabel);
 
         // Informations principales
-        VBox infoBox = new VBox(6); // Espacement réduit de 8 à 6
+        VBox infoBox = new VBox(6);
         HBox.setHgrow(infoBox, Priority.ALWAYS);
 
         Label titleLabel = new Label(item.getTypeDisplay());
-        titleLabel.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; " + // Réduit de 16 à 15
-                "-fx-text-fill: " + COLOR_DARK + ";");
+        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; " +
+                "-fx-text-fill: " + COLOR_TEXT_PRIMARY + ";");
 
         Label descLabel = new Label(item.getDescription());
-        descLabel.setStyle("-fx-text-fill: #555; -fx-font-size: 13px;"); // Réduit de 14 à 13
+        descLabel.setStyle("-fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-font-size: 14px;");
         descLabel.setWrapText(true);
 
         // Métadonnées
-        HBox metaBox = new HBox(12); // Espacement réduit de 15 à 12
+        HBox metaBox = new HBox(12);
         metaBox.setAlignment(Pos.CENTER_LEFT);
 
         Label timeLabel = new Label("🕒 " + item.getShortDate());
-        timeLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 11px;"); // Réduit de 12 à 11
+        timeLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
 
         if (item.getVendeurNom() != null && !item.getVendeurNom().isEmpty()) {
             Label vendorLabel = new Label("👤 " + item.getVendeurNom());
-            vendorLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 11px;"); // Réduit de 12 à 11
+            vendorLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
             metaBox.getChildren().add(vendorLabel);
         }
 
         metaBox.getChildren().add(timeLabel);
-
         infoBox.getChildren().addAll(titleLabel, descLabel, metaBox);
 
-        // Bouton pour voir les détails dans le tableau
+        // Bouton pour voir les détails
         Button detailsBtn = new Button("Voir détails ➔");
-        detailsBtn.setStyle(getButtonStyleSmall(item.getCouleur()));
+        detailsBtn.setStyle(getButtonStyleSmall(getActionColor(item.getTypeAction())));
         detailsBtn.setOnAction(e -> {
             // Filtrer pour afficher seulement ce type
             typeCombo.setValue(item.getTypeAction());
@@ -620,21 +639,64 @@ public class HistoriqueController implements Initializable {
 
         // Séparateur
         Separator separator = new Separator();
-        separator.setPadding(new Insets(0, 18, 0, 18));
+        separator.setStyle("-fx-background-color: " + COLOR_BORDER + ";");
+        separator.setPadding(new Insets(0, 20, 0, 20));
 
         card.getChildren().addAll(header, separator);
 
         // Animation au survol
         card.setOnMouseEntered(e -> {
-            card.setStyle(card.getStyle().replace("rgba(0,0,0,0.08)", "rgba(0,0,0,0.12)"));
+            card.setStyle(card.getStyle().replace("rgba(0,0,0,0.15)", "rgba(0,0,0,0.25)"));
+            card.setTranslateY(-2);
         });
 
         card.setOnMouseExited(e -> {
-            card.setStyle(card.getStyle().replace("rgba(0,0,0,0.12)", "rgba(0,0,0,0.08)"));
+            card.setStyle(card.getStyle().replace("rgba(0,0,0,0.25)", "rgba(0,0,0,0.15)"));
+            card.setTranslateY(0);
         });
 
         return card;
     }
+
+    private String getIconGradientColor(String typeAction) {
+        switch (typeAction) {
+            case "rendez_vous":
+                return "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)";
+            case "vente":
+                return "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+            case "commentaire":
+                return "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)";
+            default:
+                return "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)";
+        }
+    }
+
+    private String getIconShadowColor(String typeAction) {
+        switch (typeAction) {
+            case "rendez_vous":
+                return "rgba(59, 130, 246, 0.4)";
+            case "vente":
+                return "rgba(16, 185, 129, 0.4)";
+            case "commentaire":
+                return "rgba(245, 158, 11, 0.4)";
+            default:
+                return "rgba(139, 92, 246, 0.4)";
+        }
+    }
+
+    private String getActionColor(String typeAction) {
+        switch (typeAction) {
+            case "rendez_vous":
+                return COLOR_PRIMARY;
+            case "vente":
+                return COLOR_SUCCESS;
+            case "commentaire":
+                return COLOR_WARNING;
+            default:
+                return COLOR_INFO;
+        }
+    }
+
     private Map<String, List<HistoriqueItem>> groupByDate(List<HistoriqueItem> items) {
         Map<String, List<HistoriqueItem>> grouped = new LinkedHashMap<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy");
@@ -698,7 +760,6 @@ public class HistoriqueController implements Initializable {
     }
 
     private void exportTableData() {
-        // Logique d'export selon le type sélectionné
         switch (currentType) {
             case "rendez_vous":
                 showToast("📤 Export des rendez-vous en PDF", COLOR_SUCCESS);
@@ -719,13 +780,13 @@ public class HistoriqueController implements Initializable {
     private VBox createLoadingState() {
         VBox loadingBox = new VBox(20);
         loadingBox.setAlignment(Pos.CENTER);
-        loadingBox.setPadding(new Insets(50));
+        loadingBox.setPadding(new Insets(80));
 
         ProgressIndicator spinner = new ProgressIndicator();
         spinner.setStyle("-fx-progress-color: " + COLOR_PRIMARY + ";");
 
         Label loadingLabel = new Label("Chargement de votre historique...");
-        loadingLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 14px;");
+        loadingLabel.setStyle("-fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-font-size: 16px;");
 
         loadingBox.getChildren().addAll(spinner, loadingLabel);
 
@@ -735,20 +796,21 @@ public class HistoriqueController implements Initializable {
     private void showEmptyState() {
         VBox emptyState = new VBox(20);
         emptyState.setAlignment(Pos.CENTER);
-        emptyState.setPadding(new Insets(80, 20, 80, 20));
+        emptyState.setPadding(new Insets(100, 20, 100, 20));
 
         Label emojiLabel = new Label("📭");
         emojiLabel.setStyle("-fx-font-size: 60px;");
 
         Label titleLabel = new Label("Aucune activité trouvée");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #555;");
+        titleLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; " +
+                "-fx-text-fill: " + COLOR_TEXT_PRIMARY + ";");
 
         Label descLabel = new Label(
                 currentPeriode.equals("Toutes périodes") && currentType.equals("Tous") ?
                         "Vous n'avez encore effectué aucune action" :
                         "Aucune activité ne correspond à vos filtres"
         );
-        descLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 14px;");
+        descLabel.setStyle("-fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-font-size: 16px;");
         descLabel.setAlignment(Pos.CENTER);
 
         Button resetButton = new Button("Réinitialiser les filtres");
@@ -766,18 +828,19 @@ public class HistoriqueController implements Initializable {
     private void showNoResultsState(String query) {
         VBox noResults = new VBox(20);
         noResults.setAlignment(Pos.CENTER);
-        noResults.setPadding(new Insets(80, 20, 80, 20));
+        noResults.setPadding(new Insets(100, 20, 100, 20));
 
         Label emojiLabel = new Label("🔍");
         emojiLabel.setStyle("-fx-font-size: 60px;");
 
         Label titleLabel = new Label("Aucun résultat");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #555;");
+        titleLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; " +
+                "-fx-text-fill: " + COLOR_TEXT_PRIMARY + ";");
 
         Label descLabel = new Label(
                 String.format("Aucune activité ne correspond à \"%s\"", query)
         );
-        descLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 14px;");
+        descLabel.setStyle("-fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-font-size: 16px;");
 
         Button clearButton = new Button("Effacer la recherche");
         clearButton.setStyle(getButtonStyle(COLOR_PRIMARY));
@@ -790,13 +853,13 @@ public class HistoriqueController implements Initializable {
     private void showError(String message) {
         VBox errorBox = new VBox(20);
         errorBox.setAlignment(Pos.CENTER);
-        errorBox.setPadding(new Insets(50));
+        errorBox.setPadding(new Insets(80));
 
         Label emojiLabel = new Label("⚠️");
         emojiLabel.setStyle("-fx-font-size: 60px;");
 
         Label errorLabel = new Label(message);
-        errorLabel.setStyle("-fx-text-fill: " + COLOR_DANGER + "; -fx-font-size: 16px;");
+        errorLabel.setStyle("-fx-text-fill: " + COLOR_DANGER + "; -fx-font-size: 18px;");
 
         errorBox.getChildren().addAll(emojiLabel, errorLabel);
         historiqueContainer.getChildren().add(errorBox);
@@ -841,7 +904,8 @@ public class HistoriqueController implements Initializable {
                         "-fx-border-radius: 20; " +
                         "-fx-text-fill: " + color + "; " +
                         "-fx-padding: 10 20; " +
-                        "-fx-font-weight: bold;"
+                        "-fx-font-weight: bold; " +
+                        "-fx-font-size: 14px;"
         );
 
         StackPane toastContainer = new StackPane(toast);
@@ -865,24 +929,25 @@ public class HistoriqueController implements Initializable {
 
     // ==================== UTILITAIRES ====================
     private String getButtonStyle(String color) {
-        return "-fx-background-color: " + color + "; " +
+        return "-fx-background-color: linear-gradient(to right, " + color + ", " + darkenColor(color) + "); " +
                 "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
+                "-fx-font-weight: 600; " +
                 "-fx-background-radius: 8; " +
-                "-fx-padding: 10 20; " +
+                "-fx-padding: 10 24; " +
                 "-fx-cursor: hand; " +
-                "-fx-font-size: 14px;";
+                "-fx-font-size: 14px; " +
+                "-fx-effect: dropshadow(gaussian, " + color + "40, 5, 0.5, 0, 2);";
     }
 
     private String getButtonStyleSmall(String color) {
         return "-fx-background-color: " + color + "20; " +
                 "-fx-text-fill: " + color + "; " +
-                "-fx-font-weight: bold; " +
+                "-fx-font-weight: 600; " +
                 "-fx-background-radius: 6; " +
-                "-fx-padding: 6 12; " +
+                "-fx-padding: 6 16; " +
                 "-fx-cursor: hand; " +
                 "-fx-font-size: 12px; " +
-                "-fx-border-color: " + color + "; " +
+                "-fx-border-color: " + color + "40; " +
                 "-fx-border-width: 1; " +
                 "-fx-border-radius: 6;";
     }
@@ -893,7 +958,7 @@ public class HistoriqueController implements Initializable {
                 "-fx-padding: 4 12; " +
                 "-fx-background-radius: 12; " +
                 "-fx-font-size: 12px; " +
-                "-fx-font-weight: bold;";
+                "-fx-font-weight: 600;";
     }
 
     private String getStatusBadgeStyle(String statut) {
@@ -912,9 +977,14 @@ public class HistoriqueController implements Initializable {
     }
 
     private String getNoteStyle(int note) {
-        if (note >= 4) return "-fx-font-weight: bold; -fx-text-fill: #2ecc71;";
-        if (note >= 3) return "-fx-font-weight: bold; -fx-text-fill: #f39c12;";
-        return "-fx-font-weight: bold; -fx-text-fill: #e74c3c;";
+        if (note >= 4) return "-fx-font-weight: bold; -fx-text-fill: #10b981;";
+        if (note >= 3) return "-fx-font-weight: bold; -fx-text-fill: #f59e0b;";
+        return "-fx-font-weight: bold; -fx-text-fill: #ef4444;";
+    }
+
+    private String darkenColor(String color) {
+        // Simple darkening function
+        return color; // In production, implement proper color manipulation
     }
 
     // ==================== GESTION AUTO-REFRESH ====================
@@ -936,123 +1006,127 @@ public class HistoriqueController implements Initializable {
         }
     }
 
-
-    // Dans la méthode setupUI() ou une nouvelle méthode
     private void setupTableSizes() {
-        // Définir des tailles plus grandes pour les tableaux
         rdvTableView.setPrefHeight(400);
         ventesTableView.setPrefHeight(400);
         commentairesTableView.setPrefHeight(400);
 
-        // Permettre le redimensionnement des colonnes
         rdvTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         ventesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         commentairesTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    // Modifiez la méthode showTable() pour ajuster la taille
-    private void showTable() {
-        // Masquer l'historique
-        historiqueContent.setVisible(false);
-        historiqueContent.setManaged(false);
-
-        // Afficher le tableau
-        tableSection.setVisible(true);
-        tableSection.setManaged(true);
-
-        // Le tableau prend tout l'espace
-        tableSection.prefHeightProperty().bind(mainContainer.heightProperty().subtract(150)); // Hauteur adaptative
-
-        // Ajuster la hauteur du tableau
-        adjustTableHeight();
-
-        // Animation d'apparition
-        FadeTransition fade = new FadeTransition(Duration.millis(300), tableSection);
-        fade.setFromValue(0);
-        fade.setToValue(1);
-        fade.play();
-
-        // Forcer le rafraîchissement du layout
-        Platform.runLater(() -> {
-            rdvTableView.refresh();
-            ventesTableView.refresh();
-            commentairesTableView.refresh();
-        });
-    }
-
-
-    // Modifiez adjustTableHeight() pour que le tableau prenne toute la hauteur
     private void adjustTableHeight() {
         Platform.runLater(() -> {
-            // Calculer la hauteur disponible
-            double availableHeight = mainContainer.getHeight() - 150; // Moins la hauteur de l'en-tête
-
-            // Ajuster la hauteur des tableaux
-            rdvTableView.setPrefHeight(availableHeight - 100); // Moins l'en-tête du tableau
+            double availableHeight = mainContainer.getHeight() - 150;
+            rdvTableView.setPrefHeight(availableHeight - 100);
             ventesTableView.setPrefHeight(availableHeight - 100);
             commentairesTableView.setPrefHeight(availableHeight - 100);
 
-            // Forcer le rafraîchissement
             rdvTableView.requestLayout();
             ventesTableView.requestLayout();
             commentairesTableView.requestLayout();
         });
     }
 
-
-
-
-
-    // Modifiez setupTableCellStyles() pour améliorer l'affichage
     private void setupTableCellStyles() {
-        // Style pour toutes les cellules
-        rdvTableView.setStyle("-fx-font-size: 14px;");
-        ventesTableView.setStyle("-fx-font-size: 14px;");
-        commentairesTableView.setStyle("-fx-font-size: 14px;");
+        // Style général des tableaux
+        String tableStyle = "-fx-font-size: 14px; " +
+                "-fx-table-cell-border-color: transparent; " +
+                "-fx-background-color: " + COLOR_CARD_BG + "; " +
+                "-fx-background-radius: 8; " +
+                "-fx-border-color: " + COLOR_BORDER + "; " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 8;";
 
-        // Style pour la colonne Statut RDV avec meilleur padding
+        rdvTableView.setStyle(tableStyle);
+        ventesTableView.setStyle(tableStyle);
+        commentairesTableView.setStyle(tableStyle);
+
+        // Style des en-têtes de colonnes
+        String headerStyle = "-fx-background-color: rgba(15, 23, 42, 0.9); " +
+                "-fx-text-fill: " + COLOR_TEXT_PRIMARY + "; " +
+                "-fx-font-weight: 600; " +
+                "-fx-font-size: 13px; " +
+                "-fx-border-color: " + COLOR_BORDER + "; " +
+                "-fx-border-width: 0 0 1 0;";
+
+        rdvDateCol.setStyle(headerStyle);
+        rdvHeureCol.setStyle(headerStyle);
+        rdvArticleCol.setStyle(headerStyle);
+        rdvVendeurCol.setStyle(headerStyle);
+        rdvStatutCol.setStyle(headerStyle);
+        rdvNotesCol.setStyle(headerStyle);
+
+        venteDateCol.setStyle(headerStyle);
+        venteArticleCol.setStyle(headerStyle);
+        venteMontantCol.setStyle(headerStyle);
+        venteStatutCol.setStyle(headerStyle);
+        ventePaiementCol.setStyle(headerStyle);
+        venteDetailsCol.setStyle(headerStyle);
+
+        comDateCol.setStyle(headerStyle);
+        comArticleCol.setStyle(headerStyle);
+        comNoteCol.setStyle(headerStyle);
+        comTitreCol.setStyle(headerStyle);
+        comTexteCol.setStyle(headerStyle);
+        comStatutCol.setStyle(headerStyle);
+
+        // Style des cellules de données
+        String cellStyle = "-fx-text-fill: " + COLOR_TEXT_PRIMARY + "; " +
+                "-fx-background-color: transparent; " +
+                "-fx-border-color: " + COLOR_BORDER + "; " +
+                "-fx-border-width: 0 0 1 0; " +
+                "-fx-padding: 8 12;";
+
+        // Style pour la colonne Statut RDV
         rdvStatutCol.setCellFactory(column -> new TableCell<HistoriqueItem, String>() {
             @Override
             protected void updateItem(String statut, boolean empty) {
                 super.updateItem(statut, empty);
                 if (empty || statut == null) {
                     setText(null);
-                    setStyle("");
+                    setStyle(cellStyle);
                 } else {
                     setText(statut.toUpperCase());
                     String style = getStatusBadgeStyle(statut) +
-                            "-fx-padding: 6px 12px;" +
-                            "-fx-font-size: 13px;";
+                            "-fx-padding: 6px 16px;" +
+                            "-fx-font-size: 12px;" +
+                            "-fx-font-weight: 600;" +
+                            "-fx-alignment: center;";
                     setStyle(style);
                     setAlignment(Pos.CENTER);
                 }
             }
         });
 
-        // Style pour la colonne Montant avec meilleur affichage
+        // Style pour la colonne Montant
         venteMontantCol.setCellFactory(column -> new TableCell<HistoriqueItem, Double>() {
             @Override
             protected void updateItem(Double montant, boolean empty) {
                 super.updateItem(montant, empty);
                 if (empty || montant == null) {
                     setText(null);
-                    setStyle("");
+                    setStyle(cellStyle);
                 } else {
                     setText(String.format("%,.2f €", montant));
-                    setStyle("-fx-font-weight: bold; -fx-text-fill: #2ecc71; -fx-font-size: 14px;");
+                    setStyle("-fx-font-weight: bold; " +
+                            "-fx-text-fill: " + COLOR_SUCCESS + "; " +
+                            "-fx-font-size: 14px;" +
+                            "-fx-alignment: center-right;");
                     setAlignment(Pos.CENTER_RIGHT);
                 }
             }
         });
 
-        // Style pour la colonne Note avec meilleur affichage
+        // Style pour la colonne Note
         comNoteCol.setCellFactory(column -> new TableCell<HistoriqueItem, Integer>() {
             @Override
             protected void updateItem(Integer note, boolean empty) {
                 super.updateItem(note, empty);
                 if (empty || note == null) {
                     setText(null);
-                    setStyle("");
+                    setStyle(cellStyle);
                 } else {
                     StringBuilder stars = new StringBuilder();
                     for (int i = 0; i < 5; i++) {
@@ -1063,24 +1137,27 @@ public class HistoriqueController implements Initializable {
                         }
                     }
                     setText(stars.toString() + " (" + note + "/5)");
-                    setStyle(getNoteStyle(note) + " -fx-font-size: 14px; -fx-padding: 5px;");
+                    setStyle(getNoteStyle(note) +
+                            " -fx-font-size: 14px; " +
+                            "-fx-padding: 6px;" +
+                            "-fx-alignment: center;");
                     setAlignment(Pos.CENTER);
                 }
             }
         });
 
-        // Style pour la colonne Commentaire (wrap text)
+        // Style pour la colonne Commentaire
         comTexteCol.setCellFactory(column -> new TableCell<HistoriqueItem, String>() {
             @Override
             protected void updateItem(String texte, boolean empty) {
                 super.updateItem(texte, empty);
                 if (empty || texte == null) {
                     setText(null);
-                    setStyle("");
+                    setStyle(cellStyle);
                 } else {
                     setText(texte);
                     setWrapText(true);
-                    setStyle("-fx-font-size: 13px; -fx-padding: 8px;");
+                    setStyle(cellStyle + " -fx-font-size: 13px; -fx-padding: 8px 12px;");
                 }
             }
         });

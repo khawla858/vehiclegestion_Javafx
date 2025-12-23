@@ -12,6 +12,7 @@ public class Article {
     private String etat;
     private String image;
     private int idVendeur;
+    private int idMagasin; // ✅ NOUVEAU CHAMP
 
     // Nouveaux attributs
     private String marque;
@@ -47,6 +48,8 @@ public class Article {
         this.carburant = carburant;
         this.puissance = puissance;
         this.couleur = couleur;
+        this.idMagasin = idMagasin; // ✅ INITIALISATION
+
     }
 
     // Getters et Setters pour tous les attributs
@@ -103,4 +106,11 @@ public class Article {
 
     public String getCouleur() { return couleur; }
     public void setCouleur(String couleur) { this.couleur = couleur; }
+
+    public int getIdMagasin() {
+        return idMagasin;
+    }
+    public void setIdMagasin(int idMagasin) {
+        this.idMagasin = idMagasin;
+    }
 }

@@ -1,235 +1,299 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1"
+<BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.vehiclegestion.common.controller.ChatWindowController"
-            prefWidth="900" prefHeight="600"
-            style="-fx-background-color: #f0f2f5;">
+            prefWidth="1000" prefHeight="700"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);">
 
-    <!-- ============================================ -->
-    <!-- SIDEBAR GAUCHE : LISTE DES CONVERSATIONS -->
-    <!-- ============================================ -->
-    <left>
-        <VBox prefWidth="320" spacing="0"
-              style="-fx-background-color: white;
-                     -fx-border-color: #e4e6eb;
-                     -fx-border-width: 0 1 0 0;">
-
-            <!-- En-tête Sidebar -->
-            <HBox alignment="CENTER_LEFT" spacing="12"
-                  style="-fx-background-color: white;
-                         -fx-padding: 20;
-                         -fx-border-color: #e4e6eb;
-                         -fx-border-width: 0 0 1 0;">
-
-                <Label text="💬 Messages"
-                       style="-fx-font-size: 22px;
-                              -fx-font-weight: bold;
-                              -fx-text-fill: #1c1e21;"/>
-
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <!-- Badge notifications -->
-                <Label fx:id="badgeNotifications"
-                       text="3"
-                       visible="false"
-                       style="-fx-background-color: #0084ff;
-                              -fx-text-fill: white;
-                              -fx-background-radius: 12;
-                              -fx-padding: 4 8;
-                              -fx-font-size: 11px;
-                              -fx-font-weight: bold;"/>
-            </HBox>
-
-            <!-- Barre de recherche -->
-            <HBox spacing="10" alignment="CENTER_LEFT"
-                  style="-fx-padding: 12 15;
-                         -fx-background-color: #f0f2f5;">
-
-                <TextField fx:id="searchConversationField"
-                           promptText="🔍 Rechercher une conversation..."
-                           style="-fx-pref-width: 280;
-                                  -fx-padding: 10;
-                                  -fx-background-radius: 20;
-                                  -fx-border-radius: 20;
-                                  -fx-background-color: white;
-                                  -fx-border-color: #ccd0d5;
-                                  -fx-border-width: 1;
-                                  -fx-font-size: 14px;"/>
-            </HBox>
-
-            <!-- Liste des conversations (ScrollPane) -->
-            <ScrollPane fitToWidth="true"
-                        style="-fx-background-color: white;
-                               -fx-background: white;"
-                        VBox.vgrow="ALWAYS">
-
-                <VBox fx:id="conversationsListContainer"
-                      spacing="0"
-                      style="-fx-background-color: white;">
-                    <!-- Les conversations seront ajoutées dynamiquement ici -->
-                </VBox>
-            </ScrollPane>
-
-        </VBox>
-    </left>
-
-    <!-- ============================================ -->
-    <!-- CENTRE : UN SEUL StackPane AVEC TOUT -->
-    <!-- ============================================ -->
+    <!-- CENTER: CONTENU DU CHAT -->
     <center>
-        <StackPane>
+        <VBox style="-fx-background-color: rgba(30, 41, 59, 0.9);
+                     -fx-border-radius: 12;
+                     -fx-background-radius: 12;
+                     -fx-border-width: 1;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);"
+              spacing="0">
+            <BorderPane.margin>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </BorderPane.margin>
 
-            <!-- ==========================================
-                 PLACEHOLDER (Affiché quand aucune conversation sélectionnée)
-                 ========================================== -->
-            <VBox fx:id="placeholderView"
-                  alignment="CENTER"
-                  spacing="20"
-                  visible="true"
-                  managed="true"
-                  style="-fx-background-color: #f0f2f5;">
+            <!-- CONTENU PRINCIPAL EN HBox (Sidebar + Chat) -->
+            <HBox spacing="0" HBox.hgrow="ALWAYS">
 
-                <Label text="💬"
-                       style="-fx-font-size: 80px;
-                              -fx-opacity: 0.3;"/>
+                <!-- SIDEBAR GAUCHE : LISTE DES CONVERSATIONS -->
+                <VBox prefWidth="320" spacing="0"
+                      style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                             -fx-border-color: #475569;
+                             -fx-border-width: 0 1 0 0;
+                             -fx-border-radius: 12 0 0 12;">
 
-                <Label text="Sélectionnez une conversation"
-                       style="-fx-font-size: 20px;
-                              -fx-font-weight: bold;
-                              -fx-text-fill: #65676b;"/>
+                    <!-- En-tête Sidebar -->
+                    <HBox alignment="CENTER_LEFT" spacing="12"
+                          style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                 -fx-padding: 20;
+                                 -fx-border-color: #475569;
+                                 -fx-border-width: 0 0 1 0;">
 
-                <Label text="Choisissez une conversation dans la liste pour commencer à discuter"
-                       style="-fx-font-size: 14px;
-                              -fx-text-fill: #8a8d91;
-                              -fx-wrap-text: true;
-                              -fx-text-alignment: center;"/>
-            </VBox>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Rectangle width="3" height="20" arcWidth="2" arcHeight="2"
+                                       style="-fx-fill: linear-gradient(to bottom, #ec4899, #8b5cf6);"/>
+                            <Label text="💬 Messages"
+                                   style="-fx-font-size: 20px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #f1f5f9;"/>
+                        </HBox>
 
-            <!-- ==========================================
-                 INTERFACE DE CHAT (Cachée au départ)
-                 ========================================== -->
-            <VBox fx:id="chatContainer"
-                  spacing="0"
-                  visible="false"
-                  managed="false"
-                  style="-fx-background-color: #ffffff;">
+                        <Region HBox.hgrow="ALWAYS"/>
 
-                <!-- En-tête du chat (info interlocuteur) -->
-                <HBox fx:id="chatHeader"
-                      alignment="CENTER_LEFT"
-                      spacing="12"
-                      style="-fx-background-color: white;
-                             -fx-padding: 15 20;
-                             -fx-border-color: #e4e6eb;
-                             -fx-border-width: 0 0 1 0;
-                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+                        <!-- Badge notifications -->
+                        <Label fx:id="badgeNotifications"
+                               text="3"
+                               visible="false"
+                               style="-fx-background-color: #ef4444;
+                                      -fx-text-fill: white;
+                                      -fx-background-radius: 12;
+                                      -fx-padding: 4 8;
+                                      -fx-font-size: 11px;
+                                      -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.4), 5, 0.5, 0, 2);"/>
+                    </HBox>
 
-                    <!-- Photo de profil -->
-                    <StackPane style="-fx-background-color: #0084ff;
-                                      -fx-background-radius: 25;
-                                      -fx-pref-width: 50;
-                                      -fx-pref-height: 50;">
-                        <Label fx:id="avatarLabel"
-                               text="JD"
-                               style="-fx-text-fill: white;
-                                      -fx-font-size: 18px;
-                                      -fx-font-weight: bold;"/>
+                    <!-- Barre de recherche -->
+                    <HBox spacing="10" alignment="CENTER_LEFT"
+                          style="-fx-padding: 15;">
+
+                        <TextField fx:id="searchConversationField"
+                                   promptText="🔍 Rechercher une conversation..."
+                                   style="-fx-pref-width: 280;
+                                          -fx-padding: 10 15;
+                                          -fx-background-radius: 8;
+                                          -fx-border-radius: 8;
+                                          -fx-background-color: rgba(15, 23, 42, 0.6);
+                                          -fx-border-color: #475569;
+                                          -fx-border-width: 1;
+                                          -fx-font-size: 14px;
+                                          -fx-text-fill: #f1f5f9;
+                                          -fx-prompt-text-fill: #94a3b8;"/>
+                    </HBox>
+
+                    <!-- Liste des conversations (ScrollPane) -->
+                    <ScrollPane fitToWidth="true"
+                                style="-fx-background-color: transparent;
+                                       -fx-background: transparent;
+                                       -fx-border-color: transparent;"
+                                VBox.vgrow="ALWAYS">
+
+                        <VBox fx:id="conversationsListContainer"
+                              spacing="0"
+                              style="-fx-background-color: transparent;">
+                            <!-- Les conversations seront ajoutées dynamiquement ici -->
+                        </VBox>
+                    </ScrollPane>
+
+                </VBox>
+
+                <!-- ZONE CENTRALE DU CHAT -->
+                <VBox HBox.hgrow="ALWAYS" spacing="0">
+
+                    <StackPane HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+
+                        <!-- PLACEHOLDER (Affiché quand aucune conversation sélectionnée) -->
+                        <VBox fx:id="placeholderView"
+                              alignment="CENTER"
+                              spacing="20"
+                              visible="true"
+                              managed="true"
+                              style="-fx-background-color: rgba(30, 41, 59, 0.8);">
+
+                            <Label text="💬"
+                                   style="-fx-font-size: 80px;
+                                          -fx-opacity: 0.5;
+                                          -fx-text-fill: #3b82f6;"/>
+
+                            <VBox spacing="8" alignment="CENTER">
+                                <Label text="Sélectionnez une conversation"
+                                       style="-fx-font-size: 22px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #f1f5f9;"/>
+
+                                <Label text="Choisissez une conversation dans la liste pour commencer à discuter"
+                                       style="-fx-font-size: 14px;
+                                              -fx-text-fill: #94a3b8;
+                                              -fx-wrap-text: true;
+                                              -fx-text-alignment: center;"/>
+                            </VBox>
+                        </VBox>
+
+                        <!-- INTERFACE DE CHAT (Cachée au départ) -->
+                        <VBox fx:id="chatContainer"
+                              spacing="0"
+                              visible="false"
+                              managed="false"
+                              style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                     -fx-border-radius: 0 12 12 0;">
+
+                            <!-- En-tête du chat (info interlocuteur) -->
+                            <HBox fx:id="chatHeader"
+                                  alignment="CENTER_LEFT"
+                                  spacing="12"
+                                  style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                         -fx-padding: 20;
+                                         -fx-border-color: #475569;
+                                         -fx-border-width: 0 0 1 0;
+                                         -fx-border-radius: 0 12 0 0;">
+
+                                <!-- Photo de profil -->
+                                <StackPane style="-fx-background-color: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+                                                  -fx-background-radius: 25;
+                                                  -fx-pref-width: 50;
+                                                  -fx-pref-height: 50;
+                                                  -fx-effect: dropshadow(gaussian, rgba(236, 72, 153, 0.4), 8, 0.5, 0, 2);">
+                                    <Label fx:id="avatarLabel"
+                                           text="JD"
+                                           style="-fx-text-fill: white;
+                                                  -fx-font-size: 18px;
+                                                  -fx-font-weight: bold;"/>
+                                </StackPane>
+
+                                <!-- Infos interlocuteur -->
+                                <VBox spacing="4">
+                                    <Label fx:id="interlocuteurNomLabel"
+                                           text="John Doe"
+                                           style="-fx-font-size: 18px;
+                                                  -fx-font-weight: bold;
+                                                  -fx-text-fill: #f1f5f9;"/>
+
+                                    <Label fx:id="interlocuteurStatusLabel"
+                                           text="En ligne"
+                                           style="-fx-font-size: 13px;
+                                                  -fx-text-fill: #94a3b8;"/>
+                                </VBox>
+
+                                <Region HBox.hgrow="ALWAYS"/>
+
+                                <!-- Boutons d'action -->
+                                <HBox spacing="12">
+                                    <Button text="📞"
+                                            style="-fx-background-color: rgba(59, 130, 246, 0.1);
+                                                   -fx-text-fill: #60a5fa;
+                                                   -fx-font-size: 18px;
+                                                   -fx-cursor: hand;
+                                                   -fx-background-radius: 8;
+                                                   -fx-padding: 8;
+                                                   -fx-border-color: rgba(59, 130, 246, 0.3);
+                                                   -fx-border-width: 1;
+                                                   -fx-border-radius: 8;"
+                                            onAction="#callInterlocuteur"/>
+
+                                    <Button text="ℹ️"
+                                            style="-fx-background-color: rgba(139, 92, 246, 0.1);
+                                                   -fx-text-fill: #a78bfa;
+                                                   -fx-font-size: 18px;
+                                                   -fx-cursor: hand;
+                                                   -fx-background-radius: 8;
+                                                   -fx-padding: 8;
+                                                   -fx-border-color: rgba(139, 92, 246, 0.3);
+                                                   -fx-border-width: 1;
+                                                   -fx-border-radius: 8;"
+                                            onAction="#showInfos"/>
+                                </HBox>
+                            </HBox>
+
+                            <!-- Zone des messages (ScrollPane) -->
+                            <ScrollPane fx:id="messagesScrollPane"
+                                        fitToWidth="true"
+                                        vbarPolicy="AS_NEEDED"
+                                        style="-fx-background-color: transparent;
+                                               -fx-background: transparent;
+                                               -fx-border-color: transparent;"
+                                        VBox.vgrow="ALWAYS">
+
+                                <VBox fx:id="messagesContainer"
+                                      spacing="8"
+                                      style="-fx-padding: 20;
+                                             -fx-background-color: transparent;">
+                                    <!-- Les messages seront ajoutés dynamiquement ici -->
+                                </VBox>
+                            </ScrollPane>
+
+                            <!-- Zone de saisie du message -->
+                            <HBox fx:id="messageInputArea"
+                                  alignment="CENTER_LEFT"
+                                  spacing="12"
+                                  style="-fx-background-color: rgba(15, 23, 42, 0.8);
+                                         -fx-padding: 15 20;
+                                         -fx-border-color: #475569;
+                                         -fx-border-width: 1 0 0 0;
+                                         -fx-border-radius: 0 0 12 0;">
+
+                                <!-- Bouton ajouter fichier -->
+                                <Button text="📎"
+                                        style="-fx-background-color: rgba(59, 130, 246, 0.1);
+                                               -fx-text-fill: #60a5fa;
+                                               -fx-font-size: 20px;
+                                               -fx-cursor: hand;
+                                               -fx-background-radius: 8;
+                                               -fx-padding: 8;
+                                               -fx-border-color: rgba(59, 130, 246, 0.3);
+                                               -fx-border-width: 1;
+                                               -fx-border-radius: 8;"
+                                        onAction="#attachFile"/>
+
+                                <!-- Champ de texte -->
+                                <TextField fx:id="messageInputField"
+                                           promptText="Écrivez votre message..."
+                                           style="-fx-padding: 12 15;
+                                                  -fx-background-radius: 8;
+                                                  -fx-border-radius: 8;
+                                                  -fx-background-color: rgba(15, 23, 42, 0.6);
+                                                  -fx-border-color: #475569;
+                                                  -fx-border-width: 1;
+                                                  -fx-font-size: 14px;
+                                                  -fx-text-fill: #f1f5f9;
+                                                  -fx-prompt-text-fill: #94a3b8;"
+                                           HBox.hgrow="ALWAYS"/>
+
+                                <!-- Bouton emoji -->
+                                <Button text="😊"
+                                        style="-fx-background-color: rgba(245, 158, 11, 0.1);
+                                               -fx-text-fill: #fbbf24;
+                                               -fx-font-size: 20px;
+                                               -fx-cursor: hand;
+                                               -fx-background-radius: 8;
+                                               -fx-padding: 8;
+                                               -fx-border-color: rgba(245, 158, 11, 0.3);
+                                               -fx-border-width: 1;
+                                               -fx-border-radius: 8;"
+                                        onAction="#showEmojiPicker"/>
+
+                                <!-- Bouton envoyer -->
+                                <Button fx:id="sendButton" text="➤"
+                                        style="-fx-background-color: linear-gradient(to right, #10b981, #059669);
+                                               -fx-text-fill: white;
+                                               -fx-font-size: 18px;
+                                               -fx-cursor: hand;
+                                               -fx-background-radius: 8;
+                                               -fx-padding: 12;
+                                               -fx-font-weight: bold;
+                                               -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 8, 0.5, 0, 2);"
+                                        onAction="#sendMessage"/>
+
+                            </HBox>
+
+                        </VBox>
+
                     </StackPane>
 
-                    <!-- Infos interlocuteur -->
-                    <VBox spacing="2">
-                        <Label fx:id="interlocuteurNomLabel"
-                               text="John Doe"
-                               style="-fx-font-size: 16px;
-                                      -fx-font-weight: bold;
-                                      -fx-text-fill: #1c1e21;"/>
+                </VBox>
 
-                        <Label fx:id="interlocuteurStatusLabel"
-                               text="En ligne"
-                               style="-fx-font-size: 12px;
-                                      -fx-text-fill: #65676b;"/>
-                    </VBox>
+            </HBox>
 
-                    <Region HBox.hgrow="ALWAYS"/>
-
-                    <!-- Boutons d'action -->
-                    <HBox spacing="10">
-                        <Button text="📞"
-                                style="-fx-background-color: transparent;
-                                       -fx-font-size: 18px;
-                                       -fx-cursor: hand;"
-                                onAction="#callInterlocuteur"/>
-
-                        <Button text="ℹ️"
-                                style="-fx-background-color: transparent;
-                                       -fx-font-size: 18px;
-                                       -fx-cursor: hand;"
-                                onAction="#showInfos"/>
-                    </HBox>
-                </HBox>
-
-                <!-- Zone des messages (ScrollPane) -->
-                <ScrollPane fx:id="messagesScrollPane"
-                            fitToWidth="true"
-                            vbarPolicy="AS_NEEDED"
-                            style="-fx-background-color: #f0f2f5;
-                                   -fx-background: #f0f2f5;"
-                            VBox.vgrow="ALWAYS">
-
-                    <VBox fx:id="messagesContainer"
-                          spacing="8"
-                          style="-fx-padding: 20;
-                                 -fx-background-color: #f0f2f5;">
-                        <!-- Les messages seront ajoutés dynamiquement ici -->
-                    </VBox>
-                </ScrollPane>
-
-                <!-- Zone de saisie du message -->
-                <HBox fx:id="messageInputArea"
-                      alignment="CENTER_LEFT"
-                      spacing="12"
-                      style="-fx-background-color: white;
-                             -fx-padding: 15 20;
-                             -fx-border-color: #e4e6eb;
-                             -fx-border-width: 1 0 0 0;">
-
-                    <!-- Bouton ajouter fichier -->
-                    <Button text="📎"
-                            style="-fx-background-color: transparent;
-                                   -fx-font-size: 20px;
-                                   -fx-cursor: hand;"
-                            onAction="#attachFile"/>
-
-                    <!-- Champ de texte -->
-                    <!-- REMPLACEZ lignes 152-158 : -->
-                    <TextField fx:id="messageInputField"
-                               promptText="Écrivez votre message..."
-                               style="-fx-padding: 12 15;
-                  -fx-background-radius: 20;
-                  -fx-border-radius: 20;
-                  -fx-background-color: #f0f2f5;
-                  -fx-border-color: transparent;
-                  -fx-font-size: 14px;"
-                               HBox.hgrow="ALWAYS"/>
-
-                    <!-- Bouton emoji -->
-                    <Button text="😊"
-                            style="-fx-background-color: transparent;
-                                   -fx-font-size: 20px;
-                                   -fx-cursor: hand;"
-                            onAction="#showEmojiPicker"/>
-
-                    <!-- Bouton envoyer -->
-
-                </HBox>
-
-            </VBox>
-
-        </StackPane>
+        </VBox>
     </center>
 
 </BorderPane>

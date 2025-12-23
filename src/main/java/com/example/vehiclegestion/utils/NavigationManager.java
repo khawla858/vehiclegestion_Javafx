@@ -6,12 +6,14 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.common.controller.ChatWindowController; // ✅ IMPORT AJOUTÉ
+
 
 import java.io.IOException;
 import java.util.Stack;
-
 /**
- * 🎯 GESTIONNAIRE DE NAVIGATION CENTRALISÉ
+ *  GESTIONNAIRE DE NAVIGATION CENTRALISÉ
  */
 public class NavigationManager {
 
@@ -36,7 +38,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 🚀 MÉTHODES DE NAVIGATION PRINCIPALES
+    //  MÉTHODES DE NAVIGATION PRINCIPALES
     // ========================================
 
     public void navigateTo(String fxmlPath) {
@@ -136,7 +138,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 🏠 RACCOURCIS DE NAVIGATION
+    //  RACCOURCIS DE NAVIGATION
     // ========================================
 
     public void goToDashboard() {
@@ -144,11 +146,11 @@ public class NavigationManager {
     }
 
     public void goToClients() {
-        navigateTo("/view/vendeur/ClientList.fxml");
+        navigateTo("/view/vendeur/VentesList.fxml");
     }
 
     public void goToVehicles() {
-        navigateTo("/view/vendeur/VendeurVehicle.fxml");
+        navigateTo("/view/client/vehicles-view.fxml");
     }
 
     public void goToMagasins() {
@@ -168,7 +170,7 @@ public class NavigationManager {
     }
 
     /**
-     * ⬅️ Retour à la page précédente
+     * ⬅ Retour à la page précédente
      */
     public void goBack() {
         if (navigationHistory.size() > 1) {
@@ -183,7 +185,7 @@ public class NavigationManager {
     }
 
     /**
-     * 🔄 Rafraîchir la page actuelle
+     *  Rafraîchir la page actuelle
      */
     public void refresh() {
         if (!navigationHistory.isEmpty()) {
@@ -194,7 +196,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 🎨 GESTION DES ERREURS
+    //  GESTION DES ERREURS
     // ========================================
 
     private void showErrorContent(String message) {
@@ -219,7 +221,7 @@ public class NavigationManager {
     }
 
     // ========================================
-    // 📊 INFORMATIONS
+    //  INFORMATIONS
     // ========================================
 
     public String getCurrentPage() {
@@ -233,5 +235,23 @@ public class NavigationManager {
     public void clearHistory() {
         navigationHistory.clear();
         System.out.println("🗑️ Historique de navigation effacé");
+    }
+
+    public void showMessages() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/common/ChatWindow.fxml"));
+            Node content = loader.load();
+
+            ChatWindowController controller = loader.getController();
+
+            // ✅ PASSER LE VENDEUR CONNECTÉ
+            SessionManager session = SessionManager.getInstance();
+            controller.setUserInfo(session.getUserId(), session.getUserRole());
+
+            contentPane.getChildren().setAll(content);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

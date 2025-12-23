@@ -79,23 +79,55 @@ public class VendeurDAO {
         return completeMap;
     }
 
+    // ============================================
+// 🔧 CORRECTION de getProductDistribution()
+// ============================================
+
     public Map<String, Integer> getProductDistribution() throws SQLException {
-        Map<String, Integer> data = new LinkedHashMap<>();
-        String sql = "SELECT categorie, COUNT(*) as count "
-                + "FROM Article "
-                + "WHERE id_vendeur = ? AND etat = 'vendu' "
-                + "GROUP BY categorie "
-                + "ORDER BY count DESC";
+        Map<String, Integer> distribution = new LinkedHashMap<>();
+
+        // ✅ NOUVELLE REQUÊTE : Chercher dans les VENTES, pas dans les articles
+        String sql = "SELECT a.categorie, COUNT(*) as total " +
+                "FROM Vente v " +
+                "JOIN Article a ON v.id_article = a.id_article " +
+                "WHERE v.id_vendeur = ? AND v.statut_vente = 'terminée' " +
+                "GROUP BY a.categorie " +
+                "ORDER BY total DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, vendeurId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                data.put(rs.getString("categorie"), rs.getInt("count"));
+
+            stmt.setInt(1, this.vendeurId);
+
+            System.out.println("🔍 Exécution requête PieChart pour vendeur ID: " + this.vendeurId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String categorie = rs.getString("categorie");
+                    int total = rs.getInt("total");
+
+                    // ✅ Gestion des catégories NULL
+                    if (categorie == null || categorie.trim().isEmpty()) {
+                        categorie = "Non catégorisé";
+                    }
+
+                    distribution.put(categorie, total);
+
+                    // 🔍 Debug
+                    System.out.println("📊 PieChart Data: " + categorie + " = " + total + " ventes");
+                }
             }
         }
-        return data;
+
+        // ⚠️ Si aucune donnée
+        if (distribution.isEmpty()) {
+            System.out.println("⚠️ ATTENTION : Aucune vente terminée trouvée pour le PieChart !");
+            System.out.println("Vérifiez que vous avez des ventes avec statut_vente = 'terminée' pour le vendeur ID: " + this.vendeurId);
+        } else {
+            System.out.println("✅ PieChart chargé avec " + distribution.size() + " catégories");
+        }
+
+        return distribution;
     }
 
     // 🔹 Nouvelles méthodes supplémentaires
@@ -262,5 +294,6 @@ public class VendeurDAO {
         }
         return result;
     }
+
 
 }

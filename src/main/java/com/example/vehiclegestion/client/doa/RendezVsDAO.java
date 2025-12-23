@@ -1,7 +1,7 @@
 package com.example.vehiclegestion.client.doa;
 
 import com.example.vehiclegestion.client.model.RendezVs;
-import com.example.vehiclegestion.utils.DatabaseConnection;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;

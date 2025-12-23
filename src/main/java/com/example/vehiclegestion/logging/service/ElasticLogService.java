@@ -4,23 +4,20 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.example.vehiclegestion.logging.model.LogEntry;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class  ElasticLogService {
+public class ElasticLogService {
 
     private final ElasticsearchClient client;
     private final ExecutorService executor;
 
     public ElasticLogService() {
-
         RestClient restClient = RestClient.builder(
                         new HttpHost("localhost", 9200, "http"))
                 .build();
@@ -31,26 +28,39 @@ public class  ElasticLogService {
         );
 
         this.client = new ElasticsearchClient(transport);
-
-        // Créer un thread pour envoyer les logs en arrière-plan
         this.executor = Executors.newSingleThreadExecutor();
     }
 
-    public void sendLog(String level, String message) {
+    /**
+     * Envoie un objet LogEntry complet à Elasticsearch
+     */
+    public void sendLog(LogEntry logEntry) {
         executor.submit(() -> {
-            Map<String, Object> log = new HashMap<>();
-            log.put("level", level);
-            log.put("message", message);
-            log.put("timestamp", new Date());
-
             try {
                 client.index(i -> i
                         .index("app-logs")
-                        .document(log)
+                        .document(logEntry)
                 );
+                System.out.println("✅ Log envoyé à Elasticsearch: " + logEntry.getAction());
             } catch (IOException e) {
+                System.err.println("❌ Erreur envoi log Elasticsearch: " + e.getMessage());
                 e.printStackTrace();
             }
         });
+    }
+
+    /**
+     * Méthode alternative pour envoyer un log simple (backward compatibility)
+     */
+    public void sendLog(String level, String message) {
+        LogEntry logEntry = new LogEntry();
+        logEntry.setLevel(level);
+        logEntry.setMessage(message);
+        logEntry.setAction("LOG_MESSAGE");
+        sendLog(logEntry);
+    }
+
+    public void shutdown() {
+        executor.shutdown();
     }
 }

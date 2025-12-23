@@ -2,7 +2,7 @@ package com.example.vehiclegestion.common.dao;
 
 import com.example.vehiclegestion.common.model.Conversation;
 import com.example.vehiclegestion.common.model.Message;
-import com.example.vehiclegestion.utils.DatabaseConnection;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 import com.example.vehiclegestion.auth.SessionManager;
 
 import java.sql.*;

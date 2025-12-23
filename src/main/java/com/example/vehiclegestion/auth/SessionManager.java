@@ -75,6 +75,7 @@ public class SessionManager {
             return null;
         }
 
+
         Utilisateur user = utilisateurConnecte;
         if (user.getPrenom() != null && user.getNom() != null) {
             return user.getPrenom() + " " + user.getNom();
@@ -91,4 +92,8 @@ public class SessionManager {
             return "Utilisateur";
         }
     }
+    public String getUserEmail() {
+        return utilisateurConnecte != null ? utilisateurConnecte.getEmail() : null;
+    }
+
 }

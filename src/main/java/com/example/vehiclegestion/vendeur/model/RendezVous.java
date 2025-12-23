@@ -19,6 +19,8 @@ public class RendezVous {
     private String description;  // Description du RDV
     private int duree;  // Durée en minutes
     private String commentaire;  // Commentaire du vendeur
+    private Integer idReservation;  // Lien vers la réservation
+
 
     // Constructeurs
     public RendezVous() {}
@@ -88,6 +90,13 @@ public class RendezVous {
 
     public String getCommentaire() { return commentaire; }
     public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+    public Integer getIdReservation() {
+        return idReservation;
+    }
+
+    public void setIdReservation(Integer idReservation) {
+        this.idReservation = idReservation;
+    }
 
     @Override
     public String toString() {

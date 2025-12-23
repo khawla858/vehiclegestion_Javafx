@@ -1,14 +1,14 @@
 package com.example.vehiclegestion.vendeur.controller;
 
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.VendeurDAO;
+import com.example.vehiclegestion.auth.model.Utilisateur;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.collections.FXCollections;
@@ -17,18 +17,7 @@ import javafx.collections.ObservableList;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import javafx.scene.chart.StackedBarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import java.util.HashMap;
-import com.example.vehiclegestion.auth.SessionManager;
-import com.example.vehiclegestion.auth.model.Utilisateur;
-
-
+import java.util.*;
 
 public class VendeurDashboardController implements Initializable {
 
@@ -42,57 +31,48 @@ public class VendeurDashboardController implements Initializable {
 
     @FXML private LineChart<String, Number> salesChart;
     @FXML private PieChart productsPieChart;
-
     @FXML private VBox activitiesContainer;
     @FXML private Label systemStatusLabel;
     @FXML private Label systemStatusValue;
     @FXML private Label systemStatusDesc;
-    @FXML
-    private StackedBarChart<String, Number> categorySalesChart;
+    @FXML private StackedBarChart<String, Number> categorySalesChart;
 
-
-    private VendeurDAO vendeurDAO;
     private final DecimalFormat df = new DecimalFormat("#,##0.00");
+    private VendeurDAO vendeurDAO;
+    private final ElasticLogService logService = new ElasticLogService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("🚀 Initialisation du Dashboard...");
-
         try {
-            // 🔹 Récupérer l'utilisateur connecté
-            Utilisateur utilisateurConnecte = SessionManager.getInstance().getUtilisateurConnecte();
+            logService.sendLog("INFO", "Initialisation du Dashboard");
+            System.out.println("🚀 Initialisation du Dashboard...");
 
+            // Vérifier utilisateur connecté
+            Utilisateur utilisateurConnecte = SessionManager.getInstance().getUtilisateurConnecte();
             if (utilisateurConnecte == null || !SessionManager.getInstance().estVendeur()) {
+                logService.sendLog("WARN", "Aucun vendeur connecté ou accès refusé");
                 System.err.println("❌ Aucun vendeur connecté ou accès refusé !");
-                // Ici tu peux rediriger vers la page login ou afficher un message
                 return;
             }
 
-            int vendeurId = utilisateurConnecte.getIdUtilisateur(); // ✅ ID du vendeur connecté
+            int vendeurId = utilisateurConnecte.getIdUtilisateur();
             vendeurDAO = new VendeurDAO(vendeurId);
 
-            // 1. Initialiser les statistiques principales
+            // Initialisation
             initializeStatistics();
-
-            // 2. Initialiser les statistiques supplémentaires
             initializeAdditionalStatistics();
-
-            // 3. Initialiser les graphiques
             initializeCharts();
             loadCategorySalesChart();
-
-            // 4. Initialiser les activités dynamiques
             initializeActivities();
 
-            System.out.println("✅ Dashboard initialisé avec succès!");
+            logService.sendLog("INFO", "Dashboard initialisé avec succès");
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de l'initialisation: " + e.getMessage());
+            logService.sendLog("ERROR", "Erreur lors de l'initialisation du dashboard: " + e.getMessage());
             e.printStackTrace();
             showErrorStatistics();
         }
     }
-
 
     private void initializeStatistics() {
         try {
@@ -106,8 +86,10 @@ public class VendeurDashboardController implements Initializable {
             activeClientsLabel.setText(String.valueOf(activeClients));
             pendingOrdersLabel.setText(String.valueOf(pendingOrders));
 
+            logService.sendLog("INFO", "Statistiques principales chargées");
+
         } catch (SQLException e) {
-            System.err.println("❌ Erreur lors du chargement des statistiques: " + e.getMessage());
+            logService.sendLog("ERROR", "Erreur statistiques principales: " + e.getMessage());
             showErrorStatistics();
         }
     }
@@ -122,8 +104,10 @@ public class VendeurDashboardController implements Initializable {
             availableArticlesLabel.setText(String.valueOf(availableArticles));
             avgRatingLabel.setText(String.format("%.1f", avgRating));
 
+            logService.sendLog("INFO", "Statistiques supplémentaires chargées");
+
         } catch (SQLException e) {
-            System.err.println("❌ Erreur statistiques supplémentaires: " + e.getMessage());
+            logService.sendLog("ERROR", "Erreur statistiques supplémentaires: " + e.getMessage());
             totalArticlesLabel.setText("0");
             availableArticlesLabel.setText("0");
             avgRatingLabel.setText("0.0");
@@ -134,16 +118,15 @@ public class VendeurDashboardController implements Initializable {
         try {
             initializeSalesChart();
             initializeProductsChart();
-
+            logService.sendLog("INFO", "Graphiques chargés");
         } catch (SQLException e) {
-            System.err.println("❌ Erreur lors du chargement des graphiques: " + e.getMessage());
-            initializeSampleCharts(); // Graphiques d'exemple en cas d'erreur
+            logService.sendLog("ERROR", "Erreur lors du chargement des graphiques: " + e.getMessage());
+            initializeSampleCharts();
         }
     }
 
     private void initializeSalesChart() throws SQLException {
         Map<String, Integer> salesData = vendeurDAO.getSalesPerMonth();
-
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Ventes 2024");
 
@@ -154,12 +137,10 @@ public class VendeurDashboardController implements Initializable {
         salesChart.getData().clear();
         salesChart.getData().add(series);
         salesChart.setLegendVisible(false);
-        salesChart.setTitle("Évolution des ventes mensuelles");
     }
 
     private void initializeProductsChart() throws SQLException {
         Map<String, Integer> productData = vendeurDAO.getProductDistribution();
-
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
 
         for (Map.Entry<String, Integer> entry : productData.entrySet()) {
@@ -167,13 +148,11 @@ public class VendeurDashboardController implements Initializable {
             pieData.add(new PieChart.Data(category + " (" + entry.getValue() + ")", entry.getValue()));
         }
 
-        // Si pas de données, afficher un message
         if (pieData.isEmpty()) {
             pieData.add(new PieChart.Data("Aucune vente", 1));
         }
 
         productsPieChart.setData(pieData);
-        productsPieChart.setTitle("Répartition des produits vendus");
     }
 
     private void initializeActivities() {
@@ -181,16 +160,14 @@ public class VendeurDashboardController implements Initializable {
             refreshActivities();
             initializeSystemStatus();
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors du chargement des activités: " + e.getMessage());
+            logService.sendLog("ERROR", "Erreur lors du chargement des activités: " + e.getMessage());
         }
     }
 
-    // Méthode pour rafraîchir les activités
     @FXML
     private void refreshActivities() {
         try {
             activitiesContainer.getChildren().clear();
-
             List<Map<String, String>> activities = vendeurDAO.getRecentActivities();
 
             if (activities.isEmpty()) {
@@ -201,71 +178,37 @@ public class VendeurDashboardController implements Initializable {
             }
 
             for (Map<String, String> activity : activities) {
-                VBox activityCard = createActivityCard(
+                VBox card = createActivityCard(
                         activity.get("type"),
                         activity.get("description"),
                         activity.get("status")
                 );
-                activitiesContainer.getChildren().add(activityCard);
+                activitiesContainer.getChildren().add(card);
             }
 
+            logService.sendLog("INFO", "Activités récentes chargées");
+
         } catch (SQLException e) {
-            System.err.println("❌ Erreur lors du rafraîchissement des activités: " + e.getMessage());
-            Label errorLabel = new Label("Erreur de chargement des activités");
-            errorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 12px; -fx-padding: 20;");
-            activitiesContainer.getChildren().add(errorLabel);
+            logService.sendLog("ERROR", "Erreur rafraîchissement activités: " + e.getMessage());
         }
     }
 
-    // Méthode pour créer une carte d'activité
     private VBox createActivityCard(String type, String description, String status) {
         VBox card = new VBox(5);
         card.setStyle("-fx-padding: 15; -fx-background-color: #f8f9fa; -fx-background-radius: 8;");
-
-        // Icône selon le type
-        String icon = getIconForType(type);
-        String statusText = getStatusText(status);
-        String statusColor = getStatusColor(status);
-        String statusBgColor = getStatusBackgroundColor(status);
-
-        Label titleLabel = new Label(icon + " " + description);
+        Label titleLabel = new Label(getIconForType(type) + " " + description);
         titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        titleLabel.setWrapText(true);
-        titleLabel.setMaxWidth(300);
 
         HBox statusBox = new HBox(10);
-        statusBox.setAlignment(Pos.CENTER_LEFT);
+        statusBox.setStyle("-fx-font-size: 12px;");
+        Label statusLabel = new Label(getStatusText(status));
+        statusLabel.setStyle("-fx-text-fill: " + getStatusColor(status) + "; -fx-font-weight: bold;");
+        statusBox.getChildren().add(statusLabel);
 
-        Label viewLabel = new Label("Voir détails");
-        viewLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #3498db; -fx-cursor: hand;");
-
-        // Ajouter un événement de clic
-        viewLabel.setOnMouseClicked(e -> {
-            System.out.println("Détails de l'activité: " + description);
-            // Ici vous pouvez ouvrir une fenêtre de détails
-        });
-
-        Label statusLabel = new Label(statusText);
-        statusLabel.setStyle("-fx-text-fill: " + statusColor + "; -fx-font-size: 12px; " +
-                "-fx-font-weight: bold; -fx-padding: 2 8; " +
-                "-fx-background-color: " + statusBgColor + "; -fx-background-radius: 10;");
-
-        statusBox.getChildren().addAll(viewLabel, statusLabel);
         card.getChildren().addAll(titleLabel, statusBox);
-
-        // Effet au survol
-        card.setOnMouseEntered(e -> {
-            card.setStyle("-fx-padding: 15; -fx-background-color: #e8f4f8; -fx-background-radius: 8; -fx-border-color: #3498db; -fx-border-width: 1; -fx-border-radius: 8;");
-        });
-
-        card.setOnMouseExited(e -> {
-            card.setStyle("-fx-padding: 15; -fx-background-color: #f8f9fa; -fx-background-radius: 8;");
-        });
-
         return card;
     }
 
-    // Méthodes utilitaires pour les icônes et statuts
     private String getIconForType(String type) {
         switch (type) {
             case "VENTE": return "💰";
@@ -283,50 +226,27 @@ public class VendeurDashboardController implements Initializable {
         return status.equals("COMPLETED") ? "#27ae60" : "#e67e22";
     }
 
-    private String getStatusBackgroundColor(String status) {
-        return status.equals("COMPLETED") ? "#eafaf1" : "#fef5e7";
-    }
-
-    // Méthode pour le statut système
     private void initializeSystemStatus() {
         try {
             Map<String, String> systemStatus = vendeurDAO.getSystemStatus();
-
             systemStatusValue.setText(systemStatus.get("statut"));
-            systemStatusValue.setStyle("-fx-text-fill: " + systemStatus.get("couleur") +
-                    "; -fx-font-weight: bold; -fx-font-size: 16px;");
             systemStatusDesc.setText(systemStatus.get("description"));
-
-            systemStatusLabel.setText("Statut système • " +
-                    systemStatus.get("ventes_en_cours") + " ventes en cours • " +
-                    systemStatus.get("rdv_confirmes") + " RDV • Note: " +
-                    systemStatus.get("note_moyenne") + "/5");
-
         } catch (SQLException e) {
-            System.err.println("❌ Erreur statut système: " + e.getMessage());
+            logService.sendLog("ERROR", "Erreur statut système: " + e.getMessage());
             systemStatusValue.setText("ERREUR");
-            systemStatusValue.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 16px;");
             systemStatusDesc.setText("Impossible de charger le statut système");
         }
     }
 
     private void initializeSampleCharts() {
-        // Graphiques d'exemple en cas d'erreur BD
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Ventes 2024");
-
         series.getData().add(new XYChart.Data<>("Jan", 45));
         series.getData().add(new XYChart.Data<>("Fév", 68));
-        series.getData().add(new XYChart.Data<>("Mar", 72));
-        series.getData().add(new XYChart.Data<>("Avr", 85));
-
         salesChart.getData().add(series);
-        salesChart.setLegendVisible(false);
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
                 new PieChart.Data("Berlines", 45),
-                new PieChart.Data("SUV", 30),
-                new PieChart.Data("Compactes", 15)
+                new PieChart.Data("SUV", 30)
         );
         productsPieChart.setData(pieData);
     }
@@ -343,44 +263,26 @@ public class VendeurDashboardController implements Initializable {
 
     @FXML
     private void refreshData() {
-        System.out.println("🔄 Actualisation des données...");
-        try {
-            initializeStatistics();
-            initializeAdditionalStatistics();
-            initializeCharts();
-            refreshActivities();
-            initializeSystemStatus();
-            System.out.println("✅ Données actualisées avec succès!");
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de l'actualisation: " + e.getMessage());
-        }
+        logService.sendLog("INFO", "Actualisation des données du Dashboard");
+        initializeStatistics();
+        initializeAdditionalStatistics();
+        initializeCharts();
+        refreshActivities();
+        initializeSystemStatus();
     }
 
-    // Méthode utilitaire pour formater les dates
-    private String formatDate(String dateString) {
-        try {
-            // Simple formattage de date - vous pouvez utiliser SimpleDateFormat pour plus de sophistication
-            return dateString.substring(0, 16); // Retourne "YYYY-MM-DD HH:MM"
-        } catch (Exception e) {
-            return dateString;
-        }
-    }
     public void loadCategorySalesChart() {
         try {
-            // Récupérer les catégories existantes
-            Map<String, Integer> productCounts = vendeurDAO.getProductDistribution(); // total par catégorie
             Map<String, Map<String, Double>> monthlyCategorySales = vendeurDAO.getMonthlyCategoryRevenuePercentage();
-
             categorySalesChart.getData().clear();
 
-            for (String category : productCounts.keySet()) {
+            for (String category : monthlyCategorySales.keySet()) {
                 XYChart.Series<String, Number> series = new XYChart.Series<>();
                 series.setName(category);
 
-                Map<String, Double> monthData = monthlyCategorySales.getOrDefault(category, new HashMap<>());
+                Map<String, Double> monthData = monthlyCategorySales.get(category);
+                String[] months = {"Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"};
 
-                // Ajouter chaque mois
-                String[] months = {"Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"};
                 for (String month : months) {
                     series.getData().add(new XYChart.Data<>(month, monthData.getOrDefault(month, 0.0)));
                 }
@@ -388,9 +290,11 @@ public class VendeurDashboardController implements Initializable {
                 categorySalesChart.getData().add(series);
             }
 
+            logService.sendLog("INFO", "Graphique ventes par catégorie chargé");
+
         } catch (SQLException e) {
+            logService.sendLog("ERROR", "Erreur chargement graphique ventes par catégorie: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
 }

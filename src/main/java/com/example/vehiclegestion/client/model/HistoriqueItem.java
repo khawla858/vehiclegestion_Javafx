@@ -106,4 +106,6 @@ public class HistoriqueItem {
     public boolean hasNote() {
         return note != null && note > 0;
     }
+
+
 }

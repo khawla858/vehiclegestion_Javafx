@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.vehiclegestion.admin.controller.AdminSettingsController"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);">
+
+
+    <!-- HEADER -->
+    <top>
+        <VBox style="-fx-background-color: linear-gradient(to right, #0f172a, #1e40af);
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);"
+              spacing="10">
+            <padding>
+                <Insets top="25" right="25" bottom="25" left="25"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Rectangle width="4" height="40" arcWidth="10" arcHeight="10"
+                               style="-fx-fill: linear-gradient(to bottom, #3b82f6, #8b5cf6);"/>
+
+                    <VBox spacing="2">
+                        <Label text="⚙️ PARAMÈTRES SYSTÈME"
+                               style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28px;
+                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0.5, 0, 2);"/>
+                        <Label text="Administration • Configuration et Préférences"
+                               style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </VBox>
+                </HBox>
+
+                <HBox HBox.hgrow="ALWAYS"/>
+
+                <Button fx:id="saveButton" text="💾 Enregistrer les Modifications" onAction="#handleSave"
+                        style="-fx-background-color: linear-gradient(to right, #10b981, #059669);
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-font-size: 14px;
+                               -fx-padding: 12 24;
+                               -fx-background-radius: 8;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.5), 10, 0.5, 0, 3);"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- MAIN CONTENT AVEC SCROLLPANE -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background: transparent; -fx-background-color: transparent;"
+                    hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+
+            <VBox spacing="25" style="-fx-background-color: transparent;">
+                <padding>
+                    <Insets top="25" right="25" bottom="25" left="25"/>
+                </padding>
+
+                <!-- PROFIL ADMINISTRATEUR -->
+                <VBox spacing="20" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+
+                    <Label text="👤 PROFIL ADMINISTRATEUR"
+                           style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                    <Separator style="-fx-background-color: #334155;"/>
+
+                    <GridPane hgap="20" vgap="15">
+                        <Label text="Nom complet:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="adminNameField" promptText="Nom de l'administrateur"
+                                   prefWidth="300"
+                                   style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                          -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #64748b;
+                                          -fx-background-radius: 8;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 8;
+                                          -fx-padding: 10;"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                        <Label text="Email:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"
+                               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="adminEmailField" promptText="admin@example.com"
+                                   prefWidth="300"
+                                   style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                          -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #64748b;
+                                          -fx-background-radius: 8;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 8;
+                                          -fx-padding: 10;"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </GridPane>
+
+                    <Button fx:id="changePasswordButton" text="🔑 Changer le mot de passe"
+                            onAction="#handleChangePassword"
+                            style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                   -fx-text-fill: #3b82f6; -fx-font-size: 13px; -fx-font-weight: bold;
+                                   -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;"/>
+                </VBox>
+
+                <!-- PARAMÈTRES GÉNÉRAUX -->
+                <VBox spacing="20" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+
+                    <Label text="🌐 PARAMÈTRES GÉNÉRAUX"
+                           style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                    <Separator style="-fx-background-color: #334155;"/>
+
+                    <GridPane hgap="20" vgap="15">
+                        <Label text="Nom de l'application:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="appNameField" prefWidth="300"
+                                   style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                          -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #64748b;
+                                          -fx-background-radius: 8;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 8;
+                                          -fx-padding: 10;"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                        <Label text="Langue:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"
+                               GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <ComboBox fx:id="languageCombo" prefWidth="300"
+                                  style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                         -fx-text-fill: white;
+                                         -fx-border-color: #334155;
+                                         -fx-border-radius: 8;
+                                         -fx-background-radius: 8;"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                        <Label text="Fuseau horaire:" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"
+                               GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <ComboBox fx:id="timezoneCombo" prefWidth="300"
+                                  style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                         -fx-text-fill: white;
+                                         -fx-border-color: #334155;
+                                         -fx-border-radius: 8;
+                                         -fx-background-radius: 8;"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    </GridPane>
+                </VBox>
+
+                <!-- SÉCURITÉ -->
+                <VBox spacing="20" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+
+                    <Label text="🔒 SÉCURITÉ"
+                           style="-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                    <Separator style="-fx-background-color: #334155;"/>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="twoFactorCheckbox" text="Activer l'authentification à deux facteurs (2FA)"
+                                  style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </HBox>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="emailNotifCheckbox"
+                                  text="Recevoir des notifications par email pour les connexions suspectes"
+                                  style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </HBox>
+
+                    <VBox spacing="8">
+                        <Label text="Durée de session (minutes):" style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                        <Spinner fx:id="sessionDurationSpinner" prefWidth="150"
+                                 style="-fx-background-color: rgba(15, 23, 42, 0.6);"/>
+                    </VBox>
+                </VBox>
+
+                <!-- NOTIFICATIONS -->
+                <VBox spacing="20" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+
+                    <Label text="🔔 NOTIFICATIONS"
+                           style="-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                    <Separator style="-fx-background-color: #334155;"/>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="newUserNotifCheckbox" text="Notification pour les nouvelles inscriptions"
+                                  style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </HBox>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="newMagasinNotifCheckbox" text="Notification pour les nouveaux magasins"
+                                  style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </HBox>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="systemErrorNotifCheckbox" text="Notification pour les erreurs système"
+                                  style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </HBox>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="dailyReportCheckbox" text="Recevoir un rapport quotidien des activités"
+                                  style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- BASE DE DONNÉES -->
+                <VBox spacing="20" style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+
+                    <Label text="💾 BASE DE DONNÉES"
+                           style="-fx-text-fill: #8b5cf6; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                    <Separator style="-fx-background-color: #334155;"/>
+
+                    <HBox spacing="12">
+                        <Button fx:id="backupButton" text="📦 Sauvegarder la BD" onAction="#handleBackup"
+                                style="-fx-background-color: linear-gradient(to right, #3b82f6, #2563eb);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;"/>
+
+                        <Button fx:id="restoreButton" text="📥 Restaurer la BD" onAction="#handleRestore"
+                                style="-fx-background-color: linear-gradient(to right, #f59e0b, #d97706);
+                                       -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                       -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <VBox spacing="8" style="-fx-background-color: rgba(16, 185, 129, 0.1);
+                                            -fx-background-radius: 8;
+                                            -fx-padding: 15;">
+                        <Label text="ℹ️ Dernière sauvegarde:" style="-fx-text-fill: #10b981; -fx-font-weight: bold;"/>
+                        <Label fx:id="lastBackupLabel" text="Aucune sauvegarde"
+                               style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                    </VBox>
+                </VBox>
+
+                <!-- ZONE DANGEREUSE -->
+                <VBox spacing="20" style="-fx-background-color: rgba(239, 68, 68, 0.1);
+                                          -fx-background-radius: 12;
+                                          -fx-border-color: #ef4444;
+                                          -fx-border-width: 2;
+                                          -fx-border-radius: 12;
+                                          -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.2), 10, 0.5, 0, 3);">
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+
+                    <Label text="⚠️ ZONE DANGEREUSE"
+                           style="-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 18px;"/>
+                    <Separator style="-fx-background-color: #ef4444;"/>
+
+                    <VBox spacing="12">
+                        <Label text="Les actions suivantes sont irréversibles et peuvent avoir des conséquences graves."
+                               style="-fx-text-fill: #fca5a5; -fx-font-size: 12px;"
+                               wrapText="true"/>
+
+                        <HBox spacing="12">
+                            <Button fx:id="clearLogsButton" text="🗑️ Effacer tous les logs" onAction="#handleClearLogs"
+                                    style="-fx-background-color: rgba(239, 68, 68, 0.2);
+                                           -fx-text-fill: #ef4444; -fx-font-size: 13px; -fx-font-weight: bold;
+                                           -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;
+                                           -fx-border-color: #ef4444; -fx-border-width: 1; -fx-border-radius: 8px;"/>
+
+                            <Button fx:id="resetSystemButton" text="🔄 Réinitialiser le système"
+                                    onAction="#handleResetSystem"
+                                    style="-fx-background-color: rgba(239, 68, 68, 0.2);
+                                           -fx-text-fill: #ef4444; -fx-font-size: 13px; -fx-font-weight: bold;
+                                           -fx-padding: 10px 20px; -fx-background-radius: 8px; -fx-cursor: hand;
+                                           -fx-border-color: #ef4444; -fx-border-width: 1; -fx-border-radius: 8px;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
