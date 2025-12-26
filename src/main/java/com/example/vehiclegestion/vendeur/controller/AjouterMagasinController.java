@@ -20,6 +20,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+
+import java.util.Map;
+
 
 public class AjouterMagasinController {
 
@@ -41,6 +47,9 @@ public class AjouterMagasinController {
     // ✅ Session Manager
     private SessionManager session = SessionManager.getInstance();
     private int vendeurIdConnecte; // ✅ Nom cohérent
+    private static final Logger logger = LoggerUtil.getLogger(AjouterMagasinController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @FXML
     public void initialize() {
@@ -73,73 +82,48 @@ public class AjouterMagasinController {
 
     @FXML
     public void ajouterMagasin() {
-        System.out.println("\n💾 === Ajout d'un nouveau magasin ===");
-
-        // ✅ VÉRIFICATION FINALE DE LA SESSION
-        if (!session.estConnecte() || !session.estVendeur()) {
-            System.err.println("❌ Session expirée");
-            showError("Session expirée", "Veuillez vous reconnecter");
-            return;
-        }
-
-        // ✅ VALIDATION DES CHAMPS
-        if (!validateForm()) {
-            System.out.println("❌ Validation du formulaire échouée");
-            return;
-        }
+        if (!validateForm()) return;
 
         try {
-            // ✅ CRÉER L'OBJET MAGASIN
             Magasin m = new Magasin();
             m.setNomMagasin(txtNom.getText().trim());
             m.setAdresse(txtAdresse.getText().trim());
             m.setLocalisation(txtLocalisation.getText().trim());
             m.setDescription(txtDescription.getText().trim());
-
-            // ✅ IMPORTANT : Utiliser l'ID du vendeur connecté
             m.setIdVendeur(vendeurIdConnecte);
-
-            m.setTelephone(txtTelephone.getText().trim());
-            m.setEmailContact(txtEmail.getText().trim());
-            m.setSiteWeb(txtSiteWeb.getText().trim());
-            m.setFacebook(txtFacebook.getText().trim());
-            m.setInstagram(txtInstagram.getText().trim());
-            m.setCategorie(txtCategorie.getText().trim());
             m.setLogoMagasin(logoField.getText());
-            m.setNbVentesMensuelles(0);
 
-            System.out.println("📋 Données du magasin:");
-            System.out.println("   - Nom: " + m.getNomMagasin());
-            System.out.println("   - Adresse: " + m.getAdresse());
-            System.out.println("   - ID Vendeur: " + m.getIdVendeur());
-            System.out.println("   - Logo: " + m.getLogoMagasin());
-
-            // ✅ INSERTION EN BASE DE DONNÉES
             MagasinDAO dao = new MagasinDAO();
             dao.addMagasin(m);
 
-            System.out.println("✅ Magasin ajouté avec succès pour le vendeur ID: " + vendeurIdConnecte);
+            // ✅ Log succès
+            logger.info("Magasin créé IDVendeur={} Nom={} Adresse={} Logo={}",
+                    vendeurIdConnecte, m.getNomMagasin(), m.getAdresse(), m.getLogoMagasin());
 
-            // ✅ AFFICHER UN MESSAGE DE SUCCÈS
-            showSuccess("Magasin créé", "Votre magasin a été créé avec succès !");
-
-            // ✅ FERMER LA FENÊTRE APRÈS UN DÉLAI
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            javafx.application.Platform.runLater(() -> closeWindow());
-                        }
-                    }, 1500 // 1.5 secondes
+            elasticLogService.sendLog(
+                    "INFO",
+                    "Magasin créé",
+                    Map.of(
+                            "vendeurId", vendeurIdConnecte,
+                            "nomMagasin", m.getNomMagasin(),
+                            "adresse", m.getAdresse(),
+                            "logo", m.getLogoMagasin()
+                    )
             );
 
+            showSuccess("Magasin créé", "Votre magasin a été créé avec succès !");
+            closeWindow();
+
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de l'ajout du magasin: " + e.getMessage());
-            e.printStackTrace();
+            // ✅ Log erreur
+            logger.error("Erreur création magasin VendeurID={} : {}", vendeurIdConnecte, e.getMessage(), e);
+            elasticLogService.sendLog(
+                    "ERROR",
+                    "Erreur création magasin",
+                    Map.of("vendeurId", vendeurIdConnecte, "message", e.getMessage())
+            );
             showError("Erreur", "Impossible de créer le magasin: " + e.getMessage());
         }
-
-        System.out.println("💾 === Fin ajout magasin ===\n");
     }
 
     @FXML

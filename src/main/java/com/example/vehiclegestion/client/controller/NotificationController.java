@@ -1,5 +1,6 @@
 package com.example.vehiclegestion.client.controller;
 
+import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.common.model.Notification;
 import com.example.vehiclegestion.common.utils.NotificationManager;
 import com.example.vehiclegestion.common.utils.NotificationService;
@@ -14,9 +15,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import  com.example.vehiclegestion.auth.utils.SessionManager;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;

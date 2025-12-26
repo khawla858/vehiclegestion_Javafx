@@ -1,13 +1,66 @@
-2025-12-23 18:28:58 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Erreur récupération ID vendeur: FATAL: password authentication failed for user "postgres"
-2025-12-23 18:28:58 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ ID vendeur invalide
-2025-12-23 18:29:08 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Échec de la sauvegarde du commentaire
-2025-12-23 18:45:38 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Erreur récupération ID vendeur: FATAL: password authentication failed for user "postgres"
-2025-12-23 18:45:38 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ ID vendeur invalide
-2025-12-23 18:45:46 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Échec de la sauvegarde du commentaire
-2025-12-23 18:46:36 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Échec de la sauvegarde du commentaire
-2025-12-23 18:46:42 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Erreur récupération ID vendeur: FATAL: password authentication failed for user "postgres"
-2025-12-23 18:46:42 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ ID vendeur invalide
-2025-12-23 18:46:46 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Erreur récupération ID vendeur: FATAL: password authentication failed for user "postgres"
-2025-12-23 18:46:46 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ ID vendeur invalide
-2025-12-23 21:40:06 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Échec de la sauvegarde du commentaire
-2025-12-23 21:49:12 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Échec de la sauvegarde du commentaire
+2025-12-21 10:05:35 ERROR [JavaFX Application Thread] c.e.v.c.c.ClientVehiclesController - Erreur critique lors de l'initialisation du contrÃ´leur
+java.lang.IllegalStateException: showAndWait is not allowed during animation or layout processing
+	at javafx.controls@25.0.1/javafx.scene.control.Dialog.showAndWait(Dialog.java:334)
+	at com.example.vehiclegestion.client.controller.ClientVehiclesController.showAlert(ClientVehiclesController.java:953)
+	at com.example.vehiclegestion.client.controller.ClientVehiclesController.initialize(ClientVehiclesController.java:78)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.sun.javafx.reflect.Trampoline.invoke(MethodUtil.java:65)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at javafx.base@25.0.1/com.sun.javafx.reflect.MethodUtil.invoke(MethodUtil.java:112)
+	at javafx.fxml@25.0.1/com.sun.javafx.fxml.MethodHelper.invoke(MethodHelper.java:78)
+	at javafx.fxml@25.0.1/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2658)
+	at javafx.fxml@25.0.1/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2533)
+	at javafx.fxml@25.0.1/javafx.fxml.FXMLLoader.load(FXMLLoader.java:2503)
+	at com.example.vehiclegestion.utils.NavigationManager.loadPage(NavigationManager.java:95)
+	at com.example.vehiclegestion.utils.NavigationManager.lambda$navigateWithAnimation$0(NavigationManager.java:77)
+	at javafx.graphics@25.0.1/javafx.animation.Animation.runHandler(Animation.java:1147)
+	at javafx.graphics@25.0.1/javafx.animation.Animation.finished(Animation.java:1141)
+	at javafx.graphics@25.0.1/javafx.animation.AnimationAccessorImpl.finished(AnimationAccessorImpl.java:49)
+	at javafx.graphics@25.0.1/com.sun.scenario.animation.shared.SingleLoopClipEnvelope.timePulse(SingleLoopClipEnvelope.java:107)
+	at javafx.graphics@25.0.1/javafx.animation.Animation.doTimePulse(Animation.java:1234)
+	at javafx.graphics@25.0.1/javafx.animation.Animation$1.timePulse(Animation.java:190)
+	at javafx.graphics@25.0.1/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:326)
+	at javafx.graphics@25.0.1/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:247)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:588)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:572)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:565)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$0(QuantumToolkit.java:346)
+	at javafx.graphics@25.0.1/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+	at javafx.graphics@25.0.1/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics@25.0.1/com.sun.glass.ui.win.WinApplication.lambda$runLoop$0(WinApplication.java:168)
+	at java.base/java.lang.Thread.run(Thread.java:1575)
+2025-12-21 10:33:25 ERROR [JavaFX Application Thread] c.e.v.c.c.ClientVehiclesController - Erreur critique lors de l'initialisation du contrÃ´leur
+java.lang.IllegalStateException: showAndWait is not allowed during animation or layout processing
+	at javafx.controls@25.0.1/javafx.scene.control.Dialog.showAndWait(Dialog.java:334)
+	at com.example.vehiclegestion.client.controller.ClientVehiclesController.showAlert(ClientVehiclesController.java:953)
+	at com.example.vehiclegestion.client.controller.ClientVehiclesController.initialize(ClientVehiclesController.java:78)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.sun.javafx.reflect.Trampoline.invoke(MethodUtil.java:65)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at javafx.base@25.0.1/com.sun.javafx.reflect.MethodUtil.invoke(MethodUtil.java:112)
+	at javafx.fxml@25.0.1/com.sun.javafx.fxml.MethodHelper.invoke(MethodHelper.java:78)
+	at javafx.fxml@25.0.1/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2658)
+	at javafx.fxml@25.0.1/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2533)
+	at javafx.fxml@25.0.1/javafx.fxml.FXMLLoader.load(FXMLLoader.java:2503)
+	at com.example.vehiclegestion.utils.NavigationManager.loadPage(NavigationManager.java:98)
+	at com.example.vehiclegestion.utils.NavigationManager.lambda$navigateWithAnimation$0(NavigationManager.java:80)
+	at javafx.graphics@25.0.1/javafx.animation.Animation.runHandler(Animation.java:1147)
+	at javafx.graphics@25.0.1/javafx.animation.Animation.finished(Animation.java:1141)
+	at javafx.graphics@25.0.1/javafx.animation.AnimationAccessorImpl.finished(AnimationAccessorImpl.java:49)
+	at javafx.graphics@25.0.1/com.sun.scenario.animation.shared.SingleLoopClipEnvelope.timePulse(SingleLoopClipEnvelope.java:107)
+	at javafx.graphics@25.0.1/javafx.animation.Animation.doTimePulse(Animation.java:1234)
+	at javafx.graphics@25.0.1/javafx.animation.Animation$1.timePulse(Animation.java:190)
+	at javafx.graphics@25.0.1/com.sun.scenario.animation.AbstractPrimaryTimer.timePulseImpl(AbstractPrimaryTimer.java:326)
+	at javafx.graphics@25.0.1/com.sun.scenario.animation.AbstractPrimaryTimer$MainLoop.run(AbstractPrimaryTimer.java:247)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:588)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.pulse(QuantumToolkit.java:572)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.pulseFromQueue(QuantumToolkit.java:565)
+	at javafx.graphics@25.0.1/com.sun.javafx.tk.quantum.QuantumToolkit.lambda$runToolkit$0(QuantumToolkit.java:346)
+	at javafx.graphics@25.0.1/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+	at javafx.graphics@25.0.1/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics@25.0.1/com.sun.glass.ui.win.WinApplication.lambda$runLoop$0(WinApplication.java:168)
+	at java.base/java.lang.Thread.run(Thread.java:1575)

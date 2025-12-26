@@ -7,7 +7,7 @@
 
 <AnchorPane prefHeight="650.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.vehiclegestion.vendeur.controller.AjouterRendezVousController">
     <children>
-        <VBox layoutX="20.0" layoutY="20.0" prefHeight="610.0" prefWidth="760.0" spacing="20.0" style="-fx-background-color: white; -fx-border-color: #e1e5e9; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+        <VBox layoutX="20.0" layoutY="20.0" prefHeight="610.0" prefWidth="760.0" spacing="20.0" style="-fx-background-color: rgba(30, 41, 59, 0.95); -fx-border-color: #334155; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 3);">
             <padding>
                 <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
             </padding>
@@ -18,17 +18,17 @@
                         <Label text="📅" style="-fx-font-size: 28;" />
                         <VBox spacing="2.0">
                             <children>
-                                <Label text="Nouveau Rendez-vous" style="-fx-font-weight: bold; -fx-font-size: 22; -fx-text-fill: #1e293b;" />
-                                <Label text="Planifier un nouveau rendez-vous avec un client" style="-fx-text-fill: #6b7280; -fx-font-size: 13;" />
+                                <Label text="Nouveau Rendez-vous" style="-fx-font-weight: bold; -fx-font-size: 22; -fx-text-fill: white;" />
+                                <Label text="Planifier un nouveau rendez-vous avec un client" style="-fx-text-fill: #94a3b8; -fx-font-size: 13;" />
                             </children>
                         </VBox>
                     </children>
                 </HBox>
 
-                <Separator />
+                <Separator style="-fx-background-color: #475569;" />
 
                 <!-- Formulaire en 2 colonnes -->
-                <GridPane hgap="20.0" vgap="15.0">
+                <GridPane hgap="20.0" vgap="18.0">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
@@ -36,64 +36,73 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
                         <!-- Ligne 1 - Client -->
-                        <Label text="Client *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <ComboBox fx:id="clientCombo" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <Label text="Client *" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <ComboBox fx:id="clientCombo" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                  style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;" />
 
-                        <Label text="Téléphone" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <TextField fx:id="telephoneField" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                        <Label text="Téléphone" GridPane.columnIndex="2" GridPane.rowIndex="0" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <TextField fx:id="telephoneField" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="0"
+                                   style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;" />
 
                         <!-- Ligne 2 - Véhicule -->
-                        <Label text="Véhicule" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <ComboBox fx:id="vehiculeCombo" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label text="Véhicule" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <ComboBox fx:id="vehiculeCombo" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                  style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;" />
 
-                        <Label text="Email" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <TextField fx:id="emailField" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <Label text="Email" GridPane.columnIndex="2" GridPane.rowIndex="1" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <TextField fx:id="emailField" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="1"
+                                   style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-padding: 8; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;" />
 
                         <!-- Ligne 3 - Date/Heure -->
-                        <Label text="Date *" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <DatePicker fx:id="datePicker" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="Date *" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <DatePicker fx:id="datePicker" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                    style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;" />
 
-                        <Label text="Heure *" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <ComboBox fx:id="heureCombo" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                        <Label text="Heure *" GridPane.columnIndex="2" GridPane.rowIndex="2" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <ComboBox fx:id="heureCombo" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="2"
+                                  style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;" />
 
                         <!-- Ligne 4 - Durée/Type -->
-                        <Label text="Durée *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <ComboBox fx:id="dureeCombo" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label text="Durée *" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <ComboBox fx:id="dureeCombo" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                                  style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;" />
 
-                        <Label text="Type de RDV" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <ComboBox fx:id="typeCombo" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                        <Label text="Type de RDV" GridPane.columnIndex="2" GridPane.rowIndex="3" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <ComboBox fx:id="typeCombo" prefWidth="250.0" GridPane.columnIndex="3" GridPane.rowIndex="3"
+                                  style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6;" />
 
                         <!-- Ligne 5 - Description -->
-                        <Label text="Description / Notes" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold; -fx-text-fill: #374151;" />
-                        <TextArea fx:id="descriptionArea" prefHeight="100.0" prefWidth="530.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="3" />
+                        <Label text="Description / Notes" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-font-weight: bold; -fx-text-fill: white;" />
+                        <TextArea fx:id="descriptionArea" prefHeight="100.0" prefWidth="530.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="3"
+                                  style="-fx-background-color: white; -fx-text-fill: #1e293b; -fx-prompt-text-fill: #64748b; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-border-width: 1.5;" />
                     </children>
                 </GridPane>
 
                 <!-- Section informations client -->
-                <VBox fx:id="clientInfoBox" spacing="10.0" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 15; -fx-background-radius: 8;" visible="false">
+                <VBox fx:id="clientInfoBox" spacing="10.0" style="-fx-background-color: rgba(59, 130, 246, 0.15); -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-padding: 15; -fx-background-radius: 8;" visible="false">
                     <children>
-                        <Label text="📋 Informations Client" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+                        <Label text="📋 Informations Client" style="-fx-font-weight: bold; -fx-text-fill: white;" />
                         <HBox spacing="30.0">
                             <children>
                                 <VBox spacing="5.0">
                                     <children>
-                                        <Label fx:id="clientNomLabel" text="Nom: " style="-fx-text-fill: #475569;" />
-                                        <Label fx:id="clientEmailLabel" text="Email: " style="-fx-text-fill: #475569;" />
+                                        <Label fx:id="clientNomLabel" text="Nom: " style="-fx-text-fill: #cbd5e1;" />
+                                        <Label fx:id="clientEmailLabel" text="Email: " style="-fx-text-fill: #cbd5e1;" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="5.0">
                                     <children>
-                                        <Label fx:id="clientTelLabel" text="Téléphone: " style="-fx-text-fill: #475569;" />
-                                        <Label fx:id="clientAdresseLabel" text="Adresse: " style="-fx-text-fill: #475569;" />
+                                        <Label fx:id="clientTelLabel" text="Téléphone: " style="-fx-text-fill: #cbd5e1;" />
+                                        <Label fx:id="clientAdresseLabel" text="Adresse: " style="-fx-text-fill: #cbd5e1;" />
                                     </children>
                                 </VBox>
                             </children>
@@ -102,21 +111,21 @@
                 </VBox>
 
                 <!-- Section informations véhicule -->
-                <VBox fx:id="vehiculeInfoBox" spacing="10.0" style="-fx-background-color: #f0f9ff; -fx-border-color: #bae6fd; -fx-border-radius: 8; -fx-padding: 15; -fx-background-radius: 8;" visible="false">
+                <VBox fx:id="vehiculeInfoBox" spacing="10.0" style="-fx-background-color: rgba(16, 185, 129, 0.15); -fx-border-color: #10b981; -fx-border-radius: 8; -fx-padding: 15; -fx-background-radius: 8;" visible="false">
                     <children>
-                        <Label text="🚗 Informations Véhicule" style="-fx-font-weight: bold; -fx-text-fill: #0369a1;" />
+                        <Label text="🚗 Informations Véhicule" style="-fx-font-weight: bold; -fx-text-fill: white;" />
                         <HBox spacing="30.0">
                             <children>
                                 <VBox spacing="5.0">
                                     <children>
-                                        <Label fx:id="vehiculeTitreLabel" text="Modèle: " style="-fx-text-fill: #475569;" />
-                                        <Label fx:id="vehiculePrixLabel" text="Prix: " style="-fx-text-fill: #475569;" />
+                                        <Label fx:id="vehiculeTitreLabel" text="Modèle: " style="-fx-text-fill: #cbd5e1;" />
+                                        <Label fx:id="vehiculePrixLabel" text="Prix: " style="-fx-text-fill: #cbd5e1;" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="5.0">
                                     <children>
-                                        <Label fx:id="vehiculeMarqueLabel" text="Marque: " style="-fx-text-fill: #475569;" />
-                                        <Label fx:id="vehiculeAnneeLabel" text="Année: " style="-fx-text-fill: #475569;" />
+                                        <Label fx:id="vehiculeMarqueLabel" text="Marque: " style="-fx-text-fill: #cbd5e1;" />
+                                        <Label fx:id="vehiculeAnneeLabel" text="Année: " style="-fx-text-fill: #cbd5e1;" />
                                     </children>
                                 </VBox>
                             </children>
@@ -128,12 +137,12 @@
                 <HBox alignment="CENTER_RIGHT" spacing="15.0">
                     <children>
                         <Button mnemonicParsing="false" onAction="#annuler" text="Annuler" style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;" />
-                        <Button mnemonicParsing="false" onAction="#enregistrer" text="Enregistrer le RDV" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 6; -fx-cursor: hand;" />
+                        <Button mnemonicParsing="false" onAction="#enregistrer" text="Enregistrer le RDV" style="-fx-background-color: linear-gradient(to right, #10b981, #059669); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 6; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.5), 8, 0.5, 0, 2);" />
                     </children>
                 </HBox>
 
                 <!-- Indicateur de champs obligatoires -->
-                <Label text="* Champs obligatoires" style="-fx-text-fill: #6b7280; -fx-font-size: 12; -fx-font-style: italic;" />
+                <Label text="* Champs obligatoires" style="-fx-text-fill: #94a3b8; -fx-font-size: 12; -fx-font-style: italic;" />
             </children>
         </VBox>
     </children>

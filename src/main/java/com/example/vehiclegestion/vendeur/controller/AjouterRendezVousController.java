@@ -21,6 +21,12 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import com.example.vehiclegestion.logging.service.ElasticLogService;
+import com.example.vehiclegestion.logging.util.LoggerUtil;
+import org.slf4j.Logger;
+
+import java.util.Map;
+
 
 public class AjouterRendezVousController implements Initializable {
 
@@ -50,6 +56,9 @@ public class AjouterRendezVousController implements Initializable {
     private ArticleDAO articleDAO;
     private SessionManager session = SessionManager.getInstance();
     private int idVendeurConnecte;
+    private static final Logger logger = LoggerUtil.getLogger(AjouterRendezVousController.class);
+    private final ElasticLogService elasticLogService = new ElasticLogService();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -215,19 +224,14 @@ public class AjouterRendezVousController implements Initializable {
     private void enregistrer() {
         System.out.println("\n💾 Tentative d'enregistrement RDV...");
 
-        // Validation
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
 
         try {
             RendezVous rdv = new RendezVous();
-
-            // Données du RDV
             Client client = clientCombo.getValue();
             rdv.setIdClient(client.getId());
+            rdv.setNomClient(client.getNomComplet());
             rdv.setIdVendeur(idVendeurConnecte);
-
             Article vehicule = vehiculeCombo.getValue();
             if (vehicule != null) {
                 rdv.setIdArticle(vehicule.getId());
@@ -236,22 +240,30 @@ public class AjouterRendezVousController implements Initializable {
                 rdv.setIdArticle(0);
                 rdv.setTitreArticle("Aucun véhicule spécifié");
             }
-
-            rdv.setNomClient(client.getNomComplet());
-            rdv.setTelephoneClient(telephoneField.getText());
-            rdv.setEmailClient(emailField.getText());
+            rdv.setTypeRdv(typeCombo.getValue());
             rdv.setDateRdv(datePicker.getValue());
             rdv.setHeureRdv(LocalTime.parse(heureCombo.getValue() + ":00"));
-            rdv.setTypeRdv(typeCombo.getValue());
+            rdv.setStatut("confirmé");
 
-            // ✅ MODIFICATION: Statut "confirmé" au lieu de "en attente"
-            rdv.setStatut("confirmé"); // ← CHANGEMENT ICI
-
-            rdv.setDuree(Integer.parseInt(dureeCombo.getValue().split(" ")[0]));
-
-            // Sauvegarde
             if (rendezVousDAO.addRendezVous(rdv)) {
-                System.out.println("✅ RDV confirmé et enregistré avec succès! ID: " + rdv.getIdRdv());
+                // ✅ LOG SUCCESS
+                logger.info("RDV créé ID={} client={} véhicule={} type={}",
+                        rdv.getIdRdv(), client.getNomComplet(),
+                        vehicule != null ? vehicule.getTitre() : "Aucun", rdv.getTypeRdv());
+
+                elasticLogService.sendLog(
+                        "INFO",
+                        "RDV créé",
+                        Map.of(
+                                "rdvId", rdv.getIdRdv(),
+                                "clientId", client.getId(),
+                                "clientNom", client.getNomComplet(),
+                                "vehiculeId", vehicule != null ? vehicule.getId() : 0,
+                                "typeRdv", rdv.getTypeRdv(),
+                                "vendeurId", idVendeurConnecte
+                        )
+                );
+
                 showAlert("Succès", "Rendez-vous confirmé et créé avec succès!", Alert.AlertType.INFORMATION);
                 fermerFenetre();
             } else {
@@ -259,8 +271,21 @@ public class AjouterRendezVousController implements Initializable {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur enregistrement: " + e.getMessage());
-            e.printStackTrace();
+            // ✅ LOG ERROR
+            logger.error("Erreur création RDV client={} : {}",
+                    clientCombo.getValue() != null ? clientCombo.getValue().getNomComplet() : "NULL",
+                    e.getMessage(), e);
+
+            elasticLogService.sendLog(
+                    "ERROR",
+                    "Erreur création RDV",
+                    Map.of(
+                            "clientId", clientCombo.getValue() != null ? clientCombo.getValue().getId() : 0,
+                            "vendeurId", idVendeurConnecte,
+                            "message", e.getMessage()
+                    )
+            );
+
             showAlert("Erreur", "Impossible de créer le rendez-vous: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }

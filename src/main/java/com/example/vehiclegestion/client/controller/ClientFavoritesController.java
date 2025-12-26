@@ -1,6 +1,6 @@
 package com.example.vehiclegestion.client.controller;
 
-import  com.example.vehiclegestion.auth.utils.SessionManager;
+import com.example.vehiclegestion.auth.SessionManager;
 import com.example.vehiclegestion.auth.model.Utilisateur;
 import com.example.vehiclegestion.client.doa.FavoriteDAO;
 import com.example.vehiclegestion.client.doa.ReservationDAO;
@@ -718,4 +718,5 @@ public class ClientFavoritesController implements Initializable {
         if (description == null) return "Description non disponible";
         return description.length() <= 80 ? description : description.substring(0, 77) + "...";
     }
+
 }

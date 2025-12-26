@@ -37,9 +37,6 @@ public class Magasin {
     private double noteMoyenne;
     private int nbVentesMois;
 
-    // Getter et Setter
-
-
     public Magasin() {}
 
     public Magasin(String nom, String adresse, String localisation, String description, int idVendeur) {

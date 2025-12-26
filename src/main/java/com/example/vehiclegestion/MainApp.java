@@ -1,6 +1,4 @@
 package com.example.vehiclegestion;
-import com.example.vehiclegestion.logging.model.LogEntry;
-import com.example.vehiclegestion.logging.service.ElasticLogService;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -18,14 +16,6 @@ public class MainApp extends Application {
         // Chargez la page de login au lieu du dashboard vendeur
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
         Parent root = loader.load();
-        new ElasticLogService().sendLog(
-                LogEntry.success(
-                        "APPLICATION_START",
-                        "system",
-                        "Démarrage de l'application VehicleGestion"
-                ).setModule(LogEntry.MODULE_SYSTEM)
-        );
-
 
         Scene scene = new Scene(root, 1000, 700);
         primaryStage.setScene(scene);
