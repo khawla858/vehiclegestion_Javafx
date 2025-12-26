@@ -1,7 +1,7 @@
 package com.example.vehiclegestion.client.doa;
 
 import com.example.vehiclegestion.client.model.RendezVs;
-import com.example.vehiclegestion.utils.DatabaseConnection;
+import com.example.vehiclegestion.common.dao.DatabaseConnection;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -64,7 +64,7 @@ public class RendezVsDAO {
     public void debugRendezVs(RendezVs rdv) {
         System.out.println("🔍 DEBUG RendezVs CRITIQUE:");
         System.out.println("   ID Client: " + rdv.getIdClient());
-        System.out.println("   ID Vendeur: " + rdv.getIdVendeur() + " ⚠");
+        System.out.println("   ID Vendeur: " + rdv.getIdVendeur() + " ⚠️");
         System.out.println("   ID Article: " + rdv.getIdArticle());
         System.out.println("   Type: " + rdv.getTypeRdv());
         System.out.println("   Date: " + rdv.getDateRdv());
@@ -126,7 +126,7 @@ public class RendezVsDAO {
             System.err.println("❌ Erreur recherche RDV par détails: " + e.getMessage());
         }
 
-        System.out.println("⚠ Aucun RDV trouvé avec ces détails");
+        System.out.println("⚠️ Aucun RDV trouvé avec ces détails");
         return -1;
     }
     /**

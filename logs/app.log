@@ -1,11 +1,93 @@
-2025-12-11 14:52:23 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
-2025-12-11 14:52:23 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
-2025-12-11 14:52:23 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 1, Titre: Mercedes Classe C 2020
-2025-12-11 14:52:23 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 1
-2025-12-11 14:52:23 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
-2025-12-11 14:52:23 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 28 - Déjà commenté: false
-2025-12-11 14:52:24 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 0
-2025-12-11 14:52:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🏪 Demande de visite du magasin
-2025-12-11 14:52:32 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ Erreur récupération ID vendeur: FATAL: password authentication failed for user "postgres"
-2025-12-11 14:52:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔍 ID vendeur récupéré: 0
-2025-12-11 14:52:32 ERROR [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ❌ ID vendeur invalide
+2025-12-24 09:29:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 09:29:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 09:29:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 09:29:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 5, Titre: dacia logan
+2025-12-24 09:29:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 09:29:21 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 09:29:21 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: false
+2025-12-24 09:29:21 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 0
+2025-12-24 09:30:02 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 💾 Tentative de sauvegarde d'un commentaire
+2025-12-24 09:30:02 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 👤 Sauvegarde commentaire - User ID: 29, Article ID: 5, Note: 3
+2025-12-24 09:30:03 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Commentaire sauvegardé avec succès
+2025-12-24 09:30:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 09:30:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 09:30:06 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: true
+2025-12-24 09:30:06 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 1
+2025-12-24 09:30:12 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📞 Demande de contact avec le vendeur
+2025-12-24 09:30:12 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ ID vendeur trouvé en BD: 2
+2025-12-24 09:30:12 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 👤 Client ID: 29 (client), Vendeur ID: 2
+2025-12-24 09:30:12 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 💬 Ouverture chat avec le vendeur
+2025-12-24 09:30:12 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Chat affiché sous la navbar
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 5, Titre: dacia logan
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 09:31:09 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: true
+2025-12-24 09:31:10 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 1
+2025-12-24 09:31:55 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ ID vendeur trouvé en BD: 2
+2025-12-24 09:31:55 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ BorderPane trouvé via bouton
+2025-12-24 09:31:57 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Magasin affiché sous la navbar
+2025-12-24 10:00:45 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 10:00:45 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 10:00:45 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 10:00:45 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 4, Titre: ford fiesta
+2025-12-24 10:00:45 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 4
+2025-12-24 10:00:46 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 10:00:46 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: false
+2025-12-24 10:00:46 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 0
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 5, Titre: dacia logan
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: true
+2025-12-24 10:01:58 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 1
+2025-12-24 10:03:56 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ ID vendeur trouvé en BD: 2
+2025-12-24 10:03:56 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ BorderPane trouvé via bouton
+2025-12-24 10:04:01 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Magasin affiché sous la navbar
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 5, Titre: dacia logan
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 10:04:17 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: true
+2025-12-24 10:04:18 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 1
+2025-12-24 10:04:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📞 Demande de contact avec le vendeur
+2025-12-24 10:04:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ ID vendeur trouvé en BD: 2
+2025-12-24 10:04:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 👤 Client ID: 29 (client), Vendeur ID: 2
+2025-12-24 10:04:20 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 💬 Ouverture chat avec le vendeur
+2025-12-24 10:04:21 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Chat affiché sous la navbar
+2025-12-24 10:04:29 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 10:04:29 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 10:04:29 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 10:04:29 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 5, Titre: dacia logan
+2025-12-24 10:04:29 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 10:04:30 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 10:04:30 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: true
+2025-12-24 10:04:30 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 1
+2025-12-24 10:04:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ ID vendeur trouvé en BD: 2
+2025-12-24 10:04:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ ID vendeur trouvé en BD: 2
+2025-12-24 10:04:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Conversion Article→Vehicle - Vendeur ID final: 2
+2025-12-24 10:04:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Vendeur ID pour RDV: 2
+2025-12-24 10:04:32 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Formulaire RDV affiché sous la navbar
+2025-12-24 10:04:51 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔙 Retour à la page précédente
+2025-12-24 10:05:36 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 10:05:36 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 10:05:36 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 10:05:36 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 4, Titre: ford fiesta
+2025-12-24 10:05:36 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 4
+2025-12-24 10:05:36 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 10:05:37 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: false
+2025-12-24 10:05:37 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 0
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔧 Initialisation du contrôleur VehicleDetail
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Service de logs initialisé
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📥 Réception des données du véhicule
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - ✅ Article chargé - ID: 5, Titre: dacia logan
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔄 Chargement des commentaires pour l'article ID: 5
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 🔐 État de la session: Connecté
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📝 Utilisateur 29 - Déjà commenté: true
+2025-12-24 10:07:05 INFO  [JavaFX Application Thread] c.e.v.client.controller.VehiDetaiCo - 📋 Nombre de commentaires récupérés: 1

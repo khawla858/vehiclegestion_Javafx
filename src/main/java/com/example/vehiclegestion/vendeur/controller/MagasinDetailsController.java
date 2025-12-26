@@ -15,6 +15,8 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.io.File;
+import javafx.scene.web.WebView;
+import javafx.scene.web.WebEngine;
 
 public class MagasinDetailsController implements DataReceiver {
 
@@ -30,7 +32,8 @@ public class MagasinDetailsController implements DataReceiver {
     @FXML private Text descriptionMagasin;
     @FXML private Button btnFacebook;
     @FXML private Button btnInstagram;
-    @FXML private ImageView carteImage; // ✅ ImageView au lieu de WebView
+    @FXML private WebView mapView;
+    // ✅ ImageView au lieu de WebView
     @FXML private Label etageInfo;
     @FXML private Button btnItineraire;
     @FXML private Button btnVoirCarte;
@@ -46,6 +49,11 @@ public class MagasinDetailsController implements DataReceiver {
         try {
             magasinDAO = new MagasinDAO();
             configurerActions();
+
+            if (mapView != null) {
+                mapView.getEngine().setJavaScriptEnabled(true);
+                System.out.println("✅ WebView initialisé pour la carte");
+            }
 
             if (btnRetour != null) {
                 btnRetour.setOnAction(e -> nav.goBack());
@@ -117,7 +125,8 @@ public class MagasinDetailsController implements DataReceiver {
 
         chargerLogo();
         chargerHoraires();
-        chargerImageCarte(); // ✅ Méthode originale pour ImageView
+        chargerCarteReelle();
+        // ✅ Méthode originale pour ImageView
     }
 
     private void chargerLogo() {
@@ -157,7 +166,6 @@ public class MagasinDetailsController implements DataReceiver {
             File carteFile = new File("images/logos/carte-localisation.jpg");
             if (carteFile.exists()) {
                 Image carte = new Image(carteFile.toURI().toString());
-                carteImage.setImage(carte);
                 System.out.println("✅ Carte locale chargée : " + carteFile.getAbsolutePath());
             } else {
                 chargerCarteDepuisResources();
@@ -171,7 +179,6 @@ public class MagasinDetailsController implements DataReceiver {
     private void chargerCarteDepuisResources() {
         try {
             Image carte = new Image(getClass().getResourceAsStream("/images/logos/carte-localisation.png"));
-            carteImage.setImage(carte);
             System.out.println("✅ Carte chargée depuis resources");
         } catch (Exception e) {
             System.err.println("⚠️ Carte introuvable dans resources, génération placeholder...");
@@ -216,7 +223,6 @@ public class MagasinDetailsController implements DataReceiver {
             params.setFill(javafx.scene.paint.Color.TRANSPARENT);
             javafx.scene.image.WritableImage image = canvas.snapshot(params, null);
 
-            carteImage.setImage(image);
             System.out.println("✅ Placeholder carte généré");
 
         } catch (Exception e) {
@@ -227,24 +233,12 @@ public class MagasinDetailsController implements DataReceiver {
     private void chargerHoraires() {
         horairesContainer.getChildren().clear();
 
-        if (magasin.getHoraires() != null && !magasin.getHoraires().isEmpty()) {
-            try {
-                org.json.JSONObject horairesJson = new org.json.JSONObject(magasin.getHoraires());
-                for (String jour : horairesJson.keySet()) {
-                    String horaire = horairesJson.getString(jour);
-                    HBox ligneHoraire = creerLigneHoraire(jour, horaire);
-                    horairesContainer.getChildren().add(ligneHoraire);
-                }
-            } catch (Exception e) {
-                System.err.println("⚠️ Erreur parsing horaires : " + e.getMessage());
-                // Ajouter des horaires par défaut si erreur
-                horairesContainer.getChildren().addAll(
-                        creerLigneHoraire("Du Dimanche au Jeudi", "de 10h à 20h"),
-                        creerLigneHoraire("Vendredi et Samedi", "de 10h à 20h")
-                );
-            }
+        if (magasin.getHorairesOuverture() != null && !magasin.getHorairesOuverture().isEmpty()) {
+            magasin.getHorairesOuverture().forEach((jour, horaire) -> {
+                HBox ligneHoraire = creerLigneHoraire(jour, horaire);
+                horairesContainer.getChildren().add(ligneHoraire);
+            });
         } else {
-            // Horaires par défaut si aucun JSON
             horairesContainer.getChildren().addAll(
                     creerLigneHoraire("Du Dimanche au Jeudi", "de 10h à 20h"),
                     creerLigneHoraire("Vendredi et Samedi", "de 10h à 20h")
@@ -397,4 +391,145 @@ public class MagasinDetailsController implements DataReceiver {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    // Remplacez ENTIÈREMENT la méthode chargerCarteReelle() par celle-ci :
+
+    private void chargerCarteReelle() {
+        if (magasin == null) {
+            System.err.println("❌ Magasin null");
+            return;
+        }
+
+        try {
+            // Coordonnées par défaut pour Rabat, Maroc
+            double defaultLat = 34.0209;
+            double defaultLon = -6.8416;
+
+            String nomMagasin = magasin.getNomMagasin() != null ? magasin.getNomMagasin() : "Magasin";
+            String adresseAffichage = magasin.getAdresse() != null ? magasin.getAdresse() : "";
+
+            System.out.println("🗺️ Chargement carte pour : " + nomMagasin);
+
+            // HTML avec Leaflet - CARTE PURE SANS INTERFACE
+            String htmlContent =
+                    "<!DOCTYPE html>\n" +
+                            "<html>\n" +
+                            "<head>\n" +
+                            "    <meta charset='utf-8'/>\n" +
+                            "    <title>Carte</title>\n" +
+                            "    <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' " +
+                            "          integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=' crossorigin=''/>\n" +
+                            "    <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js' " +
+                            "            integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=' crossorigin=''></script>\n" +
+                            "    <style>\n" +
+                            "        * { \n" +
+                            "            margin: 0; \n" +
+                            "            padding: 0; \n" +
+                            "            box-sizing: border-box; \n" +
+                            "        }\n" +
+                            "        html, body { \n" +
+                            "            width: 100%; \n" +
+                            "            height: 100%; \n" +
+                            "            overflow: hidden; \n" +
+                            "        }\n" +
+                            "        #map { \n" +
+                            "            width: 100%; \n" +
+                            "            height: 100%; \n" +
+                            "            position: absolute;\n" +
+                            "            top: 0;\n" +
+                            "            left: 0;\n" +
+                            "        }\n" +
+                            "        /* Masquer le logo Leaflet et les attributions */\n" +
+                            "        .leaflet-control-attribution,\n" +
+                            "        .leaflet-control-zoom a {\n" +
+                            "            font-size: 10px !important;\n" +
+                            "        }\n" +
+                            "    </style>\n" +
+                            "</head>\n" +
+                            "<body>\n" +
+                            "    <div id='map'></div>\n" +
+                            "    <script>\n" +
+                            "        try {\n" +
+                            "            // Créer la carte avec contrôles minimaux\n" +
+                            "            var map = L.map('map', {\n" +
+                            "                zoomControl: true,\n" +
+                            "                attributionControl: false,  // Masquer les attributions\n" +
+                            "                scrollWheelZoom: true,\n" +
+                            "                doubleClickZoom: true,\n" +
+                            "                boxZoom: true,\n" +
+                            "                keyboard: true,\n" +
+                            "                dragging: true\n" +
+                            "            }).setView([" + defaultLat + ", " + defaultLon + "], 15);\n" +
+                            "            \n" +
+                            "            // Ajouter les tuiles OpenStreetMap\n" +
+                            "            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {\n" +
+                            "                maxZoom: 19,\n" +
+                            "                minZoom: 10\n" +
+                            "            }).addTo(map);\n" +
+                            "            \n" +
+                            "            // Créer une icône personnalisée pour le marqueur\n" +
+                            "            var customIcon = L.icon({\n" +
+                            "                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',\n" +
+                            "                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',\n" +
+                            "                iconSize: [25, 41],\n" +
+                            "                iconAnchor: [12, 41],\n" +
+                            "                popupAnchor: [1, -34],\n" +
+                            "                shadowSize: [41, 41]\n" +
+                            "            });\n" +
+                            "            \n" +
+                            "            // Ajouter un marqueur\n" +
+                            "            var marker = L.marker([" + defaultLat + ", " + defaultLon + "], {icon: customIcon}).addTo(map);\n" +
+                            "            \n" +
+                            "            // Popup avec infos du magasin\n" +
+                            "            marker.bindPopup(\n" +
+                            "                '<div style=\"text-align: center; font-family: Arial;\">' +\n" +
+                            "                '<b style=\"font-size: 16px; color: #1e293b;\">" + nomMagasin.replace("'", "\\'") + "</b><br>' +\n" +
+                            "                '<span style=\"font-size: 12px; color: #64748b;\">" + adresseAffichage.replace("'", "\\'") + "</span>' +\n" +
+                            "                '</div>'\n" +
+                            "            ).openPopup();\n" +
+                            "            \n" +
+                            "            // Forcer le redimensionnement après chargement\n" +
+                            "            setTimeout(function() {\n" +
+                            "                map.invalidateSize();\n" +
+                            "                console.log('✅ Carte redimensionnée');\n" +
+                            "            }, 200);\n" +
+                            "            \n" +
+                            "            console.log('✅ Carte Leaflet chargée avec succès');\n" +
+                            "            \n" +
+                            "        } catch(e) {\n" +
+                            "            console.error('❌ Erreur carte:', e);\n" +
+                            "        }\n" +
+                            "    </script>\n" +
+                            "</body>\n" +
+                            "</html>";
+
+            // Activer JavaScript pour le WebView
+            mapView.getEngine().setJavaScriptEnabled(true);
+
+            // Charger le contenu HTML
+            mapView.getEngine().loadContent(htmlContent);
+
+            // Ajouter un listener pour suivre le chargement
+            mapView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+                if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                    System.out.println("✅ WebView - Carte chargée avec succès");
+                    // Forcer le redimensionnement du WebView
+                    javafx.application.Platform.runLater(() -> {
+                        mapView.getEngine().executeScript("if(typeof map !== 'undefined') map.invalidateSize();");
+                    });
+                } else if (newState == javafx.concurrent.Worker.State.FAILED) {
+                    System.err.println("❌ WebView - Échec du chargement");
+                }
+            });
+
+            System.out.println("✅ Initialisation carte terminée");
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur chargement carte : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+
 }

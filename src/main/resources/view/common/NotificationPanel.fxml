@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
+
+<!-- Panneau de notifications à intégrer dans le header du dashboard -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.vehiclegestion.common.controller.NotificationPanelController"
+      maxWidth="400" maxHeight="600"
+      style="-fx-background-color: rgba(30, 41, 59, 0.98);
+             -fx-background-radius: 15;
+             -fx-border-color: linear-gradient(to right, #3b82f6, #8b5cf6);
+             -fx-border-width: 2;
+             -fx-border-radius: 15;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 20, 0.6, 0, 8);">
+
+    <!-- Header du panneau -->
+    <VBox spacing="10" style="-fx-background-color: rgba(59, 130, 246, 0.1);
+                              -fx-border-color: #334155;
+                              -fx-border-width: 0 0 1 0;
+                              -fx-background-radius: 15 15 0 0;">
+        <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="🔔" style="-fx-font-size: 20px;"/>
+            <Label text="Notifications"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Badge compteur -->
+            <StackPane fx:id="badgeContainer" visible="false">
+                <Circle radius="12"
+                        style="-fx-fill: linear-gradient(to bottom right, #ef4444, #dc2626);
+                               -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.6), 8, 0.6, 0, 0);"/>
+                <Label fx:id="badgeLabel" text="0"
+                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+            </StackPane>
+
+            <!-- Bouton tout marquer comme lu -->
+            <Button fx:id="markAllReadBtn" text="✓"
+                    onAction="#handleMarkAllAsRead"
+                    style="-fx-background-color: rgba(16, 185, 129, 0.2);
+                           -fx-text-fill: #10b981;
+                           -fx-font-size: 14px;
+                           -fx-padding: 5 10;
+                           -fx-background-radius: 6;
+                           -fx-border-color: #10b981;
+                           -fx-border-width: 1;
+                           -fx-border-radius: 6;
+                           -fx-cursor: hand;"/>
+        </HBox>
+
+        <!-- Filtres -->
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <ToggleButton fx:id="filterAllBtn" text="Toutes"
+                          toggleGroup="$filterGroup"
+                          selected="true"
+                          onAction="#handleFilterAll"
+                          style="-fx-background-color: rgba(59, 130, 246, 0.2);
+                                -fx-text-fill: #3b82f6;
+                                -fx-font-size: 11px;
+                                -fx-padding: 5 12;
+                                -fx-background-radius: 15;
+                                -fx-border-color: #3b82f6;
+                                -fx-border-width: 1;
+                                -fx-border-radius: 15;"/>
+
+            <ToggleButton fx:id="filterUnreadBtn" text="Non lues"
+                          toggleGroup="$filterGroup"
+                          onAction="#handleFilterUnread"
+                          style="-fx-background-color: rgba(239, 68, 68, 0.2);
+                                -fx-text-fill: #ef4444;
+                                -fx-font-size: 11px;
+                                -fx-padding: 5 12;
+                                -fx-background-radius: 15;
+                                -fx-border-color: #ef4444;
+                                -fx-border-width: 1;
+                                -fx-border-radius: 15;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Liste des notifications -->
+    <ScrollPane fitToWidth="true"
+                style="-fx-background: transparent; -fx-background-color: transparent;"
+                hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                VBox.vgrow="ALWAYS">
+        <VBox fx:id="notificationsContainer" spacing="1"
+              style="-fx-background-color: transparent;">
+            <padding>
+                <Insets top="5" right="5" bottom="5" left="5"/>
+            </padding>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Footer -->
+    <HBox alignment="CENTER" spacing="10"
+          style="-fx-background-color: rgba(15, 23, 42, 0.5);
+                 -fx-border-color: #334155;
+                 -fx-border-width: 1 0 0 0;
+                 -fx-background-radius: 0 0 15 15;">
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="10"/>
+        </padding>
+
+        <Button text="🔄 Actualiser" onAction="#handleRefresh"
+                style="-fx-background-color: transparent;
+                       -fx-text-fill: #94a3b8;
+                       -fx-font-size: 12px;
+                       -fx-cursor: hand;"/>
+    </HBox>
+
+</VBox>

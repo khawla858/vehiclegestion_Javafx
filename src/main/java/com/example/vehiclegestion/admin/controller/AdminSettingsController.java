@@ -190,7 +190,7 @@ public class AdminSettingsController {
         String nom = names.length > 1 ? names[1] : "";
         String email = adminEmailField.getText().trim();
 
-        String query = "UPDATE utilisateurs SET prenom = ?, nom = ?, email = ? WHERE id = ?";
+        String query = "UPDATE Utilisateur SET prenom = ?, nom = ?, email = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {

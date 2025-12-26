@@ -4,6 +4,7 @@ import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.common.dao.ChatDAO;
 import com.example.vehiclegestion.common.model.Conversation;
 import com.example.vehiclegestion.common.model.Message;
+import com.example.vehiclegestion.common.model.Notification;
 
 import com.example.vehiclegestion.common.utils.NotificationService;
 
@@ -530,6 +531,24 @@ public class ChatWindowController implements Initializable {
             messageInputField.setDisable(false);
             messageInputField.requestFocus();
         }
+    }
+    public void notifierNouveauMessage(int idClient, int idExpediteur, String nomExpediteur) {
+        System.out.println("💬 Notification: Nouveau message pour client " + idClient + " de " + nomExpediteur);
+
+        Notification notif = new Notification(
+                idClient,
+                "client",
+                "💬 Nouveau message",
+                "Vous avez reçu un nouveau message de " + nomExpediteur,
+                "nouveau_message",
+                "message"
+        );
+        notif.setIdSource(idExpediteur);
+        notif.setTypeSource("message");
+        notif.setPriorite("haute");
+        notif.setLienAction("/messages");
+
+
     }
 
     /**

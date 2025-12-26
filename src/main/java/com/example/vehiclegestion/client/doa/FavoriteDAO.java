@@ -70,13 +70,14 @@ public class FavoriteDAO {
             stmt.setInt(1, idClient);
             stmt.setInt(2, idArticle);
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur lors de la vérification du favori: " + e.getMessage());
+            System.err.println("❌ Erreur vérification favori: " + e.getMessage());
             e.printStackTrace();
         }
 

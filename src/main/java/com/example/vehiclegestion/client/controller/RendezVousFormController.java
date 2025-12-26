@@ -4,18 +4,15 @@ import javafx.scene.control.Alert;
 import com.example.vehiclegestion.client.model.RendezVs;
 import com.example.vehiclegestion.client.doa.RendezVsDAO;
 import com.example.vehiclegestion.client.model.Vehicle;
-import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.common.utils.NotificationService;
+import  com.example.vehiclegestion.auth.utils.SessionManager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.geometry.Pos;
-import javafx.geometry.Insets;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -43,7 +40,8 @@ public class RendezVousFormController {
     public void initialize() {
         notificationService = NotificationService.getInstance();
         setupForm();
-        setupStyling();
+        // SUPPRIMER L'APPEL À setupStyling() car elle applique des styles blancs
+        // setupStyling(); // ← COMMENTEZ ou SUPPRIMEZ CETTE LIGNE
     }
 
     public void setVehicle(Vehicle vehicle) {
@@ -66,13 +64,14 @@ public class RendezVousFormController {
                 // Désactiver les dates passées
                 if (date.isBefore(today)) {
                     setDisable(true);
-                    setStyle("-fx-background-color: #ffcccc;");
+                    // Style compatible avec thème sombre
+                    setStyle("-fx-background-color: rgba(239, 68, 68, 0.3); -fx-text-fill: #fca5a5;");
                 }
 
                 // Désactiver les dates trop éloignées (max 3 mois)
                 if (date.isAfter(today.plusMonths(3))) {
                     setDisable(true);
-                    setStyle("-fx-background-color: #ffcccc;");
+                    setStyle("-fx-background-color: rgba(239, 68, 68, 0.3); -fx-text-fill: #fca5a5;");
                 }
             }
         });
@@ -110,9 +109,22 @@ public class RendezVousFormController {
         // Gestion des événements
         submitBtn.setOnAction(e -> handleSubmit());
         cancelBtn.setOnAction(e -> closeForm());
+
+        // Appliquer un style minimal pour les DateCell uniquement
+        applyDateCellStyles();
     }
 
+    private void applyDateCellStyles() {
+        // Style minimal pour les cellules du DatePicker qui ne doivent pas écraser le thème
+        datePicker.getEditor().setStyle("-fx-text-fill: #f1f5f9;");
+    }
+
+    // SUPPRIMEZ ou COMMENTEZ toute la méthode setupStyling()
+    /*
     private void setupStyling() {
+        // CETTE MÉTHODE APPLIQUE DES STYLES BLANCS QUI ÉCRASENT LE THÈME SOMBRE
+        // NE PAS L'UTILISER
+
         // Style général du container
         mainContainer.setStyle("-fx-background-color: white; -fx-padding: 25; -fx-border-radius: 10;");
 
@@ -144,6 +156,7 @@ public class RendezVousFormController {
                 "-fx-padding: 20; -fx-alignment: center;");
         successMessage.setVisible(false);
     }
+    */
 
     private void updateVehicleInfo() {
         if (vehicle != null) {
@@ -158,6 +171,9 @@ public class RendezVousFormController {
                     Math.round(vehicle.getPrice())
             );
             vehicleInfoLabel.setText(info);
+
+            // Mettre à jour le style du label pour correspondre au thème sombre
+            vehicleInfoLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #94a3b8; -fx-alignment: center; -fx-padding: 0 0 15 0;");
         }
     }
 
@@ -331,6 +347,11 @@ public class RendezVousFormController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+
+        // Style pour l'alerte si vous voulez la garder sombre
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #1e293b; -fx-text-fill: #f1f5f9;");
+
         alert.showAndWait();
     }
 }

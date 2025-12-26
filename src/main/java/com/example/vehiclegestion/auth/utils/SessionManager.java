@@ -41,7 +41,87 @@ public class SessionManager {
         return INSTANCE;
     }
 
-    // ========== GESTION DE LA SESSION ==========
+    // ========== MÉTHODES STATIQUES POUR COMPATIBILITÉ ==========
+
+    /**
+     * Définir l'utilisateur connecté (méthode statique)
+     */
+    public static void setCurrentUser(Utilisateur user) {
+        getInstance().demarrerSession(user);
+    }
+
+    /**
+     * Obtenir l'utilisateur connecté (méthode statique)
+     */
+    public static Utilisateur getCurrentUser() {
+        return getInstance().getUtilisateurConnecte();
+    }
+
+    /**
+     * Vérifier si un utilisateur est connecté (méthode statique)
+     */
+    public static boolean isLoggedIn() {
+        return getInstance().estConnecte();
+    }
+
+    /**
+     * Vérifier si l'utilisateur connecté est un administrateur (méthode statique)
+     */
+    public static boolean isAdmin() {
+        return getInstance().estAdmin();
+    }
+
+    /**
+     * Vérifier si l'utilisateur connecté est un gestionnaire (méthode statique)
+     */
+    public static boolean isGestionnaire() {
+        Utilisateur user = getInstance().getUtilisateurConnecte();
+        return user != null && "gestionnaire".equalsIgnoreCase(user.getRole());
+    }
+
+    /**
+     * Vérifier si l'utilisateur connecté est un vendeur (méthode statique)
+     */
+    public static boolean isVendeur() {
+        return getInstance().estVendeur();
+    }
+
+    /**
+     * Obtenir l'ID de l'utilisateur connecté (méthode statique)
+     */
+    public static Integer getCurrentUserId() {
+        return getInstance().getIdUtilisateur();
+    }
+
+    /**
+     * Obtenir le nom complet de l'utilisateur connecté (méthode statique)
+     */
+    public static String getCurrentUserFullName() {
+        return getInstance().getUserFullName();
+    }
+
+    /**
+     * Obtenir le rôle de l'utilisateur connecté (méthode statique)
+     */
+    public static String getCurrentUserRole() {
+        return getInstance().getRole();
+    }
+
+    /**
+     * Nettoyer la session (déconnexion) (méthode statique)
+     */
+    public static void clearSession() {
+        getInstance().fermerSession();
+    }
+
+    /**
+     * Afficher les informations de la session (debug) (méthode statique)
+     */
+    public static void printSessionInfo() {
+        getInstance().debugSession();
+    }
+
+    // ========== GESTION DE LA SESSION (MÉTHODES D'INSTANCE) ==========
 
     /**
      * Démarrer une session pour un utilisateur
@@ -150,7 +230,9 @@ public class SessionManager {
     public boolean estAdmin() {
         return hasRole("admin");
     }
-
+    public String getUserEmail() {
+        return utilisateurConnecte != null ? utilisateurConnecte.getEmail() : null;
+    }
     /**
      * Vérifier si l'utilisateur est vendeur
      */
@@ -163,6 +245,29 @@ public class SessionManager {
      */
     public boolean estClient() {
         return hasRole("client");
+    }
+
+    /**
+     * Récupérer le nom complet de l'utilisateur connecté
+     * Format: "Prénom Nom"
+     */
+    public String getUserFullName() {
+        if (utilisateurConnecte != null) {
+            String prenom = utilisateurConnecte.getPrenom() != null ? utilisateurConnecte.getPrenom() : "";
+            String nom = utilisateurConnecte.getNom() != null ? utilisateurConnecte.getNom() : "";
+
+            // Nettoyer les espaces et formater
+            String fullName = (prenom + " " + nom).trim();
+
+            // Si vide, retourner l'email ou "Utilisateur"
+            if (fullName.isEmpty()) {
+                return utilisateurConnecte.getEmail() != null ?
+                        utilisateurConnecte.getEmail() : "Utilisateur";
+            }
+
+            return fullName;
+        }
+        return "Utilisateur";
     }
 
     // ========== GESTION DU MAGASIN COURANT ==========
@@ -232,27 +337,5 @@ public class SessionManager {
         }
 
         System.out.println("=====================");
-    }
-    /**
-     * Récupérer le nom complet de l'utilisateur connecté
-     * Format: "Prénom Nom"
-     */
-    public String getUserFullName() {
-        if (utilisateurConnecte != null) {
-            String prenom = utilisateurConnecte.getPrenom() != null ? utilisateurConnecte.getPrenom() : "";
-            String nom = utilisateurConnecte.getNom() != null ? utilisateurConnecte.getNom() : "";
-
-            // Nettoyer les espaces et formater
-            String fullName = (prenom + " " + nom).trim();
-
-            // Si vide, retourner l'email ou "Utilisateur"
-            if (fullName.isEmpty()) {
-                return utilisateurConnecte.getEmail() != null ?
-                        utilisateurConnecte.getEmail() : "Utilisateur";
-            }
-
-            return fullName;
-        }
-        return "Utilisateur";
     }
 }

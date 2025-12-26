@@ -23,138 +23,77 @@
                 <Insets top="60" right="40" bottom="40" left="40"/>
             </padding>
 
-            <HBox alignment="CENTER" spacing="50" maxWidth="1200">
+            <!-- FORMULAIRE CENTRÉ -->
+            <VBox spacing="25" maxWidth="500"
+                  style="-fx-background-color: rgba(30, 41, 59, 0.8);
+                         -fx-background-radius: 15;
+                         -fx-border-color: linear-gradient(to right, #10b981, #3b82f6);
+                         -fx-border-width: 2;
+                         -fx-border-radius: 15;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);">
+                <padding>
+                    <Insets top="40" right="40" bottom="40" left="40"/>
+                </padding>
 
-                <!-- SECTION GAUCHE -->
-                <VBox spacing="30" prefWidth="500" HBox.hgrow="ALWAYS"
-                      style="-fx-background-color: rgba(15, 23, 42, 0.7);
-                             -fx-background-radius: 15;
-                             -fx-border-color: linear-gradient(to bottom, #3b82f6, #1e40af);
-                             -fx-border-width: 2;
-                             -fx-border-radius: 15;
-                             -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 20, 0.5, 0, 5);"
-                      alignment="CENTER">
-                    <padding>
-                        <Insets top="50" right="40" bottom="50" left="40"/>
-                    </padding>
-
-                    <VBox alignment="CENTER" spacing="20">
-                        <StackPane>
-                            <Rectangle width="120" height="120" arcWidth="30" arcHeight="30"
-                                       style="-fx-fill: radial-gradient(center 50% 50%, radius 80,
-                                                                        rgba(59, 130, 246, 0.9),
-                                                                        rgba(30, 64, 175, 0.7));
-                                              -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.6), 30, 0.7, 0, 0);"/>
-                            <Label text="🚗" style="-fx-font-size: 60px;">
-                                <effect>
-                                    <Glow level="0.8"/>
-                                </effect>
-                            </Label>
-                        </StackPane>
-
-                        <VBox alignment="CENTER" spacing="10">
-                            <Label text="La Route vers"
-                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 22px; -fx-font-weight: bold;
-                                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 2, 0.5, 0, 1);"/>
-                            <Label text="L'EXCELLENCE"
-                                   style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 34px;
-                                          -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.5), 10, 0.5, 0, 2);"/>
+                <VBox alignment="CENTER" spacing="15">
+                    <HBox alignment="CENTER" spacing="10">
+                        <Rectangle width="4" height="40" arcWidth="10" arcHeight="10"
+                                   style="-fx-fill: linear-gradient(to bottom, #3b82f6, #8b5cf6);"/>
+                        <VBox spacing="3">
+                            <Label text="GESTION VÉHICULES"
+                                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 24px;"/>
+                            <Label text="Connexion Sécurisée"
+                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
                         </VBox>
-                    </VBox>
-
-                    <HBox alignment="CENTER" spacing="10" prefWidth="100">
-                        <Rectangle width="30" height="2"
-                                   style="-fx-fill: linear-gradient(to right, transparent, #3b82f6);"/>
-                        <Label text="⚡"
-                               style="-fx-text-fill: #f59e0b; -fx-font-size: 20px;"/>
-                        <Rectangle width="30" height="2"
-                                   style="-fx-fill: linear-gradient(to right, #3b82f6, transparent);"/>
                     </HBox>
-
-                    <VBox alignment="CENTER" spacing="15">
-                        <Label text="&quot;La performance n'est pas une destination,&quot;"
-                               wrapText="true"
-                               style="-fx-text-fill: #e2e8f0; -fx-font-size: 15px; -fx-font-style: italic;"/>
-                        <Label text="c'est un voyage perpétuel&quot;"
-                               wrapText="true"
-                               style="-fx-text-fill: #e2e8f0; -fx-font-size: 15px; -fx-font-style: italic;"/>
-
-                        <HBox alignment="CENTER" spacing="5">
-                            <Rectangle width="15" height="1"
-                                       style="-fx-fill: linear-gradient(to right, #3b82f6, #10b981);"/>
-                            <Label text="Gestion Véhicules Pro"
-                                   style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;"/>
-                        </HBox>
-                    </VBox>
-
-                    <VBox spacing="20" alignment="CENTER_LEFT" maxWidth="350">
-                        <HBox spacing="12" alignment="CENTER_LEFT">
-                            <Rectangle width="8" height="8" arcWidth="4" arcHeight="4"
-                                       style="-fx-fill: #10b981;"/>
-                            <Label text="Précision au millimètre près"
-                                   style="-fx-text-fill: #e2e8f0; -fx-font-size: 14px;"/>
-                        </HBox>
-
-                        <HBox spacing="12" alignment="CENTER_LEFT">
-                            <Rectangle width="8" height="8" arcWidth="4" arcHeight="4"
-                                       style="-fx-fill: #f59e0b;"/>
-                            <Label text="Performance optimisée"
-                                   style="-fx-text-fill: #e2e8f0; -fx-font-size: 14px;"/>
-                        </HBox>
-
-                        <HBox spacing="12" alignment="CENTER_LEFT">
-                            <Rectangle width="8" height="8" arcWidth="4" arcHeight="4"
-                                       style="-fx-fill: #8b5cf6;"/>
-                            <Label text="Innovation continue"
-                                   style="-fx-text-fill: #e2e8f0; -fx-font-size: 14px;"/>
-                        </HBox>
-                    </VBox>
-
-                    <VBox alignment="CENTER" spacing="5">
-                        <Rectangle width="200" height="2"
-                                   style="-fx-fill: linear-gradient(to right, transparent, #334155, transparent);"/>
-                        <Label text="🏁"
-                               style="-fx-text-fill: #3b82f6; -fx-font-size: 24px;"/>
-                    </VBox>
+                    <Label text="Accédez à votre tableau de bord professionnel"
+                           style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;" textAlignment="CENTER"/>
                 </VBox>
 
-                <!-- SECTION DROITE - FORMULAIRE -->
-                <VBox spacing="25" prefWidth="450" HBox.hgrow="ALWAYS"
-                      style="-fx-background-color: rgba(30, 41, 59, 0.8);
-                             -fx-background-radius: 15;
-                             -fx-border-color: linear-gradient(to right, #10b981, #3b82f6);
-                             -fx-border-width: 2;
-                             -fx-border-radius: 15;
-                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0.5, 0, 5);">
-                    <padding>
-                        <Insets top="40" right="40" bottom="40" left="40"/>
-                    </padding>
+                <VBox spacing="20">
 
-                    <VBox alignment="CENTER" spacing="15">
-                        <HBox alignment="CENTER" spacing="10">
-                            <Rectangle width="4" height="40" arcWidth="10" arcHeight="10"
-                                       style="-fx-fill: linear-gradient(to bottom, #3b82f6, #8b5cf6);"/>
-                            <VBox spacing="3">
-                                <Label text="GESTION VÉHICULES"
-                                       style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 24px;"/>
-                                <Label text="Connexion Sécurisée"
-                                       style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
-                            </VBox>
+                    <VBox spacing="8">
+                        <HBox alignment="CENTER_LEFT" spacing="5">
+                            <Label text="✉"
+                                   style="-fx-text-fill: #3b82f6; -fx-font-size: 12px;"/>
+                            <Label text="ADRESSE EMAIL"
+                                   style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                         </HBox>
-                        <Label text="Accédez à votre tableau de bord professionnel"
-                               style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;" textAlignment="CENTER"/>
+                        <TextField fx:id="emailField" promptText="exemple@email.com"
+                                   prefHeight="45"
+                                   style="-fx-background-color: rgba(15, 23, 42, 0.6);
+                                          -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #64748b;
+                                          -fx-background-radius: 8;
+                                          -fx-border-color: #334155;
+                                          -fx-border-width: 1;
+                                          -fx-border-radius: 8;
+                                          -fx-font-size: 14px;
+                                          -fx-padding: 12;">
+                            <font>
+                                <Font size="14"/>
+                            </font>
+                        </TextField>
                     </VBox>
 
-                    <VBox spacing="20">
-
-                        <VBox spacing="8">
+                    <VBox spacing="8">
+                        <HBox alignment="CENTER_LEFT">
                             <HBox alignment="CENTER_LEFT" spacing="5">
-                                <Label text="✉"
+                                <Label text="🔒"
                                        style="-fx-text-fill: #3b82f6; -fx-font-size: 12px;"/>
-                                <Label text="ADRESSE EMAIL"
+                                <Label text="MOT DE PASSE"
                                        style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                             </HBox>
-                            <TextField fx:id="emailField" promptText="exemple@email.com"
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Hyperlink text="Mot de passe oublié?"
+                                       onAction="#handleForgotPassword"
+                                       style="-fx-text-fill: #3b82f6; -fx-font-size: 11px;">
+                                <font>
+                                    <Font size="11"/>
+                                </font>
+                            </Hyperlink>
+                        </HBox>
+                        <PasswordField fx:id="passwordField" promptText="••••••••"
                                        prefHeight="45"
                                        style="-fx-background-color: rgba(15, 23, 42, 0.6);
                                               -fx-text-fill: white;
@@ -165,117 +104,82 @@
                                               -fx-border-radius: 8;
                                               -fx-font-size: 14px;
                                               -fx-padding: 12;">
-                                <font>
-                                    <Font size="14"/>
-                                </font>
-                            </TextField>
-                        </VBox>
-
-                        <VBox spacing="8">
-                            <HBox alignment="CENTER_LEFT">
-                                <HBox alignment="CENTER_LEFT" spacing="5">
-                                    <Label text="🔒"
-                                           style="-fx-text-fill: #3b82f6; -fx-font-size: 12px;"/>
-                                    <Label text="MOT DE PASSE"
-                                           style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                                </HBox>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Hyperlink text="Mot de passe oublié?"
-                                           onAction="#handleForgotPassword"
-                                           style="-fx-text-fill: #3b82f6; -fx-font-size: 11px;">
-                                    <font>
-                                        <Font size="11"/>
-                                    </font>
-                                </Hyperlink>
-                            </HBox>
-                            <PasswordField fx:id="passwordField" promptText="••••••••"
-                                           prefHeight="45"
-                                           style="-fx-background-color: rgba(15, 23, 42, 0.6);
-                                                  -fx-text-fill: white;
-                                                  -fx-prompt-text-fill: #64748b;
-                                                  -fx-background-radius: 8;
-                                                  -fx-border-color: #334155;
-                                                  -fx-border-width: 1;
-                                                  -fx-border-radius: 8;
-                                                  -fx-font-size: 14px;
-                                                  -fx-padding: 12;">
-                                <font>
-                                    <Font size="14"/>
-                                </font>
-                            </PasswordField>
-                        </VBox>
-
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <CheckBox fx:id="rememberCheckbox" text="Se souvenir de moi"
-                                      style="-fx-text-fill: #cbd5e1;"/>
-                        </HBox>
-
-                        <Label fx:id="errorLabel" visible="false" wrapText="true"
-                               style="-fx-text-fill: #ef4444; -fx-font-size: 12px;
-                                      -fx-background-color: rgba(239, 68, 68, 0.1);
-                                      -fx-background-radius: 6;
-                                      -fx-padding: 10;
-                                      -fx-border-color: #ef4444;
-                                      -fx-border-width: 1;
-                                      -fx-border-radius: 6;">
                             <font>
-                                <Font size="12"/>
+                                <Font size="14"/>
                             </font>
-                        </Label>
+                        </PasswordField>
+                    </VBox>
 
-                        <Button text="DÉMARRER LA SESSION" onAction="#handleLogin"
-                                maxWidth="Infinity" prefHeight="50"
-                                style="-fx-background-color: linear-gradient(to right, #3b82f6, #1e40af);
-                                       -fx-text-fill: white;
-                                       -fx-font-weight: bold;
-                                       -fx-font-size: 14px;
-                                       -fx-background-radius: 8;
-                                       -fx-cursor: hand;">
-                            <font>
-                                <Font name="System Bold" size="14"/>
-                            </font>
-                        </Button>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <CheckBox fx:id="rememberCheckbox" text="Se souvenir de moi"
+                                  style="-fx-text-fill: #cbd5e1;"/>
+                    </HBox>
 
-                        <HBox alignment="CENTER" spacing="15">
-                            <Separator HBox.hgrow="ALWAYS"
-                                       style="-fx-background-color: #334155;"/>
-                            <Label text="OU"
-                                   style="-fx-text-fill: #64748b; -fx-font-weight: bold; -fx-font-size: 11px;"/>
-                            <Separator HBox.hgrow="ALWAYS"
-                                       style="-fx-background-color: #334155;"/>
-                        </HBox>
+                    <Label fx:id="errorLabel" visible="false" wrapText="true"
+                           style="-fx-text-fill: #ef4444; -fx-font-size: 12px;
+                                  -fx-background-color: rgba(239, 68, 68, 0.1);
+                                  -fx-background-radius: 6;
+                                  -fx-padding: 10;
+                                  -fx-border-color: #ef4444;
+                                  -fx-border-width: 1;
+                                  -fx-border-radius: 6;">
+                        <font>
+                            <Font size="12"/>
+                        </font>
+                    </Label>
 
-                        <Button text="🔐 Continuer avec Microsoft"
-                                maxWidth="Infinity" prefHeight="45"
-                                onAction="#handleMicrosoftLogin"
-                                style="-fx-background-color: rgba(255, 255, 255, 0.1);
-                                       -fx-text-fill: white;
-                                       -fx-font-weight: bold;
-                                       -fx-font-size: 13px;
-                                       -fx-background-radius: 8;
-                                       -fx-border-color: #334155;
-                                       -fx-border-width: 1;
-                                       -fx-border-radius: 8;
-                                       -fx-cursor: hand;">
+                    <Button text="DÉMARRER LA SESSION" onAction="#handleLogin"
+                            maxWidth="Infinity" prefHeight="50"
+                            style="-fx-background-color: linear-gradient(to right, #3b82f6, #1e40af);
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-font-size: 14px;
+                                   -fx-background-radius: 8;
+                                   -fx-cursor: hand;">
+                        <font>
+                            <Font name="System Bold" size="14"/>
+                        </font>
+                    </Button>
+
+                    <HBox alignment="CENTER" spacing="15">
+                        <Separator HBox.hgrow="ALWAYS"
+                                   style="-fx-background-color: #334155;"/>
+                        <Label text="OU"
+                               style="-fx-text-fill: #64748b; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                        <Separator HBox.hgrow="ALWAYS"
+                                   style="-fx-background-color: #334155;"/>
+                    </HBox>
+
+                    <Button text="🔐 Continuer avec Microsoft"
+                            maxWidth="Infinity" prefHeight="45"
+                            onAction="#handleMicrosoftLogin"
+                            style="-fx-background-color: rgba(255, 255, 255, 0.1);
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-font-size: 13px;
+                                   -fx-background-radius: 8;
+                                   -fx-border-color: #334155;
+                                   -fx-border-width: 1;
+                                   -fx-border-radius: 8;
+                                   -fx-cursor: hand;">
+                        <font>
+                            <Font name="System Bold" size="13"/>
+                        </font>
+                    </Button>
+
+                    <HBox alignment="CENTER" spacing="5">
+                        <Label text="Nouveau sur la plateforme ?"
+                               style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+                        <Hyperlink text="Créer un compte"
+                                   onAction="#handleGoToRegister"
+                                   style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 13px;">
                             <font>
                                 <Font name="System Bold" size="13"/>
                             </font>
-                        </Button>
-
-                        <HBox alignment="CENTER" spacing="5">
-                            <Label text="Nouveau sur la plateforme ?"
-                                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
-                            <Hyperlink text="Créer un compte"
-                                       onAction="#handleGoToRegister"
-                                       style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 13px;">
-                                <font>
-                                    <Font name="System Bold" size="13"/>
-                                </font>
-                            </Hyperlink>
-                        </HBox>
-                    </VBox>
+                        </Hyperlink>
+                    </HBox>
                 </VBox>
-            </HBox>
+            </VBox>
 
             <VBox alignment="CENTER" spacing="8" maxWidth="1200"
                   style="-fx-background-color: transparent;">
