@@ -38,6 +38,8 @@ public class AdminMainController {
     @FXML private Button dashboardBtn;
     @FXML private Button usersBtn;
     @FXML private Button magasinsBtn;
+    @FXML private Button logsBtn;
+    @FXML private Button settingsBtn;
 
     private final AuthentificationService authService;
 
@@ -73,6 +75,7 @@ public class AdminMainController {
     @FXML
     public void showDashboard() {
         try {
+            // Chemin correct selon votre structure de dossiers
             loadPage("/view/admin/admin-dashboard.fxml", "Dashboard");
             setActiveButton(dashboardBtn);
         } catch (Exception e) {
@@ -87,6 +90,7 @@ public class AdminMainController {
     @FXML
     public void showUsers() {
         try {
+            // Chemin correct selon votre structure de dossiers
             loadPage("/view/admin/admin-users.fxml", "Gestion des Utilisateurs");
             setActiveButton(usersBtn);
         } catch (Exception e) {
@@ -101,6 +105,7 @@ public class AdminMainController {
     @FXML
     public void showMagasins() {
         try {
+            // Chemin correct selon votre structure de dossiers
             loadPage("/view/admin/admin-magasins.fxml", "Gestion des Magasins");
             setActiveButton(magasinsBtn);
         } catch (Exception e) {
@@ -110,14 +115,29 @@ public class AdminMainController {
     }
 
     /**
-     * Afficher les logs d'authentification
+     * Afficher les logs système
+     */
+    @FXML
+    public void showLogs() {
+        try {
+            // Chemin correct selon votre structure de dossiers
+            loadPage("/view/admin/admin-logs.fxml", "Logs Système");
+            setActiveButton(logsBtn);
+        } catch (Exception e) {
+            showError("Erreur", "Impossible de charger les logs: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Afficher les paramètres système
      */
     @FXML
     public void showSettings() {
         try {
+            // Chemin correct selon votre structure de dossiers
             loadPage("/view/admin/admin-settings.fxml", "Paramètres Système");
-            // Si vous avez un bouton settings dans le FXML, ajoutez:
-            // setActiveButton(settingsBtn);
+            setActiveButton(settingsBtn);
         } catch (Exception e) {
             showError("Erreur", "Impossible de charger la page des paramètres: " + e.getMessage());
             e.printStackTrace();
@@ -129,15 +149,32 @@ public class AdminMainController {
      */
     private void loadPage(String fxmlPath, String title) {
         try {
+            System.out.println("🔄 Tentative de chargement: " + fxmlPath);
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+
+            // Vérifier si la ressource existe
+            if (getClass().getResource(fxmlPath) == null) {
+                throw new IOException("Ressource FXML introuvable: " + fxmlPath);
+            }
+
             Parent page = loader.load();
             contentArea.setCenter(page);
             pageTitle.setText(title);
+
             System.out.println("✅ Page chargée: " + title);
+
         } catch (IOException e) {
             System.err.println("❌ Erreur chargement page: " + fxmlPath);
+            System.err.println("Message: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Impossible de charger la page: " + fxmlPath, e);
+
+            // Afficher une erreur détaillée
+            showError("Erreur de chargement",
+                    "Impossible de charger: " + fxmlPath + "\n\n" +
+                            "Vérifiez que le fichier existe dans:\n" +
+                            "src/main/resources" + fxmlPath + "\n\n" +
+                            "Erreur: " + e.getMessage());
         }
     }
 
@@ -145,21 +182,27 @@ public class AdminMainController {
      * Mettre en surbrillance le bouton actif
      */
     private void setActiveButton(Button activeBtn) {
+        // Style par défaut pour tous les boutons
+        String defaultStyle = "-fx-background-color: transparent; -fx-text-fill: white; " +
+                "-fx-font-size: 14px; -fx-alignment: CENTER_LEFT; " +
+                "-fx-padding: 10px 20px; -fx-cursor: hand;";
+
+        // Style pour le bouton actif
+        String activeStyle = "-fx-background-color: #3498db; -fx-text-fill: white; " +
+                "-fx-font-size: 14px; -fx-alignment: CENTER_LEFT; " +
+                "-fx-padding: 10px 20px; -fx-background-radius: 5px; -fx-cursor: hand;";
+
         // Réinitialiser tous les boutons
-        dashboardBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; " +
-                "-fx-font-size: 14px; -fx-alignment: CENTER_LEFT; " +
-                "-fx-padding: 10px 20px;");
-        usersBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; " +
-                "-fx-font-size: 14px; -fx-alignment: CENTER_LEFT; " +
-                "-fx-padding: 10px 20px;");
-        magasinsBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white; " +
-                "-fx-font-size: 14px; -fx-alignment: CENTER_LEFT; " +
-                "-fx-padding: 10px 20px;");
+        dashboardBtn.setStyle(defaultStyle);
+        usersBtn.setStyle(defaultStyle);
+        magasinsBtn.setStyle(defaultStyle);
+        logsBtn.setStyle(defaultStyle);
+        if (settingsBtn != null) {
+            settingsBtn.setStyle(defaultStyle);
+        }
 
         // Mettre en surbrillance le bouton actif
-        activeBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; " +
-                "-fx-font-size: 14px; -fx-alignment: CENTER_LEFT; " +
-                "-fx-padding: 10px 20px; -fx-background-radius: 5px;");
+        activeBtn.setStyle(activeStyle);
     }
 
     /**
@@ -197,7 +240,9 @@ public class AdminMainController {
 
                 // Retour à la page de login
                 Stage stage = (Stage) contentArea.getScene().getWindow();
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
+                FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/view/auth/login.fxml")
+                );
                 Parent root = loader.load();
 
                 Scene scene = new Scene(root, 1000, 700);
@@ -228,28 +273,4 @@ public class AdminMainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    @FXML
-    public void showAuthLogs() {
-        try {
-            loadPage("/view/admin/admin-auth-logs.fxml", "Logs d'Authentification");
-            System.out.println("📜 Page des logs d'authentification chargée");
-        } catch (Exception e) {
-            showError("Erreur", "Impossible de charger les logs: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    public void showLogs() {
-        try {
-            loadPage("/view/admin/admin-logs.fxml", "Logs Système");
-            // Si vous avez un bouton logs, ajoutez: setActiveButton(logsBtn);
-        } catch (Exception e) {
-            showError("Erreur", "Impossible de charger les logs: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    @FXML private Button logsBtn;
-
 }

@@ -63,4 +63,8 @@ public class ElasticLogService {
         Map<String,Object> map = logEntry.toMap();
         sendLog((String)map.get("level"), (String)map.get("message"), map);
     }
+    public void shutdown() {
+        // fermeture future si besoin
+    }
+
 }

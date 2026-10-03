@@ -33,7 +33,8 @@ public class NotificationPanelController {
     public void initialize() {
         System.out.println("🔔 Initialisation NotificationPanelController");
 
-        notificationService = new NotificationService();
+        NotificationService notificationService = NotificationService.getInstance();
+
 
         // Récupérer l'utilisateur connecté
         var currentUser = SessionManager.getCurrentUser();

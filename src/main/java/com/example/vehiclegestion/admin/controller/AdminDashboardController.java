@@ -31,8 +31,6 @@ import java.util.List;
 import com.example.vehiclegestion.common.utils.NotificationService;
 import com.example.vehiclegestion.common.model.Notification;
 import javafx.stage.Popup;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 
 /**
  * Controller JavaFX pour le Dashboard Admin avec profil utilisateur
@@ -53,11 +51,19 @@ public class AdminDashboardController {
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
+    // Notifications
+    @FXML private Label notificationBadge;
+    @FXML private StackPane notificationBadgeContainer;
+    @FXML private Button notificationButton;
+
     private final AdminService adminService;
     private Utilisateur currentUser;
+    private NotificationService notificationService;
+    private Popup notificationPopup;
 
     public AdminDashboardController() {
         this.adminService = new AdminService();
+        this.notificationService = new NotificationService();
     }
 
     /**
@@ -72,6 +78,10 @@ public class AdminDashboardController {
 
         // Charger les données du dashboard
         loadDashboardData();
+
+        // Initialiser les notifications
+        updateNotificationBadge();
+        startNotificationRefresh();
     }
 
     /**
@@ -299,7 +309,7 @@ public class AdminDashboardController {
 
             // Rediriger vers la page de login
             Stage stage = (Stage) userNameLabel.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/vehiclegestion/auth/view/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/auth/login.fxml"));
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
@@ -399,17 +409,21 @@ public class AdminDashboardController {
     }
 
     /**
-     * Charger les graphiques magasins
+     * Charger les graphiques magasins - VERSION CORRIGÉE
      */
     @SuppressWarnings("unchecked")
     private void loadMagasinCharts(Map<String, Object> stats) {
+        // Graphique: Magasins par Catégorie
         Map<String, Integer> magasinsByCategorie = (Map<String, Integer>) stats.get("magasinsByCategorie");
         if (magasinsByCategorie != null && this.magasinsByCategorie != null) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName("Nombre de magasins");
 
             magasinsByCategorie.forEach((categorie, count) -> {
-                series.getData().add(new XYChart.Data<>(categorie, count));
+                // CORRECTION: Vérifier que la catégorie n'est pas null
+                if (categorie != null && count != null) {
+                    series.getData().add(new XYChart.Data<>(categorie, count));
+                }
             });
 
             this.magasinsByCategorie.getData().clear();
@@ -417,18 +431,37 @@ public class AdminDashboardController {
             this.magasinsByCategorie.setTitle("Magasins par Catégorie");
         }
 
+        // Graphique: Top Magasins
         List<Map<String, Object>> topMagasins = (List<Map<String, Object>>) stats.get("topMagasins");
         if (topMagasins != null && topMagasinsChart != null) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName("Nombre de véhicules");
 
             for (Map<String, Object> magasin : topMagasins) {
-                String nom = (String) magasin.get("nom");
-                Integer nbVehicules = (Integer) magasin.get("nbVehicules");
+                // CORRECTION: Accès sécurisé aux données
+                try {
+                    String nom = (String) magasin.get("nom");
+                    Object nbVehiculesObj = magasin.get("nbVehicules");
 
-                if (nom != null && nbVehicules != null) {
-                    String shortName = nom.length() > 15 ? nom.substring(0, 15) + "..." : nom;
-                    series.getData().add(new XYChart.Data<>(shortName, nbVehicules));
+                    if (nom != null && nbVehiculesObj != null) {
+                        // Convertir en Integer de manière sûre
+                        Integer nbVehicules = null;
+                        if (nbVehiculesObj instanceof Integer) {
+                            nbVehicules = (Integer) nbVehiculesObj;
+                        } else if (nbVehiculesObj instanceof Long) {
+                            nbVehicules = ((Long) nbVehiculesObj).intValue();
+                        } else if (nbVehiculesObj instanceof Number) {
+                            nbVehicules = ((Number) nbVehiculesObj).intValue();
+                        }
+
+                        if (nbVehicules != null) {
+                            String shortName = nom.length() > 15 ? nom.substring(0, 15) + "..." : nom;
+                            series.getData().add(new XYChart.Data<>(shortName, nbVehicules));
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    System.err.println("⚠️ Erreur de cast pour un magasin: " + e.getMessage());
+                    // Continuer avec le magasin suivant
                 }
             }
 
@@ -456,45 +489,27 @@ public class AdminDashboardController {
         }
         return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
     }
-    // Ajoutez ces attributs à la classe
-    @FXML private Label notificationBadge;
-    @FXML private StackPane notificationBadgeContainer;
-    @FXML private Button notificationButton;
-
-    private NotificationService notificationService;
-    private Popup notificationPopup;
-
-    /*/ Ajoutez dans le constructeur
-    public AdminDashboardController() {
-        this.adminService = new AdminService();
-        this.notificationService = new NotificationService(); // AJOUTER CETTE LIGNE
-    }*/
-
-    /*/ Ajoutez dans la méthode initialize()
-    @FXML
-    public void initialize() {
-        System.out.println("🎛️ Initialisation Dashboard Admin...");
-
-        loadCurrentUser();
-        loadDashboardData();
-
-        // AJOUTER CES LIGNES
-        updateNotificationBadge();
-        startNotificationRefresh();
-    }*/
 
     /**
      * Mettre à jour le badge de notifications
      */
     private void updateNotificationBadge() {
-        if (currentUser != null) {
-            int count = notificationService.compterNotificationsNonLues(currentUser.getIdUtilisateur());
+        if (currentUser != null && notificationService != null && notificationBadge != null) {
+            try {
+                int count = notificationService.compterNotificationsNonLues(currentUser.getIdUtilisateur());
 
-            if (count > 0) {
-                notificationBadge.setText(String.valueOf(Math.min(count, 99)));
-                notificationBadgeContainer.setVisible(true);
-            } else {
-                notificationBadgeContainer.setVisible(false);
+                if (count > 0) {
+                    notificationBadge.setText(String.valueOf(Math.min(count, 99)));
+                    if (notificationBadgeContainer != null) {
+                        notificationBadgeContainer.setVisible(true);
+                    }
+                } else {
+                    if (notificationBadgeContainer != null) {
+                        notificationBadgeContainer.setVisible(false);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Erreur lors de la mise à jour du badge: " + e.getMessage());
             }
         }
     }
@@ -526,7 +541,7 @@ public class AdminDashboardController {
             if (notificationPopup == null || !notificationPopup.isShowing()) {
                 // Charger le panneau de notifications
                 FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/com/example/vehiclegestion/common/view/NotificationPanel.fxml")
+                        getClass().getResource("/view/common/NotificationPanel.fxml")
                 );
                 Parent notifPanel = loader.load();
 
@@ -536,15 +551,17 @@ public class AdminDashboardController {
                 notificationPopup.getContent().add(notifPanel);
 
                 // Positionner le popup sous le bouton de notification
-                javafx.geometry.Bounds bounds = notificationButton.localToScreen(
-                        notificationButton.getBoundsInLocal()
-                );
+                if (notificationButton != null) {
+                    javafx.geometry.Bounds bounds = notificationButton.localToScreen(
+                            notificationButton.getBoundsInLocal()
+                    );
 
-                notificationPopup.show(
-                        notificationButton.getScene().getWindow(),
-                        bounds.getMinX() - 350, // Ajuster selon la largeur du panel
-                        bounds.getMaxY() + 10
-                );
+                    notificationPopup.show(
+                            notificationButton.getScene().getWindow(),
+                            bounds.getMinX() - 350,
+                            bounds.getMaxY() + 10
+                    );
+                }
 
                 // Mettre à jour le badge après affichage
                 notificationPopup.setOnHidden(e -> updateNotificationBadge());
@@ -580,5 +597,4 @@ public class AdminDashboardController {
             System.out.println("✅ Notification de test créée");
         }
     }
-
 }

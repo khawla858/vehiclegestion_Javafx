@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="21d4a189-069c-43e7-8dd4-f952c2e27263" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/images/articles/article_1766563709775.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/app-2025-12-07.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/app-2025-12-09.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/app-2025-12-10.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/app-2025-12-11.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/error-2025-12-09.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/error-2025-12-10.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/error-2025-12-11.log.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/controller/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/controller/AdminDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/controller/AdminMainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/controller/AdminMainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/dao/AdminMagasinDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/dao/AdminMagasinDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientVehiclesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/ClientVehiclesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/client/controller/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/controller/ChatWindowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/controller/ChatWindowController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/controller/NotificationPanelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/controller/NotificationPanelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/ChatDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/ChatDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/NotificationDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/dao/NotificationDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/model/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/model/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/utils/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/common/utils/NotificationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/logging/model/LogEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/logging/model/LogEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/logging/service/ElasticLogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/logging/service/ElasticLogService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/AjouterDemandeMagasinController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/AjouterDemandeMagasinController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/layout/NavbarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/controller/layout/NavbarController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/dao/DemandeMagasinDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/dao/DemandeMagasinDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/dao/MagasinDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/vendeur/dao/MagasinDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/vendeur/AddVehicleForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/vendeur/AddVehicleForm.fxml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FxmlFile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="364H9eTdvdOEjJZ7teWOr8TReRL" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CreateAdminUsers.executor&quot;: &quot;Run&quot;,
+    &quot;Application.EX1.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.appFX.executor&quot;: &quot;Run&quot;,
+    &quot;Application.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;branche-aamer&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/java/vehiclegestion_Javafx/src&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.externalResources&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\java\vehiclegestion_Javafx\src" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\java\vehiclegestion_Javafx\src\main\java" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.vehiclegestion.auth.utils" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="MainApp" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="25" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.example.vehiclegestion.MainApp" />
+      <module name="vehiclegestion" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\hp\Downloads\openjfx-25.0.1_windows-x64_bin-sdk\javafx-sdk-25.0.1\lib&quot; --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.web,javafx.media" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="21d4a189-069c-43e7-8dd4-f952c2e27263" name="Changes" comment="" />
+      <created>1764258779736</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1764258779736</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/vehiclegestion/admin/controller/UserFormDialog.java</url>
+          <line>224</line>
+          <properties class="com.example.vehiclegestion.admin.controller.UserFormDialog">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

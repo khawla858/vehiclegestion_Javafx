@@ -56,7 +56,7 @@ public class NotificationDAO {
                     notification.setIdNotification(generatedId);
                     System.out.println("🎯 ID généré: " + generatedId);
                 } else {
-                    System.out.println("⚠️ Aucun ID généré");
+                    System.out.println("⚠ Aucun ID généré");
                 }
             }
 

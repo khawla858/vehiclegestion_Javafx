@@ -79,7 +79,7 @@ public class MagasinDAO {
         System.out.println("\n🔍 === getMagasinByVendeur ===");
         System.out.println("   Recherche pour vendeur ID: " + idVendeur);
 
-        String sql = "SELECT * FROM Magasin WHERE id_vendeur = ? LIMIT 1";
+        String sql = "SELECT * FROM Magasin WHERE id_vendeur = ? ";
 
         try {
             // ✅ VÉRIFIER LA CONNEXION

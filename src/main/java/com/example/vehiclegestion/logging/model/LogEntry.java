@@ -11,6 +11,26 @@ import java.util.Map;
  * Ce modèle sera indexé dans Elasticsearch
  */
 public class LogEntry {
+    // ========== MODULES ==========
+    public static final String MODULE_CLIENT = "CLIENT";
+    public static final String MODULE_VEHICLE = "VEHICLE";
+
+    // ========== ACTIONS CLIENT ==========
+    public static final String ACTION_VEHICLE_DETAILS_OPENED = "VEHICLE_DETAILS_OPENED";
+    public static final String ACTION_VEHICLE_LOAD_SUCCESS = "VEHICLE_LOAD_SUCCESS";
+    public static final String ACTION_VEHICLE_LOAD_ERROR = "VEHICLE_LOAD_ERROR";
+    public static final String ACTION_NO_VEHICLES_FOUND = "NO_VEHICLES_FOUND";
+    public static final String ACTION_FILTER_APPLIED = "FILTER_APPLIED";
+    public static final String ACTION_FILTERS_RESET = "FILTERS_RESET";
+    public static final String ACTION_SORT_APPLIED = "SORT_APPLIED";
+    public static final String ACTION_VEHICLE_VIEW = "VEHICLE_VIEW";
+    public static final String ACTION_FAVORITE_ADDED = "FAVORITE_ADDED";
+    public static final String ACTION_FAVORITE_REMOVED = "FAVORITE_REMOVED";
+    public static final String ACTION_FAVORITE_ERROR = "FAVORITE_ERROR";
+    public static final String ACTION_IMAGE_LOAD_ERROR = "IMAGE_LOAD_ERROR";
+    public static final String ACTION_DISPLAY_PERFORMANCE = "DISPLAY_PERFORMANCE";
+    public static final String ACTION_FILTERS_TOGGLE = "FILTERS_TOGGLE";
+
 
     // ========== ATTRIBUTS PRINCIPAUX ==========
 
@@ -72,6 +92,7 @@ public class LogEntry {
      * Environnement (dev, prod, test)
      */
     private String environment;
+    private String module;
 
     // ========== CONSTRUCTEURS ==========
 
@@ -133,6 +154,7 @@ public class LogEntry {
         map.put("metadata", metadata);
         map.put("applicationName", applicationName);
         map.put("environment", environment);
+        map.put("module", module);
         return map;
     }
 
@@ -246,6 +268,13 @@ public class LogEntry {
     public void setEnvironment(String environment) {
         this.environment = environment;
     }
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public String getModule() {
+        return module;
+    }
 
     // ========== MÉTHODE TOSTRING ==========
 
@@ -253,5 +282,8 @@ public class LogEntry {
     public String toString() {
         return String.format("[%s] %s | %s | User: %s | %s",
                 timestamp, level, action, userEmail, message);
+    }
+    public static LogEntry info(String action, String userEmail, String message) {
+        return new LogEntry("INFO", action, userEmail, message);
     }
 }

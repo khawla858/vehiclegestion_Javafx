@@ -1,6 +1,6 @@
 package com.example.vehiclegestion.vendeur.controller;
 
-import com.example.vehiclegestion.auth.SessionManager;
+import com.example.vehiclegestion.auth.utils.SessionManager;
 import com.example.vehiclegestion.vendeur.dao.UtilisateurDAO; // ✅ Importer le DAO
 import com.example.vehiclegestion.vendeur.dao.DemandeMagasinDAO;
 import javafx.fxml.FXML;
